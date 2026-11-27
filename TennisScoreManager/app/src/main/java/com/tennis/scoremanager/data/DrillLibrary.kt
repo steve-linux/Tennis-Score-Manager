@@ -9,8 +9,8 @@ import kotlinx.serialization.json.Json
 /**
  * La raccolta di esercizi illustrati: esercizi scritti per l'app (testi e disegni originali, nessuno copiato da libri,
  * manuali o video). Qui c'è quello che non dipende dalla lingua (argomento, livello, giocatori, durata, il disegno del
- * campo e, se c'è, l'esercizio guidato da aggiungere ai propri); i testi sono in assets/drills/<lingua>.json, per ora
- * solo it.json (scelta dell'autore: nelle altre lingue l'app mostra quelli italiani).
+ * campo e, se c'è, l'esercizio guidato da aggiungere ai propri); i testi sono in assets/drills/<lingua>.json, uno per
+ * lingua dell'app (scritti in italiano, poi tradotti).
  */
 object DrillLibrary {
 

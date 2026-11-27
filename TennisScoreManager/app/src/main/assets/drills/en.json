@@ -1,0 +1,987 @@
+{
+ "fh_cross": {
+  "name": "Cross-court forehand rally",
+  "goal": "Consistency and depth on the cross-court forehand, the most played diagonal in rallies.",
+  "steps": [
+   "A and B stand on the deuce diagonal, behind the baseline.",
+   "They rally with cross-court forehands only, aiming between the service line and the baseline.",
+   "Count the shots: the goal is 10 in a row in the zone.",
+   "After each series start again from zero and switch who starts."
+  ],
+  "easier": "Play from mid-court, with a slower ball and more height over the net.",
+  "harder": "The ball must land beyond the service line and no more than a metre from the sideline.",
+  "cue": "Ball high over the net and away from the lines, deep cross-court.",
+  "stepCues": [
+   "Turn your shoulders early and finish over your shoulder."
+  ],
+  "missTip": "Three out in a row: more margin, aim a metre inside the lines and lift the trajectory.",
+  "streakTip": "Five in a row: now try hitting harder or closer to the line."
+ },
+ "bh_cross": {
+  "name": "Cross-court backhand rally",
+  "goal": "A safe, deep cross-court backhand, without giving away short balls.",
+  "steps": [
+   "A and B stand on the ad diagonal, behind the baseline.",
+   "Only cross-court backhands into the deep zone.",
+   "Every short ball (before the service line) resets the count.",
+   "Three series of 10 good shots in a row."
+  ],
+  "easier": "When needed you can run around the ball and hit a forehand; rallies of 5 are enough.",
+  "harder": "Alternate topspin and slice backhands, always cross-court.",
+  "cue": "Shoulders turned and front foot forward: the ball goes deep cross-court.",
+  "stepCues": [
+   "Prepare the racket early and hit in front of your body."
+  ],
+  "missTip": "Three out in a row: hit further in front and lift the ball a little over the net.",
+  "streakTip": "Five in a row: now look for more angle."
+ },
+ "line_cross": {
+  "name": "One down the line, one cross-court",
+  "goal": "Move along the baseline and change direction: the basis of a real rally.",
+  "steps": [
+   "A always plays down the line, B always cross-court: the ball draws a figure of eight.",
+   "After each shot go back towards the centre of the baseline.",
+   "After 2 minutes swap roles.",
+   "Count how many shots in a row you can keep."
+  ],
+  "easier": "Slower, higher ball; two bounces are allowed.",
+  "harder": "Whoever misses the direction loses the point; play to 7.",
+  "cue": "Down the line first, then cross-court: decide the direction before you hit.",
+  "stepCues": [
+   "Down the line: shoulders lined up with the line and follow through to the target.",
+   "Now cross-court: hit a little earlier, in front of your body."
+  ],
+  "missTip": "Three out in a row: down the line crosses the higher part of the net, keep more margin.",
+  "streakTip": "Five in a row: now change direction without giving it away."
+ },
+ "deep_rally": {
+  "name": "Deep rally",
+  "goal": "Get used to hitting long: every ball beyond the service line.",
+  "steps": [
+   "A and B in the middle, behind the baseline.",
+   "Free rally, but every ball must land between the service line and the baseline.",
+   "A short ball gives the other a point: play to 11."
+  ],
+  "easier": "A ball just short of the service line is fine too.",
+  "harder": "Smaller zone: the last metre and a half before the baseline.",
+  "cue": "Deep ball through the middle, beyond the service line.",
+  "stepCues": [
+   "Swing low to high and send the ball high over the net."
+  ],
+  "missTip": "Three out in a row: less power, more spin and more height.",
+  "streakTip": "Five in a row: now make it land closer to the baseline."
+ },
+ "mini_tennis": {
+  "name": "Mini tennis",
+  "goal": "Feel the ball and control it: to warm up or for beginners.",
+  "steps": [
+   "A and B inside the service boxes, near the net.",
+   "Soft rally: the ball must stay in the boxes.",
+   "Three to five minutes of forehands and backhands, then a few volleys.",
+   "If you like, count the rallies or play points to 11."
+  ],
+  "easier": "Low-pressure ball (red or orange) and two bounces allowed.",
+  "harder": "Only slices, or only volleys without letting the ball bounce.",
+  "cue": "Soft shots inside the service boxes, under control.",
+  "stepCues": [
+   "Short swing and a steady racket at contact."
+  ],
+  "missTip": "Three out in a row: slow down, open the face and guide the ball.",
+  "streakTip": "Five in a row: now alternate forehand and backhand."
+ },
+ "serve_targets": {
+  "name": "Serve to three targets",
+  "goal": "Vary the direction of the serve: down the T, at the body, wide.",
+  "steps": [
+   "Put three cones in the service box: near the T, in the middle and near the sideline.",
+   "Serve 5 balls to each cone from the deuce side, then from the ad side.",
+   "Mark in or out on every serve: the app counts the percentage per target.",
+   "Aim for accuracy first, then add a little speed."
+  ],
+  "easier": "Serve from mid-court, or try only two targets (T and wide).",
+  "harder": "Only one ball per target, in rotation: T, body, wide, without repeating.",
+  "cue": "Same toss for every target: only the direction changes.",
+  "stepCues": [
+   "Down the T: aim at the centre line.",
+   "At the body: aim at the receiver's hip.",
+   "Wide: open the angle towards the sideline.",
+   "Now from the left, down the T.",
+   "From the left, at the body.",
+   "From the left, wide: open the angle."
+  ],
+  "missTip": "Three out in a row: check your toss, it must always be in the same place.",
+  "streakTip": "Five in a row: now aim closer to the lines."
+ },
+ "second_serve": {
+  "name": "Second serve with margin",
+  "goal": "A safe second serve: more spin, high over the net and deep.",
+  "steps": [
+   "Serve second serves only, towards the back of the service box.",
+   "Look for a high path over the net that drops into the deep zone.",
+   "Ten serves per side, marking in or out.",
+   "Goal: at least 8 out of 10 in."
+  ],
+  "easier": "Anywhere in the box is fine: margin over the net is what counts.",
+  "harder": "Zone reduced to the deepest third of the box, towards the receiver's backhand.",
+  "cue": "Kick second serve: lots of spin, the ball clears the net high.",
+  "stepCues": [
+   "From the right: brush the ball from low to high.",
+   "Now from the left: same motion, loose arm."
+  ],
+  "missTip": "Three out in a row: more spin, not more power, and toss a little above your head.",
+  "streakTip": "Five in a row: now try to make it bounce deeper."
+ },
+ "return_deep": {
+  "name": "Deep return through the middle",
+  "goal": "Return long and through the middle, to take angles away from the server.",
+  "steps": [
+   "B serves from the deuce side, A returns from the other end.",
+   "A aims for the deep central zone: no risks on the lines.",
+   "After 10 returns switch serving side, then swap roles.",
+   "Count the returns in the zone."
+  ],
+  "easier": "B serves more slowly, or only second serves.",
+  "harder": "After the return the point is played: a return in the zone counts double.",
+  "cue": "Deep return through the middle: short, compact swing.",
+  "stepCues": [
+   "Split step when the server hits, then block the ball in front."
+  ],
+  "missTip": "Three out in a row: shorten the swing and aim at the middle, away from the lines.",
+  "streakTip": "Five in a row: now try to open the angle."
+ },
+ "volley_feed": {
+  "name": "Forehand and backhand volleys",
+  "goal": "Firm, accurate volleys with a steady racket face.",
+  "steps": [
+   "A at the net, one step inside the service line; the coach feeds from the middle of the other half.",
+   "The balls come one to the right and one to the left: forehand volley, then backhand.",
+   "Every volley goes cross-court and deep.",
+   "Two series of 10 per side."
+  ],
+  "easier": "Balls fed by hand, slowly, at shoulder height.",
+  "harder": "Faster, lower balls; after each volley one step back and forward again.",
+  "cue": "Firm volleys: steady racket face, no backswing.",
+  "stepCues": [
+   "Forehand volley: racket in front, hit with a step forward.",
+   "Now backhand volley: shoulder turned and firm wrist."
+  ],
+  "missTip": "Three out in a row: block the ball in front of your body, no backswing.",
+  "streakTip": "Five in a row: now look for more depth."
+ },
+ "approach_volley": {
+  "name": "Approach and volley",
+  "goal": "Recognise the short ball, attack and finish at the net.",
+  "steps": [
+   "The coach feeds a short ball to A.",
+   "A moves in, approaches down the line and keeps going to the net.",
+   "As the coach hits, A split-steps, then plays a cross-court volley.",
+   "Go back to the baseline and repeat: 10 times."
+  ],
+  "easier": "Slow, high short ball; the volley is played to the middle.",
+  "harder": "The coach alternates passing shot down the line and lob: A must read and choose.",
+  "cue": "Approach down the line, move in and finish with the volley.",
+  "stepCues": [
+   "After the approach stop with a split step, then volley cross-court."
+  ],
+  "missTip": "Three out in a row: stop before the volley, don't hit on the run.",
+  "streakTip": "Five in a row: now try to get closer to the net."
+ },
+ "smash": {
+  "name": "Overhead",
+  "goal": "Move back with the right steps and hit the overhead in balance.",
+  "steps": [
+   "A touches the net with the racket, then moves back sideways.",
+   "The coach lifts a lob towards the service line.",
+   "A hits the overhead to the marked zone and goes back to the net.",
+   "Ten overheads, then change zone."
+  ],
+  "easier": "Lower lobs closer to the net; A starts already side-on.",
+  "harder": "Deeper lobs: A hits a jump smash and goes straight back to the net."
+ },
+ "one_vs_two": {
+  "name": "One at the net against two",
+  "goal": "Reflexes and net position under pressure.",
+  "steps": [
+   "A at the net, B and C at the baseline, each on one half.",
+   "B and C play to A, who volleys towards the other one.",
+   "The balls alternate: forehand and backhand, high and low.",
+   "After 2 minutes someone else goes to the net."
+  ],
+  "easier": "B and C play slowly and towards A.",
+  "harder": "B and C may try a passing shot or a lob: the point is played.",
+  "cue": "One volley per side: watch who hits and stop before.",
+  "stepCues": [
+   "Forehand volley: steady face and the ball towards the other player.",
+   "Now backhand volley: shoulder turned, hit in front."
+  ],
+  "missTip": "Three out in a row: less power, just try to send it back in.",
+  "streakTip": "Five in a row: now look for the gap between the two."
+ },
+ "drop_recover": {
+  "name": "Drop shot and recovery",
+  "goal": "Sprint forward to the short ball and get back into position.",
+  "steps": [
+   "A starts from the centre of the baseline, B plays near the net.",
+   "B plays a drop shot, A sprints and plays it back cross-court.",
+   "A goes straight back to the baseline, sideways or backwards.",
+   "Eight repetitions, then swap roles."
+  ],
+  "easier": "Longer, slower drop shot; A may start from mid-court.",
+  "harder": "After the recovery B lifts a lob: A runs back and plays it.",
+  "cue": "Run to the short ball, hit and get straight back.",
+  "stepCues": [
+   "Get low on your legs and play a short cross-court ball."
+  ],
+  "missTip": "Three out in a row: get to the ball sooner and bend your legs more.",
+  "streakTip": "Five in a row: now run back faster."
+ },
+ "spider": {
+  "name": "The spider",
+  "goal": "Speed and changes of direction towards every part of the court.",
+  "steps": [
+   "Put five cones: the two corners of the baseline, the two service-line corners and the T.",
+   "From the centre of the baseline run to the first cone, touch it and come back to the centre.",
+   "Then to the second, and so on up to the fifth.",
+   "Three rounds, with 1-2 minutes of rest between rounds."
+  ],
+  "easier": "Walk fast instead of running, or use only three cones.",
+  "harder": "With the racket in hand and a shadow stroke at every cone; time yourself."
+ },
+ "split_step": {
+  "name": "Split step",
+  "goal": "Be ready: a small hop while the other player hits.",
+  "steps": [
+   "A in the centre of the baseline, the coach feeds from the other half.",
+   "When the coach hits, A makes a small hop with feet apart.",
+   "As soon as A lands, A goes to the ball and plays it.",
+   "After each shot back to the centre: 15 alternating balls."
+  ],
+  "easier": "Balls fed by hand and announced beforehand (right or left).",
+  "harder": "The coach picks side and depth at random."
+ },
+ "baseline_shuffle": {
+  "name": "Side steps on the baseline",
+  "goal": "Short, quick lateral movement, without crossing the feet.",
+  "steps": [
+   "Put three cones: in the centre of the baseline and in the two singles corners.",
+   "From the centre, side-step to one corner: touch the cone and come back.",
+   "Then the other corner; one round is 4 touches.",
+   "Three series of 30 seconds with 1 minute of rest."
+  ],
+  "easier": "Slower and with fewer touches.",
+  "harder": "With the racket in hand and a shadow stroke at every cone."
+ },
+ "serve_plus_one": {
+  "name": "Serve plus one",
+  "goal": "Prepare the shot after the serve: open the court and finish on the other side.",
+  "steps": [
+   "A serves wide from the deuce side.",
+   "B returns towards the middle.",
+   "A steps in and plays the forehand into the other half, away from B.",
+   "Then the point is played; ten serves and swap roles."
+  ],
+  "easier": "B returns slowly to the middle and the point is not played.",
+  "harder": "B returns wherever they like: A must choose the right shot.",
+  "cue": "Serve wide, then the forehand into the open court.",
+  "stepCues": [
+   "Serve wide from the right and get ready for the next shot straight away."
+  ],
+  "missTip": "Three out in a row: less angle, aim a little further inside the box.",
+  "streakTip": "Five in a row: now count the forehand after the serve too."
+ },
+ "cross_points": {
+  "name": "Cross-court points only",
+  "goal": "Patience and shot choice in a smaller space.",
+  "steps": [
+   "Play only in the diagonal half of the singles court.",
+   "Start with an underhand feed, then a free point inside the diagonal.",
+   "Whoever sends the ball outside the diagonal loses the point.",
+   "Games to 11, then change diagonal."
+  ],
+  "easier": "The ball may bounce twice.",
+  "harder": "After three shots you may also play down the line, but only for a winner.",
+  "cue": "Cross-court points only: patience and a deep ball.",
+  "stepCues": [
+   "Play cross-court with margin and wait for the short ball to attack."
+  ],
+  "missTip": "Three out in a row: no rush, send the ball back high and deep.",
+  "streakTip": "Five in a row: now look for a sharper angle."
+ },
+ "king_court": {
+  "name": "King of the court",
+  "goal": "Play points under pressure, like in a match, even with many players.",
+  "steps": [
+   "A is the king and stays on their side; B challenges from the other side, C and D wait outside.",
+   "One point is played: if the challenger wins, they take the king's place.",
+   "Whoever loses goes out and the next in line comes in.",
+   "Play 10-15 minutes: the winner is whoever scores most points as king."
+  ],
+  "easier": "Every point starts with an easy underhand feed by the challenger.",
+  "harder": "The king must win two points in a row to stay."
+ },
+ "doubles_poach": {
+  "name": "Doubles: the poach",
+  "goal": "Play as a pair: the net player intercepts the cross-court return.",
+  "steps": [
+   "A1 serves and A2 is at the net; B1 returns cross-court, B2 stands on the service line.",
+   "Before the serve A1 and A2 decide whether A2 poaches.",
+   "A2 moves when B1 hits, intercepts and finishes between the two opponents.",
+   "A1 covers the side left open; ten serves, then rotate."
+  ],
+  "easier": "No serve: the coach feeds the return ball.",
+  "harder": "B1 may return down the line: A2 must move at the right moment."
+ },
+ "fh_inside_out": {
+  "name": "Inside-out forehand",
+  "goal": "Run around the backhand and control the rally with a cross-court forehand into the other player's ad side.",
+  "steps": [
+   "A starts from the centre of the baseline; the coach feeds to A's backhand.",
+   "A moves left with quick side steps, leaving the ball on their right.",
+   "Deep cross-court forehand towards the ad side of the other half.",
+   "After the shot, a short recovery: one step towards the centre, no more."
+  ],
+  "easier": "The ball comes slowly and already a little to the left: half a step is enough to run around it.",
+  "harder": "The ball comes faster and closer to the centre; the forehand must land beyond the service line.",
+  "cue": "Run around the backhand and hit cross-court into the ad side.",
+  "stepCues": [
+   "Quick feet, leave the ball on your right and finish towards the corner."
+  ],
+  "missTip": "Three out in a row: move earlier, so you hit in front without stretching.",
+  "streakTip": "Five in a row: now look for more depth and more angle."
+ },
+ "fh_inside_in": {
+  "name": "Inside-in forehand",
+  "goal": "Change direction with the forehand from the ad side: down the line, when the other expects cross-court.",
+  "steps": [
+   "As in the inside-out: A runs around the ball fed to their backhand.",
+   "Same preparation, but the forehand goes down the line, close to the left line of the other half.",
+   "After the shot A goes back towards the centre: down the line opens the court for the other player.",
+   "Series of 10, then rest."
+  ],
+  "easier": "Bigger target, away from the line; slow feed.",
+  "harder": "The coach calls \"in\" or \"out\" at the last moment: on \"in\" cross-court, on \"out\" down the line.",
+  "cue": "Run around the ball, but this time down the line.",
+  "stepCues": [
+   "Prepare as for cross-court and finish towards the line."
+  ],
+  "missTip": "Three out in a row: down the line crosses the higher part of the net, keep more margin.",
+  "streakTip": "Five in a row: now hit a little harder, without losing the direction."
+ },
+ "fh_topspin_height": {
+  "name": "Heavy, deep forehand",
+  "goal": "Put spin on the forehand: ball high over the net that drops in and bounces high.",
+  "steps": [
+   "A at the baseline, the coach feeds comfortable balls to the forehand.",
+   "Swing from low to high, racket finishing over the shoulder.",
+   "The ball must clear the net by a couple of metres and land beyond the service line.",
+   "Count how many land in the deep zone out of 20."
+  ],
+  "easier": "Start from mid-court, with less distance and less power.",
+  "harder": "Alternate one high, heavy ball and one flat ball, always in the deep zone.",
+  "cue": "Low to high: ball high over the net and deep.",
+  "stepCues": [
+   "Brush the ball and finish with the racket over your shoulder."
+  ],
+  "missTip": "Three out in a row: more spin and less power, the ball has to come down.",
+  "streakTip": "Five in a row: now try to make it bounce closer to the baseline."
+ },
+ "fh_run_wide": {
+  "name": "Forehand on the run",
+  "goal": "Reach the wide ball in balance, send it back cross-court and get straight back to the centre.",
+  "steps": [
+   "A starts from the centre of the baseline.",
+   "The coach feeds wide to the forehand: A runs, stops and hits cross-court.",
+   "Straight after the shot, back to the centre with side steps.",
+   "Series of 6 balls, then a minute of rest."
+  ],
+  "easier": "Less wide ball, with more time between feeds.",
+  "harder": "The feed comes while A is still recovering; the forehand must land beyond the service line.",
+  "cue": "Run, stop and hit cross-court, then back to the centre.",
+  "stepCues": [
+   "Small last steps to arrive balanced, then a cross-court shot with margin."
+  ],
+  "missTip": "Three out in a row: you are late, start earlier and hit more cross-court.",
+  "streakTip": "Five in a row: now get back to the centre faster."
+ },
+ "fh_short_angle": {
+  "name": "Short-angle forehand",
+  "goal": "Pull the other player off the court with a short, sharp cross-court ball.",
+  "steps": [
+   "A and B rally cross-court on the deuce diagonal.",
+   "When the ball comes comfortably, A plays the short cross-court that leaves the court near the net.",
+   "B runs and tries to get it back: the rally continues.",
+   "After 10 angles swap roles."
+  ],
+  "easier": "The angle is played only on a ball fed by hand, standing still.",
+  "harder": "The angle is played only on a deep ball, not a comfortable one.",
+  "cue": "Short, sharp cross-court: the ball leaves the court near the net.",
+  "stepCues": [
+   "Hit further in front and close the wrist towards the corner."
+  ],
+  "missTip": "Three out in a row: less power and more spin, the ball must drop early.",
+  "streakTip": "Five in a row: now try it off a deeper ball."
+ },
+ "fh_approach_line": {
+  "name": "Forehand approach on the short ball",
+  "goal": "Recognise the short ball, move into the court and attack down the line.",
+  "steps": [
+   "A starts from the baseline; the coach feeds a short ball to the forehand.",
+   "A moves in, hits moving forward, down the line and deep.",
+   "After the approach, A keeps going to the net and stops with a split step.",
+   "Series of 8, going back to the baseline each time."
+  ],
+  "easier": "Short, high ball that stays in the air longer.",
+  "harder": "After the approach the coach plays a passing shot: A must finish with the volley.",
+  "cue": "Move in and attack down the line, then go to the net.",
+  "stepCues": [
+   "Hit while walking forward, down the line and deep."
+  ],
+  "missTip": "Three out in a row: slow the approach down, depth matters more than power.",
+  "streakTip": "Five in a row: now the approach must land near the baseline."
+ },
+ "bh_line": {
+  "name": "Backhand down the line",
+  "goal": "A safe backhand down the line from the ad side, without opening the body too much.",
+  "steps": [
+   "A on the baseline, ad side; the coach feeds to the backhand.",
+   "Shoulders turned and shot down the line to the deep target.",
+   "After every shot, one recovery step towards the centre.",
+   "Three series of 10."
+  ],
+  "easier": "Wider target, away from the line.",
+  "harder": "Alternate one cross-court and one down-the-line backhand, always deep.",
+  "cue": "Shoulders turned, deep down the line.",
+  "stepCues": [
+   "Keep your shoulders closed until contact and follow through towards the line."
+  ],
+  "missTip": "Three out in a row: keep more margin from the line and clear the net higher.",
+  "streakTip": "Five in a row: now aim closer to the sideline."
+ },
+ "bh_slice": {
+  "name": "Slice backhand",
+  "goal": "Slice backhand low over the net and deep, that stays low after the bounce.",
+  "steps": [
+   "The coach feeds to A's backhand, balls at medium height.",
+   "Racket high in the preparation, swing from high and forward, face slightly open.",
+   "The ball skims low over the net and lands deep.",
+   "Count how many land in the zone out of 20."
+  ],
+  "easier": "Slower, higher feeds, from mid-court.",
+  "harder": "Alternate a deep slice and a short slice that dies after the net.",
+  "cue": "Slice low over the net and deep.",
+  "stepCues": [
+   "Start with the racket high and guide the ball forward, not down."
+  ],
+  "missTip": "Three out in a row: follow through more forward and less downward.",
+  "streakTip": "Five in a row: now try to keep it even lower over the net."
+ },
+ "bh_cross_line": {
+  "name": "Backhand cross-court and down the line",
+  "goal": "Change direction with the backhand without changing the preparation.",
+  "steps": [
+   "Step 1: the coach feeds to the backhand and A plays cross-court.",
+   "Step 2: same ball, A plays down the line.",
+   "The preparation is the same in both cases: only the contact point changes.",
+   "10 cross-court, then 10 down the line."
+  ],
+  "easier": "Change direction every 10 shots, always slowly.",
+  "harder": "The coach calls the direction while the ball is in the air.",
+  "cue": "Same preparation, two directions.",
+  "stepCues": [
+   "Cross-court: hit a little earlier, in front of your body.",
+   "Now down the line: hit a little later, shoulders closed."
+  ],
+  "missTip": "Three out in a row: slow down and think only about the direction.",
+  "streakTip": "Five in a row: now increase the speed a little."
+ },
+ "bh_defense": {
+  "name": "Defensive backhand",
+  "goal": "When pushed into the corner, send back a high, deep ball to win time to retake the centre.",
+  "steps": [
+   "A starts from the centre; the coach feeds deep and wide to the backhand.",
+   "A runs into the corner and plays a high, deep ball to the middle.",
+   "While the ball is in the air, A goes back to the centre.",
+   "Series of 6 balls."
+  ],
+  "easier": "Less wide ball; just send it back in, high.",
+  "harder": "A's ball must land beyond the service line, and the coach feeds the next one straight away.",
+  "cue": "Pushed into the corner: high and deep, then back to the centre.",
+  "stepCues": [
+   "Reach the ball, lift it well over the net and get straight back to the centre."
+  ],
+  "missTip": "Three out in a row: don't look for power, only height and the middle of the court.",
+  "streakTip": "Five in a row: now make the ball land deeper."
+ },
+ "bh_short_angle": {
+  "name": "Short-angle backhand",
+  "goal": "Open the court with the short cross-court backhand on the ad diagonal.",
+  "steps": [
+   "A and B rally with backhands on the ad diagonal.",
+   "On a comfortable ball A plays the short, sharp cross-court.",
+   "B chases and gets it back: the rally continues.",
+   "After 10 angles swap roles."
+  ],
+  "easier": "The angle is played on a ball fed by hand.",
+  "harder": "Deep balls only: the angle must be built, not given away.",
+  "cue": "Short, sharp cross-court backhand.",
+  "stepCues": [
+   "Hit in front and close towards the corner near the net."
+  ],
+  "missTip": "Three out in a row: less power, more spin: the ball must drop early.",
+  "streakTip": "Five in a row: now try to tighten the angle even more."
+ },
+ "bh_first": {
+  "name": "First backhands",
+  "goal": "Learn the backhand standing still: shoulders turned, contact in front, ball over the net.",
+  "steps": [
+   "A stands inside the court, just behind the service line.",
+   "The coach hand-feeds slow balls to the backhand, from near the net.",
+   "A turns the shoulders, hits in front of the body and sends the ball into the other half.",
+   "Series of 10, with a pause to correct."
+  ],
+  "easier": "Let the ball bounce twice, or hit it off a cone.",
+  "harder": "A moves one step before each shot; the ball must land beyond the service line.",
+  "cue": "Shoulders turned and contact in front.",
+  "stepCues": [
+   "Turn your shoulders as soon as you see the ball and hit in front of your body."
+  ],
+  "missTip": "Three out in a row: hit more gently and guide the ball upwards.",
+  "streakTip": "Five in a row: now try to send it further."
+ },
+ "serve_ad_targets": {
+  "name": "Serve from the left to the targets",
+  "goal": "Serve from the ad side down the T and wide with the same toss.",
+  "steps": [
+   "A serves from the left.",
+   "Step 1: 10 first serves down the T.",
+   "Step 2: 10 first serves wide, towards the sideline.",
+   "Count how many end up in the target."
+  ],
+  "easier": "Bigger targets: the whole half of the box.",
+  "harder": "Alternate one serve down the T and one wide, without changing the toss.",
+  "cue": "From the left: same toss, two directions.",
+  "stepCues": [
+   "Down the T: aim at the centre line.",
+   "Now wide: open the angle towards the sideline."
+  ],
+  "missTip": "Three out in a row: check your toss, it must always be in the same place.",
+  "streakTip": "Five in a row: now aim closer to the lines."
+ },
+ "serve_toss": {
+  "name": "First serves",
+  "goal": "A complete, simple serve: steady toss, ball hit high, inside the box.",
+  "steps": [
+   "First just the toss: the ball goes up and falls in front of the left foot, without hitting.",
+   "Then the full serve, slowly, from the right.",
+   "After 10 from the right, 10 from the left.",
+   "The ball in counts, not the speed."
+  ],
+  "easier": "Serve from the service line, closer to the net.",
+  "harder": "The ball must land in the half of the box furthest from the net.",
+  "cue": "Steady toss and ball hit high.",
+  "stepCues": [
+   "From the right: toss in front of your foot, arm straight at contact.",
+   "Now from the left: same toss, same rhythm."
+  ],
+  "missTip": "Three out in a row: toss lower and more in front, and hit more gently.",
+  "streakTip": "Five in a row: now try to serve a little harder."
+ },
+ "serve_first_pct": {
+  "name": "Ten first serves in a row",
+  "goal": "Raise the first-serve percentage: a firm but safe serve, alternating sides.",
+  "steps": [
+   "A serves 5 first serves from the right, then 5 from the left, twice.",
+   "Only the first serve counts: if it is out, no second serve.",
+   "Write down how many first serves go in out of 20.",
+   "The goal is to beat last time's score."
+  ],
+  "easier": "Serve at 80% power, thinking only about getting it in.",
+  "harder": "Every first serve out costs a lap around the service box.",
+  "cue": "Firm but safe first serve: getting it in is what counts.",
+  "stepCues": [
+   "From the right: calm rhythm, toss always the same.",
+   "Now from the left: same speed.",
+   "From the right again.",
+   "Last 5 from the left."
+  ],
+  "missTip": "Three out in a row: take off a little power and think about the toss.",
+  "streakTip": "Five in a row: now add a little speed."
+ },
+ "serve_body": {
+  "name": "Serve at the body",
+  "goal": "Serve straight at the receiver, to take away room for the shot.",
+  "steps": [
+   "Step 1: from the right, serve towards the receiver's hip.",
+   "Step 2: from the left, same target.",
+   "The ball goes straight at the body, not to the corner.",
+   "Count how many end up in the target."
+  ],
+  "easier": "Wider target, the whole central part of the box.",
+  "harder": "Someone returns: count whether the return is short or in the net.",
+  "cue": "At the body: take away room from the receiver.",
+  "stepCues": [
+   "From the right: aim at the receiver's hip.",
+   "Now from the left: same target."
+  ],
+  "missTip": "Three out in a row: slow down and look only for the middle of the box.",
+  "streakTip": "Five in a row: now try with a little more speed."
+ },
+ "serve_pressure": {
+  "name": "First and second serve as in a match",
+  "goal": "Serve under pressure: a strong first serve down the T, a safe second with spin.",
+  "steps": [
+   "A serves 5 first serves down the T from the right, then 5 second serves from the right.",
+   "Then the same from the left.",
+   "Every second serve out counts as a double fault.",
+   "Write down the double faults: the goal is zero."
+  ],
+  "easier": "Second serves are served more slowly, with lots of spin.",
+  "harder": "Serve a real point: if the first serve is out, play the second and then the rally.",
+  "cue": "Strong first serve down the T, safe second serve with spin.",
+  "stepCues": [
+   "First serve from the right: firm, down the T.",
+   "Second from the right: lots of spin, high over the net.",
+   "First serve from the left: firm, down the T.",
+   "Second from the left: loose arm."
+  ],
+  "missTip": "Three out in a row: breathe, slow the rhythm and toss always the same.",
+  "streakTip": "Five in a row: now try a slightly faster first serve."
+ },
+ "return_block": {
+  "name": "Blocked return",
+  "goal": "Return a strong serve with a short swing, sending the ball deep through the middle.",
+  "steps": [
+   "B serves hard from the right; A returns on the deuce side.",
+   "A split-steps as B hits and blocks the ball with a short swing.",
+   "The return goes deep through the middle.",
+   "After 10 returns swap roles."
+  ],
+  "easier": "B serves more slowly, or from the service line.",
+  "harder": "A stands one step further inside the court.",
+  "cue": "Short swing: block the ball through the middle.",
+  "stepCues": [
+   "Split step when the server hits, then racket in front and short."
+  ],
+  "missTip": "Three out in a row: shorten the swing even more and aim at the middle.",
+  "streakTip": "Five in a row: now try to return deeper."
+ },
+ "return_second_attack": {
+  "name": "Attack the second serve",
+  "goal": "Take advantage of the second serve: step into the court and attack with the forehand.",
+  "steps": [
+   "B serves second serves from the left; A returns on the ad side.",
+   "A steps in during B's toss.",
+   "A runs around the ball and attacks with a cross-court forehand.",
+   "After 10 second serves swap roles."
+  ],
+  "easier": "B serves slow, high second serves.",
+  "harder": "After the attack the point is played.",
+  "cue": "On the second serve, step in and attack with the forehand.",
+  "stepCues": [
+   "Step in during the toss, run around the ball and hit cross-court."
+  ],
+  "missTip": "Three out in a row: attack with more margin, depth matters more than power.",
+  "streakTip": "Five in a row: now try to attack closer to the line."
+ },
+ "return_cross": {
+  "name": "Cross-court backhand return",
+  "goal": "Return on the ad side with a cross-court backhand, away from the server.",
+  "steps": [
+   "B serves from the left; A returns on the ad side.",
+   "A returns with a deep cross-court backhand.",
+   "After the return, A goes back to the centre.",
+   "After 10 returns swap roles."
+  ],
+  "easier": "B serves more slowly, always to the backhand.",
+  "harder": "The point is played after the return.",
+  "cue": "Cross-court backhand, away from the server.",
+  "stepCues": [
+   "Turn your shoulders early and hit in front, cross-court."
+  ],
+  "missTip": "Three out in a row: shorten the swing and keep more margin.",
+  "streakTip": "Five in a row: now try more angle."
+ },
+ "return_lob": {
+  "name": "Lob return in doubles",
+  "goal": "Beat the net player with a lob return, when the opponents play serve and volley.",
+  "steps": [
+   "B1 serves from the right, B2 is at the net.",
+   "A returns with a high lob over B2.",
+   "B2 tries to reach it moving back; if they can't, the point goes to A.",
+   "After 10 returns swap roles."
+  ],
+  "easier": "B1 serves slowly; B2 stays still.",
+  "harder": "A chooses: lob or low cross-court return, without giving it away."
+ },
+ "volley_low": {
+  "name": "Low volley",
+  "goal": "Play the volley below the net: knees bent, open face, deep ball.",
+  "steps": [
+   "A on the service line; the coach feeds low, towards the feet.",
+   "A gets down on the legs, opens the face slightly and guides the ball forward.",
+   "The volley must clear the net and land deep in the middle.",
+   "Series of 10."
+  ],
+  "easier": "Higher feeds, above the knee.",
+  "harder": "After the low volley, a high volley to put away moving forward.",
+  "cue": "Get down with your legs, not with the racket.",
+  "stepCues": [
+   "Knees bent, face slightly open and guide forward."
+  ],
+  "missTip": "Three out in a row: bend your legs more and open the face a little.",
+  "streakTip": "Five in a row: now look for more depth."
+ },
+ "volley_reflex": {
+  "name": "Volley to volley",
+  "goal": "Reflexes and a steady face, both at the net.",
+  "steps": [
+   "A and B one step inside the service line, facing each other.",
+   "Volley to volley, firm but controllable balls.",
+   "Count the exchanges without errors.",
+   "Try again to beat the score."
+  ],
+  "easier": "Further from the net, slower balls.",
+  "harder": "Move one step closer every 10 volleys in a row.",
+  "cue": "Steady face and racket in front.",
+  "stepCues": [
+   "Racket always in front, short strokes and steady face."
+  ],
+  "missTip": "Three out in a row: slow down, the exchanges count, not the speed.",
+  "streakTip": "Five in a row: now move half a step closer."
+ },
+ "volley_drop": {
+  "name": "Drop volley",
+  "goal": "The volley that dies just after the net, when the other player is at the baseline.",
+  "steps": [
+   "A at the net; the coach feeds from the baseline.",
+   "A blocks the ball with an open face and a soft hand.",
+   "The ball must land inside the service box, cross-court.",
+   "Series of 10."
+  ],
+  "easier": "Bigger target, the whole service box.",
+  "harder": "The coach runs forward after each drop volley: if they get it, the point is theirs.",
+  "cue": "Soft hand: the ball dies after the net.",
+  "stepCues": [
+   "Open face and soft wrist: absorb the ball instead of pushing it."
+  ],
+  "missTip": "Three out in a row: less push, let the racket absorb the ball.",
+  "streakTip": "Five in a row: now try to make it land even closer to the net."
+ },
+ "half_volley": {
+  "name": "Half volley on the service line",
+  "goal": "Play the ball just after the bounce, while moving in to the net.",
+  "steps": [
+   "A on the service line; the coach feeds a ball that bounces at A's feet.",
+   "A gets down on the legs and hits just after the bounce, deep.",
+   "After the shot, A keeps going to the net.",
+   "Series of 8."
+  ],
+  "easier": "Slower ball, bouncing one step in front of A.",
+  "harder": "After the half volley, the coach feeds a volley to put away.",
+  "cue": "Down on your legs, hit just after the bounce.",
+  "stepCues": [
+   "Racket low and steady, guide forward and then go to the net."
+  ],
+  "missTip": "Three out in a row: bend your legs more, short swing.",
+  "streakTip": "Five in a row: now try to send it deeper."
+ },
+ "volley_angle": {
+  "name": "Angled volley",
+  "goal": "Finish the point at the net with an angled volley, forehand and backhand.",
+  "steps": [
+   "A at the net, halfway between the net and the service line.",
+   "Step 1: angled forehand volley that leaves the court at the side.",
+   "Step 2: angled backhand volley on the other side.",
+   "10 per side."
+  ],
+  "easier": "Slower, higher feeds.",
+  "harder": "The coach feeds at random, forehand or backhand.",
+  "cue": "Angled volley: the ball leaves the court at the side.",
+  "stepCues": [
+   "Forehand volley: racket in front, firm wrist, towards the corner.",
+   "Now backhand: shoulder turned and face towards the corner."
+  ],
+  "missTip": "Three out in a row: less angle, aim a little further inside the court.",
+  "streakTip": "Five in a row: now tighten the angle."
+ },
+ "swing_volley": {
+  "name": "Swing volley from mid-court",
+  "goal": "Don't let the high, slow ball bounce: take it in the air and finish.",
+  "steps": [
+   "A starts from the baseline; the coach feeds a high, slow ball.",
+   "A moves in and hits it in the air, with a full forehand, before the bounce.",
+   "The ball goes cross-court and deep.",
+   "Series of 8."
+  ],
+  "easier": "Lower ball, at shoulder height.",
+  "harder": "After the swing volley, A goes to the net for a volley.",
+  "cue": "In the air, without waiting for the bounce.",
+  "stepCues": [
+   "Move in, get under the ball and hit a full cross-court forehand."
+  ],
+  "missTip": "Three out in a row: hit in front, not above your head, and follow through downwards.",
+  "streakTip": "Five in a row: now try more depth."
+ },
+ "smash_bounce": {
+  "name": "Overhead after the bounce",
+  "goal": "On a very high lob let the ball bounce and smash from the back of the court.",
+  "steps": [
+   "A at mid-court; the coach feeds a very high, deep lob.",
+   "A moves back, lets the ball bounce and gets under it, left arm up.",
+   "Deep overhead through the middle, without rushing.",
+   "Series of 8."
+  ],
+  "easier": "Less deep lobs, bouncing near the service line.",
+  "harder": "The coach decides at the last moment whether to feed short (smash in the air) or long (after the bounce)."
+ },
+ "lob_smash": {
+  "name": "Lob and overhead in pairs",
+  "goal": "Train lob and overhead together: the baseline player lifts, the net player smashes.",
+  "steps": [
+   "A at the net, B at the baseline.",
+   "B plays lobs; A moves back sideways and smashes.",
+   "B tries to get the smash back with another lob.",
+   "After 10 overheads swap roles."
+  ],
+  "easier": "B feeds the lobs by hand.",
+  "harder": "The point is played: B may choose lob or passing shot."
+ },
+ "volley_smash": {
+  "name": "Volley and overhead",
+  "goal": "After the volley be ready for the lob: move back and smash.",
+  "steps": [
+   "Step 1: A at the net plays a deep volley.",
+   "Step 2: the coach feeds a lob straight away; A moves back sideways and smashes.",
+   "After the overhead, A goes back to the net.",
+   "Series of 6 volley-and-overhead pairs."
+  ],
+  "easier": "Lower, shorter lobs.",
+  "harder": "The coach alternates volley, lob and body ball at random."
+ },
+ "fw_cones": {
+  "name": "Cone slalom",
+  "goal": "Short, quick steps and clean changes of direction.",
+  "steps": [
+   "Five cones in a zig-zag between the baseline and the service line.",
+   "A goes around each cone with short steps, always facing the net.",
+   "At the end walk back.",
+   "Four rounds, with a pause."
+  ],
+  "easier": "Cones further apart, normal pace.",
+  "harder": "At every cone a shadow stroke (forehand or backhand) before setting off again."
+ },
+ "fw_recover": {
+  "name": "Hit and back to the centre",
+  "goal": "Get used to going back to the centre after every shot, right and left.",
+  "steps": [
+   "Step 1: wide ball to the forehand, A hits cross-court and goes back to the centre.",
+   "Step 2: wide ball to the backhand, A hits cross-court and goes back to the centre.",
+   "The next feed comes when A is back in the centre.",
+   "Series of 8 alternating balls."
+  ],
+  "easier": "Less wide balls and more time between feeds.",
+  "harder": "The feed comes before A is back in the centre."
+ },
+ "fw_body_ball": {
+  "name": "Out of the way of the body ball",
+  "goal": "Get away from the ball coming at you with a side step, to hit a forehand.",
+  "steps": [
+   "A in the centre of the baseline; the coach feeds straight at A.",
+   "A takes a step to the left, leaves the ball on their right and hits a forehand.",
+   "The ball goes deep through the middle.",
+   "Series of 10."
+  ],
+  "easier": "Slower ball, slightly off the body.",
+  "harder": "The coach feeds at random: at the body, to the right or to the left."
+ },
+ "fw_forward_back": {
+  "name": "Forward and back",
+  "goal": "Cover the court in depth: first the short ball, then the deep one.",
+  "steps": [
+   "Step 1: short ball, A moves into the court and hits.",
+   "Step 2: straight away a high, deep ball, A moves back and hits.",
+   "Move back sideways, not with your back to the net.",
+   "Series of 6 pairs."
+  ],
+  "easier": "More time between the two balls.",
+  "harder": "After the deep ball, a third short ball."
+ },
+ "fit_lines": {
+  "name": "Line sprints",
+  "goal": "Speed and changes of direction: longer and longer sprints, back to the baseline each time.",
+  "steps": [
+   "From the baseline, sprint to the service line and back.",
+   "Then sprint halfway between the service line and the net, and back.",
+   "Then sprint to the net and back.",
+   "Three series, with a minute of rest."
+  ],
+  "easier": "Walk fast on the way back.",
+  "harder": "Touch the line with your hand at every change of direction."
+ },
+ "fit_shadow": {
+  "name": "Shadow strokes",
+  "goal": "Repeat the stroke movements without a ball, in rhythm, to warm up and fix the technique.",
+  "steps": [
+   "A in the centre of the baseline, racket in hand.",
+   "Side steps to the right, shadow forehand, back to the centre.",
+   "Then to the left with the backhand, then forward for a shadow volley.",
+   "30 seconds of work and 30 of rest, 6 times."
+  ],
+  "easier": "Slower, focusing only on the technique.",
+  "harder": "45 seconds of work, 15 of rest."
+ },
+ "fit_box": {
+  "name": "The service box",
+  "goal": "Move in every direction: sideways, back, forward.",
+  "steps": [
+   "Four cones at the corners of the service box.",
+   "Side steps along the service line, then backwards along the sideline.",
+   "Side steps along the net, then sprint forward to the service line.",
+   "Three rounds each way, with a pause."
+  ],
+  "easier": "One round at a time, walking.",
+  "harder": "Time the round and try to beat the time."
+ },
+ "tac_approach_pass": {
+  "name": "Approach and passing shot",
+  "goal": "Learn to choose the right approach and, on the other side, the passing shot.",
+  "steps": [
+   "Step 1: B plays a short ball, A approaches down the line.",
+   "Step 2: A goes to the net, B tries a passing shot down the line or cross-court.",
+   "The point is played to the end.",
+   "Game to 7 points, then swap roles."
+  ],
+  "easier": "B feeds the short ball by hand; the passing shot is played only cross-court.",
+  "harder": "The point counts double if A wins with the first volley."
+ },
+ "tac_middle": {
+  "name": "Doubles: down the middle",
+  "goal": "In doubles a ball down the middle creates doubt between the two opponents and reduces the angles.",
+  "steps": [
+   "Play doubles normally.",
+   "For the whole point pair A plays only in the central strip.",
+   "Look for the middle with the serve too.",
+   "Game to 10 points, then it is pair B's turn."
+  ],
+  "easier": "Play only from the baseline, no volleys.",
+  "harder": "The point counts double if it is won with a shot in the central strip."
+ },
+ "tac_high_low": {
+  "name": "High ball and flat ball",
+  "goal": "Change the pace in the cross-court rally to take time and rhythm away from the other player.",
+  "steps": [
+   "A and B rally cross-court on the deuce diagonal.",
+   "A alternates a high, heavy ball and a flat, fast one.",
+   "B must send every ball back deep.",
+   "After 20 shots swap roles."
+  ],
+  "easier": "Change pace every two shots.",
+  "harder": "A decides at random; the other has to read it from the preparation.",
+  "cue": "One high, one flat: change the pace.",
+  "stepCues": [
+   "Alternate: high and heavy over the net, then flat and fast."
+  ],
+  "missTip": "Three out in a row: keep more margin on the flat ball.",
+  "streakTip": "Five in a row: now make both of them land deeper."
+ }
+}

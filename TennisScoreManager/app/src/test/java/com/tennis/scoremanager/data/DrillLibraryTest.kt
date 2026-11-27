@@ -93,4 +93,20 @@ class DrillLibraryTest {
         c.shot(false); c.shot(false); c.undo()
         assertEquals(null, c.shot(false))
     }
+
+    @Test
+    fun everyLanguageHasTheSameDrills() {
+        for (lang in com.tennis.scoremanager.model.Lang.entries) {
+            val other = DrillLibrary.texts(File("src/main/assets/drills/${lang.code}.json").readText())
+            assertEquals(lang.code, texts.keys, other.keys)
+            for ((id, it) in texts) {
+                val t = other.getValue(id)
+                assertTrue("${lang.code} $id", t.name.isNotBlank() && t.goal.isNotBlank() && t.easier.isNotBlank() && t.harder.isNotBlank())
+                assertEquals("${lang.code} $id: passi", it.steps.size, t.steps.size)
+                assertEquals("${lang.code} $id: voce", it.stepCues.size, t.stepCues.size)
+                assertEquals("${lang.code} $id: frase chiave", it.cue.isBlank(), t.cue.isBlank())
+                assertEquals("${lang.code} $id: consigli", it.missTip.isBlank() || it.streakTip.isBlank(), t.missTip.isBlank() || t.streakTip.isBlank())
+            }
+        }
+    }
 }

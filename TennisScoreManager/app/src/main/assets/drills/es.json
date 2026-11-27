@@ -1,0 +1,987 @@
+{
+ "fh_cross": {
+  "name": "Derecha cruzada en diagonal",
+  "goal": "Regularidad y profundidad en la derecha cruzada, la diagonal más jugada en los peloteos.",
+  "steps": [
+   "A y B se colocan en la diagonal de iguales, detrás de la línea de fondo.",
+   "Pelotean solo con derecha cruzada, buscando la zona entre la línea de saque y la de fondo.",
+   "Contad los golpes: el objetivo es 10 seguidos en la zona.",
+   "Después de cada serie se empieza de cero y cambia quién empieza."
+  ],
+  "easier": "Se juega desde media pista, con la bola más lenta y más alta sobre la red.",
+  "harder": "La bola debe caer pasada la línea de saque y a no más de un metro de la línea lateral.",
+  "cue": "Bola alta sobre la red y lejos de las líneas, cruzada y profunda.",
+  "stepCues": [
+   "Gira los hombros pronto y termina el movimiento por encima del hombro."
+  ],
+  "missTip": "Tres fuera seguidas: más margen, apunta un metro dentro de las líneas y sube la trayectoria.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta golpear más fuerte o más cerca de la línea."
+ },
+ "bh_cross": {
+  "name": "Revés cruzado en diagonal",
+  "goal": "Un revés cruzado seguro y profundo, sin regalar bolas cortas.",
+  "steps": [
+   "A y B se colocan en la diagonal de ventaja, detrás de la línea de fondo.",
+   "Solo reveses cruzados a la zona profunda.",
+   "Cada bola corta (antes de la línea de saque) pone el contador a cero.",
+   "Tres series de 10 golpes buenos seguidos."
+  ],
+  "easier": "Si hace falta se puede rodear la bola y jugar de derecha; bastan peloteos de 5.",
+  "harder": "Alternar revés liftado y revés cortado, siempre cruzado.",
+  "cue": "Hombros girados y pie adelantado: la bola va cruzada y profunda.",
+  "stepCues": [
+   "Prepara pronto la raqueta y golpea delante del cuerpo."
+  ],
+  "missTip": "Tres fuera seguidas: golpea más adelante y sube un poco la bola sobre la red.",
+  "streakTip": "Cinco dentro seguidas: ahora busca más ángulo."
+ },
+ "line_cross": {
+  "name": "Uno paralelo, el otro cruzado",
+  "goal": "Moverse a lo largo de la línea de fondo y cambiar de dirección: la base del peloteo real.",
+  "steps": [
+   "A juega siempre paralelo, B siempre cruzado: la bola dibuja un ocho.",
+   "Después de cada golpe se vuelve hacia el centro de la línea de fondo.",
+   "A los 2 minutos se cambian los papeles.",
+   "Contad cuántos golpes seguidos aguantáis."
+  ],
+  "easier": "Bola más lenta y alta; se pueden dejar dos botes.",
+  "harder": "Quien falla la dirección pierde el punto; se juega a 7.",
+  "cue": "Primero paralelo, luego cruzado: decide la dirección antes de golpear.",
+  "stepCues": [
+   "Paralelo: hombros alineados con la línea y acompaña hacia el objetivo.",
+   "Ahora cruzado: golpea un poco antes, delante del cuerpo."
+  ],
+  "missTip": "Tres fuera seguidas: el paralelo pasa por donde la red es más alta, deja más margen.",
+  "streakTip": "Cinco dentro seguidas: ahora cambia de dirección sin que se note."
+ },
+ "deep_rally": {
+  "name": "Peloteo profundo",
+  "goal": "Acostumbrarse a jugar largo: cada bola pasada la línea de saque.",
+  "steps": [
+   "A y B en el centro, detrás de la línea de fondo.",
+   "Peloteo libre, pero cada bola debe caer entre la línea de saque y la de fondo.",
+   "Una bola corta da un punto al otro: se juega a 11."
+  ],
+  "easier": "También vale una bola justo antes de la línea de saque.",
+  "harder": "Zona reducida: el último metro y medio antes de la línea de fondo.",
+  "cue": "Bola profunda al centro, pasada la línea de saque.",
+  "stepCues": [
+   "Golpea de abajo arriba y haz pasar la bola alta sobre la red."
+  ],
+  "missTip": "Tres fuera seguidas: menos fuerza, más efecto y más altura.",
+  "streakTip": "Cinco dentro seguidas: ahora haz que bote más cerca de la línea de fondo."
+ },
+ "mini_tennis": {
+  "name": "Minitenis",
+  "goal": "Sentir la bola y controlarla: para calentar o para quien empieza.",
+  "steps": [
+   "A y B dentro de los cuadros de saque, cerca de la red.",
+   "Peloteo suave: la bola debe quedarse en los cuadros.",
+   "De tres a cinco minutos de derechas y reveses, luego algunas voleas.",
+   "Quien quiera cuenta los peloteos o juega puntos a 11."
+  ],
+  "easier": "Bola de baja presión (roja o naranja) y dos botes permitidos.",
+  "harder": "Solo golpes cortados, o solo voleas sin dejar botar la bola.",
+  "cue": "Golpes suaves dentro de los cuadros de saque, con control.",
+  "stepCues": [
+   "Movimiento corto y raqueta firme en el impacto."
+  ],
+  "missTip": "Tres fuera seguidas: frena, abre la cara y acompaña la bola.",
+  "streakTip": "Cinco dentro seguidas: ahora alterna derecha y revés."
+ },
+ "serve_targets": {
+  "name": "Saque a tres objetivos",
+  "goal": "Variar la dirección del saque: a la T, al cuerpo, abierto.",
+  "steps": [
+   "Pon tres conos en el cuadro de saque: cerca de la T, en el centro y cerca de la línea lateral.",
+   "Saca 5 bolas a cada cono desde el lado de iguales, luego desde el de ventaja.",
+   "Marca dentro o fuera en cada saque: la app cuenta el porcentaje por objetivo.",
+   "Primero busca la precisión, luego añade algo de velocidad."
+  ],
+  "easier": "Saca desde media pista, o prueba solo dos objetivos (T y abierto).",
+  "harder": "Una sola bola por objetivo, por turnos: T, cuerpo, abierto, sin repetir.",
+  "cue": "El mismo lanzamiento para todos los objetivos: solo cambia la dirección.",
+  "stepCues": [
+   "A la T: apunta a la línea central.",
+   "Al cuerpo: apunta a la cadera de quien resta.",
+   "Abierto: abre el ángulo hacia la línea lateral.",
+   "Ahora desde la izquierda, a la T.",
+   "Desde la izquierda, al cuerpo.",
+   "Desde la izquierda, abierto: abre el ángulo."
+  ],
+  "missTip": "Tres fuera seguidas: controla el lanzamiento, tiene que estar siempre en el mismo sitio.",
+  "streakTip": "Cinco dentro seguidas: ahora apunta más cerca de las líneas."
+ },
+ "second_serve": {
+  "name": "Segundo saque con margen",
+  "goal": "Un segundo saque seguro: más efecto, alto sobre la red y profundo.",
+  "steps": [
+   "Saca solo segundos saques, hacia el fondo del cuadro de saque.",
+   "Busca una trayectoria alta sobre la red que baje a la zona profunda.",
+   "Diez saques por lado, marcando dentro o fuera.",
+   "Objetivo: al menos 8 de 10 dentro."
+  ],
+  "easier": "Vale cualquier punto del cuadro: cuenta el margen sobre la red.",
+  "harder": "Zona reducida al tercio más profundo del cuadro, hacia el revés de quien resta.",
+  "cue": "Segundo saque liftado: mucho efecto, la bola pasa alta sobre la red.",
+  "stepCues": [
+   "Desde la derecha: cepilla la bola de abajo arriba.",
+   "Ahora desde la izquierda: mismo movimiento, brazo suelto."
+  ],
+  "missTip": "Tres fuera seguidas: más efecto, no más fuerza, y lanza un poco por encima de la cabeza.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta que bote más profundo."
+ },
+ "return_deep": {
+  "name": "Resto profundo al centro",
+  "goal": "Restar largo y al centro, para quitar ángulos a quien saca.",
+  "steps": [
+   "B saca desde el lado de iguales, A resta desde el otro lado.",
+   "A busca la zona central profunda: sin riesgos en las líneas.",
+   "Después de 10 restos se cambia el lado del saque, luego los papeles.",
+   "Contad los restos en la zona."
+  ],
+  "easier": "B saca más despacio, o solo segundos saques.",
+  "harder": "Después del resto se juega el punto: el resto en la zona vale doble.",
+  "cue": "Resto profundo al centro: movimiento corto y compacto.",
+  "stepCues": [
+   "Split step cuando el otro golpea, luego bloquea la bola delante."
+  ],
+  "missTip": "Tres fuera seguidas: acorta el movimiento y apunta al centro, lejos de las líneas.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta abrir el ángulo."
+ },
+ "volley_feed": {
+  "name": "Volea de derecha y de revés",
+  "goal": "Voleas firmes y precisas, con la cara de la raqueta estable.",
+  "steps": [
+   "A en la red, un paso delante de la línea de saque; el entrenador lanza desde el centro de la otra mitad.",
+   "Las bolas llegan una a la derecha y otra a la izquierda: volea de derecha, luego de revés.",
+   "Cada volea va cruzada y profunda.",
+   "Dos series de 10 por lado."
+  ],
+  "easier": "Bolas lanzadas a mano, despacio, a la altura de los hombros.",
+  "harder": "Bolas más rápidas y más bajas; después de cada volea un paso atrás y otra vez adelante.",
+  "cue": "Voleas firmes: cara de la raqueta estable, sin preparación larga.",
+  "stepCues": [
+   "Volea de derecha: raqueta delante, golpea con un paso adelante.",
+   "Ahora volea de revés: hombro girado y muñeca firme."
+  ],
+  "missTip": "Tres fuera seguidas: bloquea la bola delante del cuerpo, sin armar.",
+  "streakTip": "Cinco dentro seguidas: ahora busca más profundidad."
+ },
+ "approach_volley": {
+  "name": "Subida y volea",
+  "goal": "Reconocer la bola corta, atacar y cerrar en la red.",
+  "steps": [
+   "El entrenador lanza una bola corta hacia A.",
+   "A avanza, ataca paralelo y sigue hacia la red.",
+   "Mientras el entrenador golpea, A hace el split step y luego juega la volea cruzada.",
+   "Se vuelve al fondo y se repite: 10 veces."
+  ],
+  "easier": "Bola corta lenta y alta; la volea se juega al centro.",
+  "harder": "El entrenador alterna passing paralelo y globo: A debe leer y elegir.",
+  "cue": "Ataca paralelo, avanza y cierra con la volea.",
+  "stepCues": [
+   "Después del ataque párate con el split step, luego volea cruzada."
+  ],
+  "missTip": "Tres fuera seguidas: párate antes de la volea, no golpees corriendo.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta llegar más cerca de la red."
+ },
+ "smash": {
+  "name": "Remate",
+  "goal": "Retroceder con los pasos correctos y golpear el remate en equilibrio.",
+  "steps": [
+   "A toca la red con la raqueta y luego retrocede de lado.",
+   "El entrenador levanta un globo hacia la línea de saque.",
+   "A remata hacia la zona indicada y vuelve a la red.",
+   "Diez remates, luego se cambia de zona."
+  ],
+  "easier": "Globos más bajos y cerca de la red; A empieza ya de lado.",
+  "harder": "Globos más profundos: A remata en salto y vuelve enseguida a la red."
+ },
+ "one_vs_two": {
+  "name": "Uno en la red contra dos",
+  "goal": "Reflejos y posición en la red bajo presión.",
+  "steps": [
+   "A en la red, B y C en el fondo, cada uno en una mitad.",
+   "B y C juegan hacia A, que responde de volea hacia el otro.",
+   "Las bolas se alternan: derecha y revés, altas y bajas.",
+   "A los 2 minutos cambia quién va a la red."
+  ],
+  "easier": "B y C juegan despacio y hacia A.",
+  "harder": "B y C pueden intentar el passing o el globo: se juega el punto.",
+  "cue": "Una volea por lado: mira quién golpea y párate antes.",
+  "stepCues": [
+   "Volea de derecha: cara firme y bola hacia el otro jugador.",
+   "Ahora volea de revés: hombro girado, golpea delante."
+  ],
+  "missTip": "Tres fuera seguidas: menos potencia, busca solo devolverla a la pista.",
+  "streakTip": "Cinco dentro seguidas: ahora busca el hueco entre los dos."
+ },
+ "drop_recover": {
+  "name": "Dejada y recuperación",
+  "goal": "Arrancar hacia la bola corta y volver a la posición.",
+  "steps": [
+   "A sale del centro de la línea de fondo, B juega cerca de la red.",
+   "B hace una dejada, A arranca y la devuelve en diagonal.",
+   "A vuelve enseguida al fondo, de lado o hacia atrás.",
+   "Ocho repeticiones, luego se cambian los papeles."
+  ],
+  "easier": "Dejada más larga y lenta; A puede salir desde media pista.",
+  "harder": "Después de la recuperación B levanta un globo: A vuelve atrás y lo devuelve.",
+  "cue": "Corre a la bola corta, golpea y vuelve enseguida atrás.",
+  "stepCues": [
+   "Llega bajo, con las piernas flexionadas, y juega en diagonal corta."
+  ],
+  "missTip": "Tres fuera seguidas: llega antes a la bola y flexiona más las piernas.",
+  "streakTip": "Cinco dentro seguidas: ahora vuelve atrás más rápido."
+ },
+ "spider": {
+  "name": "La araña",
+  "goal": "Velocidad y cambios de dirección hacia todas las partes de la pista.",
+  "steps": [
+   "Pon cinco conos: las dos esquinas de la línea de fondo, los dos cruces con la línea de saque y la T.",
+   "Desde el centro de la línea de fondo corre al primer cono, tócalo y vuelve al centro.",
+   "Luego al segundo, y así hasta el quinto.",
+   "Tres vueltas, con 1-2 minutos de recuperación entre una y otra."
+  ],
+  "easier": "Camina rápido en lugar de correr, o usa solo tres conos.",
+  "harder": "Con la raqueta en la mano y un golpe simulado en cada cono; cronométrate."
+ },
+ "split_step": {
+  "name": "Split step",
+  "goal": "Estar listo: un pequeño salto mientras el otro golpea.",
+  "steps": [
+   "A en el centro de la línea de fondo, el entrenador lanza desde la otra mitad.",
+   "Cuando el entrenador golpea, A hace un pequeño salto con los pies separados.",
+   "Nada más caer, A sale hacia la bola y la juega.",
+   "Después de cada golpe vuelve al centro: 15 bolas alternas."
+  ],
+  "easier": "Bolas lanzadas a mano y anunciadas antes (derecha o izquierda).",
+  "harder": "El entrenador elige al azar lado y profundidad."
+ },
+ "baseline_shuffle": {
+  "name": "Pasos laterales en la línea de fondo",
+  "goal": "Desplazamientos laterales cortos y rápidos, sin cruzar los pies.",
+  "steps": [
+   "Pon tres conos: en el centro de la línea de fondo y en las dos esquinas del individual.",
+   "Desde el centro, con pasos laterales hasta una esquina: toca el cono y vuelve.",
+   "Luego la otra esquina; una vuelta son 4 toques.",
+   "Tres series de 30 segundos con 1 minuto de recuperación."
+  ],
+  "easier": "Más despacio y con menos toques.",
+  "harder": "Con la raqueta en la mano y un golpe simulado en cada cono."
+ },
+ "serve_plus_one": {
+  "name": "Saque y primer golpe",
+  "goal": "Preparar el golpe después del saque: abrir la pista y cerrar por el otro lado.",
+  "steps": [
+   "A saca abierto desde el lado de iguales.",
+   "B resta hacia el centro.",
+   "A da un paso adelante y juega la derecha a la otra mitad, lejos de B.",
+   "Luego se juega el punto; diez saques y se cambian los papeles."
+  ],
+  "easier": "B resta suave al centro y no se juega el punto.",
+  "harder": "B resta donde quiere: A debe elegir el golpe adecuado.",
+  "cue": "Saque abierto, luego la derecha a la pista libre.",
+  "stepCues": [
+   "Saca desde la derecha hacia fuera y prepárate enseguida para el golpe siguiente."
+  ],
+  "missTip": "Tres fuera seguidas: menos ángulo, apunta un poco más dentro del cuadro.",
+  "streakTip": "Cinco dentro seguidas: ahora cuenta también la derecha después del saque."
+ },
+ "cross_points": {
+  "name": "Puntos solo en diagonal",
+  "goal": "Paciencia y elección del golpe en un espacio reducido.",
+  "steps": [
+   "Se juega solo en la mitad diagonal de la pista de individual.",
+   "Se empieza con un lanzamiento por abajo, luego punto libre dentro de la diagonal.",
+   "Quien manda la bola fuera de la diagonal pierde el punto.",
+   "Partidos a 11, luego se cambia de diagonal."
+  ],
+  "easier": "La bola puede botar dos veces.",
+  "harder": "Después de tres golpes se puede jugar también paralelo, pero solo para un ganador.",
+  "cue": "Puntos solo en diagonal: paciencia y bola profunda.",
+  "stepCues": [
+   "Juega cruzado con margen y espera la bola corta para atacar."
+  ],
+  "missTip": "Tres fuera seguidas: sin prisa, devuelve la bola alta y profunda.",
+  "streakTip": "Cinco dentro seguidas: ahora busca un ángulo más cerrado."
+ },
+ "king_court": {
+  "name": "Rey de la pista",
+  "goal": "Jugar puntos bajo presión, como en un partido, aunque seáis muchos.",
+  "steps": [
+   "A es el rey y se queda en su lado; B desafía desde el otro, C y D esperan fuera.",
+   "Se juega un punto: si gana el aspirante, ocupa el lugar del rey.",
+   "Quien pierde sale y entra el siguiente de la fila.",
+   "Se juegan 10-15 minutos: gana quien hace más puntos como rey."
+  ],
+  "easier": "Cada punto empieza con un lanzamiento fácil por abajo del aspirante.",
+  "harder": "El rey debe ganar dos puntos seguidos para quedarse."
+ },
+ "doubles_poach": {
+  "name": "Dobles: el cruce en la red",
+  "goal": "Jugar en pareja: quien está en la red intercepta el resto cruzado.",
+  "steps": [
+   "A1 saca y A2 está en la red; B1 resta cruzado, B2 está en la línea de saque.",
+   "Antes del saque A1 y A2 deciden si A2 cruza.",
+   "A2 sale cuando B1 golpea, intercepta y cierra entre los dos rivales.",
+   "A1 cubre el lado que queda libre; diez saques, luego se rota."
+  ],
+  "easier": "Sin saque: el entrenador lanza la bola del resto.",
+  "harder": "B1 puede restar paralelo: A2 debe salir en el momento justo."
+ },
+ "fh_inside_out": {
+  "name": "Derecha invertida cruzada",
+  "goal": "Rodear el revés y dominar el peloteo con la derecha cruzada hacia el lado de ventaja del otro.",
+  "steps": [
+   "A sale del centro de la línea de fondo; el entrenador lanza hacia el revés de A.",
+   "A se desplaza a la izquierda con pasos laterales rápidos, dejando la bola a su derecha.",
+   "Derecha cruzada profunda hacia el lado de ventaja de la otra mitad.",
+   "Después del golpe, una recuperación corta: un paso hacia el centro, no más."
+  ],
+  "easier": "La bola llega lenta y ya un poco a la izquierda: basta medio paso para rodearla.",
+  "harder": "La bola llega más rápida y más cerca del centro; la derecha debe caer pasada la línea de saque.",
+  "cue": "Rodea el revés y golpea cruzado hacia el lado de ventaja.",
+  "stepCues": [
+   "Pies rápidos, deja la bola a tu derecha y termina hacia la esquina."
+  ],
+  "missTip": "Tres fuera seguidas: muévete antes, así golpeas delante sin estirarte.",
+  "streakTip": "Cinco dentro seguidas: ahora busca más profundidad y más ángulo."
+ },
+ "fh_inside_in": {
+  "name": "Derecha invertida paralela",
+  "goal": "Cambiar de dirección con la derecha desde el lado de ventaja: paralelo, cuando el otro espera el cruzado.",
+  "steps": [
+   "Como en la invertida cruzada: A rodea la bola lanzada a su revés.",
+   "Misma preparación, pero la derecha va paralela, cerca de la línea izquierda de la otra mitad.",
+   "Después del golpe A vuelve hacia el centro: el paralelo le abre la pista al otro.",
+   "Series de 10, luego descanso."
+  ],
+  "easier": "Objetivo más grande y lejos de la línea; bola lanzada lenta.",
+  "harder": "El entrenador dice en el último momento «dentro» o «fuera»: con «dentro» cruzado, con «fuera» paralelo.",
+  "cue": "Rodea la bola, pero esta vez paralelo.",
+  "stepCues": [
+   "Prepara como para el cruzado y termina hacia la línea."
+  ],
+  "missTip": "Tres fuera seguidas: el paralelo pasa por donde la red es más alta, deja más margen.",
+  "streakTip": "Cinco dentro seguidas: ahora golpea un poco más fuerte, sin perder la dirección."
+ },
+ "fh_topspin_height": {
+  "name": "Derecha liftada y profunda",
+  "goal": "Dar efecto a la derecha: bola alta sobre la red que baja dentro y bota alto.",
+  "steps": [
+   "A en el fondo, el entrenador lanza bolas cómodas a la derecha.",
+   "Movimiento de abajo arriba, la raqueta termina por encima del hombro.",
+   "La bola debe pasar un par de metros por encima de la red y caer pasada la línea de saque.",
+   "Contar cuántas caen en la zona profunda de 20."
+  ],
+  "easier": "Se empieza desde media pista, con menos distancia y menos fuerza.",
+  "harder": "Se alternan una bola liftada alta y una plana, siempre en la zona profunda.",
+  "cue": "De abajo arriba: bola alta sobre la red y profunda.",
+  "stepCues": [
+   "Cepilla la bola y termina con la raqueta por encima del hombro."
+  ],
+  "missTip": "Tres fuera seguidas: más efecto y menos fuerza, la bola tiene que bajar.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta que bote más cerca de la línea de fondo."
+ },
+ "fh_run_wide": {
+  "name": "Derecha en carrera",
+  "goal": "Llegar en equilibrio a la bola abierta, devolverla cruzada y volver enseguida al centro.",
+  "steps": [
+   "A sale del centro de la línea de fondo.",
+   "El entrenador lanza abierto a la derecha: A corre, se para y golpea cruzado.",
+   "Justo después del golpe, vuelta al centro con pasos laterales.",
+   "Series de 6 bolas, luego un minuto de pausa."
+  ],
+  "easier": "Bola menos abierta, con más tiempo entre un lanzamiento y otro.",
+  "harder": "El lanzamiento sale cuando A aún está volviendo; la derecha debe caer pasada la línea de saque.",
+  "cue": "Corre, párate y golpea cruzado, luego vuelve al centro.",
+  "stepCues": [
+   "Últimos pasos cortos para llegar firme, luego golpe cruzado con margen."
+  ],
+  "missTip": "Tres fuera seguidas: llegas tarde, sal antes y golpea más cruzado.",
+  "streakTip": "Cinco dentro seguidas: ahora vuelve al centro más rápido."
+ },
+ "fh_short_angle": {
+  "name": "Derecha cruzada corta",
+  "goal": "Sacar al otro de la pista con un cruzado corto y cerrado.",
+  "steps": [
+   "A y B pelotean cruzado en la diagonal de iguales.",
+   "Cuando la bola llega cómoda, A juega el cruzado corto que sale de la pista cerca de la red.",
+   "B corre e intenta devolverla: el peloteo sigue.",
+   "Después de 10 ángulos se cambian los papeles."
+  ],
+  "easier": "El ángulo se juega solo con bola lanzada a mano, parados.",
+  "harder": "El ángulo se juega solo con bola profunda, no cómoda.",
+  "cue": "Cruzado corto y cerrado: la bola sale cerca de la red.",
+  "stepCues": [
+   "Golpea más adelante y cierra la muñeca hacia la esquina."
+  ],
+  "missTip": "Tres fuera seguidas: menos fuerza y más efecto, la bola debe bajar pronto.",
+  "streakTip": "Cinco dentro seguidas: ahora prueba a jugarlo desde una bola más profunda."
+ },
+ "fh_approach_line": {
+  "name": "Ataque de derecha a la bola corta",
+  "goal": "Reconocer la bola corta, entrar en la pista y atacar paralelo.",
+  "steps": [
+   "A sale desde la línea de fondo; el entrenador lanza una bola corta a la derecha.",
+   "A entra en la pista y golpea avanzando, paralelo y profundo.",
+   "Después del ataque, A sigue hacia la red y se para con el split step.",
+   "Series de 8, volviendo cada vez a la línea de fondo."
+  ],
+  "easier": "Bola corta y alta, que queda más tiempo en el aire.",
+  "harder": "Después del ataque el entrenador lanza un passing: A debe cerrar con la volea.",
+  "cue": "Entra en la pista y ataca paralelo, luego ve a la red.",
+  "stepCues": [
+   "Golpea caminando hacia delante, paralelo y profundo."
+  ],
+  "missTip": "Tres fuera seguidas: frena el ataque, la profundidad cuenta más que la fuerza.",
+  "streakTip": "Cinco dentro seguidas: ahora el ataque debe caer cerca de la línea de fondo."
+ },
+ "bh_line": {
+  "name": "Revés paralelo",
+  "goal": "Revés paralelo seguro desde el lado de ventaja, sin abrir demasiado el cuerpo.",
+  "steps": [
+   "A en la línea de fondo, lado de ventaja; el entrenador lanza al revés.",
+   "Hombros girados y golpe paralelo hacia el objetivo profundo.",
+   "Después de cada golpe, un paso de vuelta hacia el centro.",
+   "Tres series de 10."
+  ],
+  "easier": "Objetivo más grande, lejos de la línea.",
+  "harder": "Se alternan un revés cruzado y uno paralelo, siempre profundos.",
+  "cue": "Hombros girados, paralelo y profundo.",
+  "stepCues": [
+   "Mantén los hombros cerrados hasta el impacto y acompaña hacia la línea."
+  ],
+  "missTip": "Tres fuera seguidas: deja más margen con la línea y pasa más alto sobre la red.",
+  "streakTip": "Cinco dentro seguidas: ahora apunta más cerca de la línea lateral."
+ },
+ "bh_slice": {
+  "name": "Revés cortado",
+  "goal": "Revés cortado bajo sobre la red y profundo, que bota poco.",
+  "steps": [
+   "El entrenador lanza al revés de A, bolas de altura media.",
+   "Raqueta alta en la preparación, movimiento de arriba hacia delante, cara un poco abierta.",
+   "La bola pasa baja sobre la red y cae profunda.",
+   "Contar cuántas caen en la zona de 20."
+  ],
+  "easier": "Bolas lanzadas más lentas y más altas, desde media pista.",
+  "harder": "Se alternan un cortado profundo y un cortado corto, que muere tras la red.",
+  "cue": "Cortado bajo sobre la red y profundo.",
+  "stepCues": [
+   "Empieza con la raqueta alta y acompaña la bola hacia delante, no hacia abajo."
+  ],
+  "missTip": "Tres fuera seguidas: acompaña más hacia delante y menos hacia abajo.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta que pase aún más baja sobre la red."
+ },
+ "bh_cross_line": {
+  "name": "Revés cruzado y paralelo",
+  "goal": "Saber cambiar de dirección con el revés sin cambiar la preparación.",
+  "steps": [
+   "Paso 1: el entrenador lanza al revés y A juega cruzado.",
+   "Paso 2: misma bola, A juega paralelo.",
+   "La preparación es la misma en los dos casos: solo cambia el punto de impacto.",
+   "10 cruzados, luego 10 paralelos."
+  ],
+  "easier": "Se cambia de dirección cada 10 golpes, siempre despacio.",
+  "harder": "El entrenador dice la dirección mientras la bola está en el aire.",
+  "cue": "Misma preparación, dos direcciones.",
+  "stepCues": [
+   "Cruzado: golpea un poco antes, delante del cuerpo.",
+   "Ahora paralelo: golpea un poco después, hombros cerrados."
+  ],
+  "missTip": "Tres fuera seguidas: frena y piensa solo en la dirección.",
+  "streakTip": "Cinco dentro seguidas: ahora sube un poco la velocidad."
+ },
+ "bh_defense": {
+  "name": "Revés defensivo",
+  "goal": "Cuando te empujan a la esquina, devolver una bola alta y profunda para recuperar el centro.",
+  "steps": [
+   "A sale del centro; el entrenador lanza profundo y abierto al revés.",
+   "A corre a la esquina y juega una bola alta y profunda al centro.",
+   "Mientras la bola vuela, A vuelve al centro.",
+   "Series de 6 bolas."
+  ],
+  "easier": "Bola menos abierta; basta con devolverla alta a la pista.",
+  "harder": "La bola de A debe caer pasada la línea de saque, y el entrenador lanza enseguida la siguiente.",
+  "cue": "Empujado a la esquina: alta y profunda, luego vuelve al centro.",
+  "stepCues": [
+   "Llega a la bola, súbela bien sobre la red y vuelve enseguida al centro."
+  ],
+  "missTip": "Tres fuera seguidas: no busques fuerza, solo altura y el centro de la pista.",
+  "streakTip": "Cinco dentro seguidas: ahora haz que la bola caiga más profunda."
+ },
+ "bh_short_angle": {
+  "name": "Revés cruzado corto",
+  "goal": "Abrir la pista con el revés cruzado corto en la diagonal de ventaja.",
+  "steps": [
+   "A y B pelotean de revés en la diagonal de ventaja.",
+   "Con la bola cómoda A juega el cruzado corto y cerrado.",
+   "B corre y la devuelve: el peloteo sigue.",
+   "Después de 10 ángulos se cambian los papeles."
+  ],
+  "easier": "El ángulo se juega con bola lanzada a mano.",
+  "harder": "Solo bolas profundas: el ángulo se construye, no se regala.",
+  "cue": "Revés cruzado corto y cerrado.",
+  "stepCues": [
+   "Golpea delante y cierra hacia la esquina cerca de la red."
+  ],
+  "missTip": "Tres fuera seguidas: menos fuerza, más efecto: la bola debe bajar pronto.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta cerrar aún más el ángulo."
+ },
+ "bh_first": {
+  "name": "Primeros reveses",
+  "goal": "Aprender el revés parado: hombros girados, impacto delante, bola al otro lado de la red.",
+  "steps": [
+   "A está dentro de la pista, poco detrás de la línea de saque.",
+   "El entrenador lanza a mano bolas lentas al revés, desde cerca de la red.",
+   "A gira los hombros, golpea delante del cuerpo y manda la bola a la otra mitad.",
+   "Series de 10, con una pausa para corregir."
+  ],
+  "easier": "Se deja botar la bola dos veces, o se golpea parada sobre un cono.",
+  "harder": "A se desplaza un paso antes de cada golpe; la bola debe caer pasada la línea de saque.",
+  "cue": "Hombros girados e impacto delante.",
+  "stepCues": [
+   "Gira los hombros en cuanto veas la bola y golpea delante del cuerpo."
+  ],
+  "missTip": "Tres fuera seguidas: golpea más suave y acompaña la bola hacia arriba.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta mandarla más lejos."
+ },
+ "serve_ad_targets": {
+  "name": "Saque desde la izquierda a los objetivos",
+  "goal": "Sacar desde el lado de ventaja a la T y abierto con el mismo lanzamiento.",
+  "steps": [
+   "A saca desde la izquierda.",
+   "Paso 1: 10 primeros saques a la T.",
+   "Paso 2: 10 primeros saques abiertos, hacia la línea lateral.",
+   "Contar cuántos acaban en el objetivo."
+  ],
+  "easier": "Objetivos más grandes: toda la mitad del cuadro.",
+  "harder": "Se alternan un saque a la T y uno abierto, sin cambiar el lanzamiento.",
+  "cue": "Desde la izquierda: mismo lanzamiento, dos direcciones.",
+  "stepCues": [
+   "A la T: apunta a la línea central.",
+   "Ahora abierto: abre el ángulo hacia la línea lateral."
+  ],
+  "missTip": "Tres fuera seguidas: controla el lanzamiento, tiene que estar siempre en el mismo sitio.",
+  "streakTip": "Cinco dentro seguidas: ahora apunta más cerca de las líneas."
+ },
+ "serve_toss": {
+  "name": "Primeros saques",
+  "goal": "Saque completo y sencillo: lanzamiento firme, bola golpeada arriba, dentro del cuadro.",
+  "steps": [
+   "Primero solo el lanzamiento: la bola sube y cae delante del pie izquierdo, sin golpear.",
+   "Luego el saque completo, despacio, desde la derecha.",
+   "Después de 10 desde la derecha, 10 desde la izquierda.",
+   "Cuenta la bola dentro, no la velocidad."
+  ],
+  "easier": "Se saca desde la línea de saque, más cerca de la red.",
+  "harder": "La bola debe caer en la mitad del cuadro más lejana de la red.",
+  "cue": "Lanzamiento firme y bola golpeada arriba.",
+  "stepCues": [
+   "Desde la derecha: lanzamiento delante del pie, brazo estirado en el impacto.",
+   "Ahora desde la izquierda: mismo lanzamiento, mismo ritmo."
+  ],
+  "missTip": "Tres fuera seguidas: lanza más bajo y más adelante, y golpea más suave.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta sacar un poco más fuerte."
+ },
+ "serve_first_pct": {
+  "name": "Diez primeros saques seguidos",
+  "goal": "Subir el porcentaje de primeros: saque decidido pero seguro, alternando los lados.",
+  "steps": [
+   "A saca 5 primeros desde la derecha, luego 5 desde la izquierda, dos veces.",
+   "Solo cuenta el primero: si es fuera, no se saca el segundo.",
+   "Se apunta cuántos primeros entran de 20.",
+   "El objetivo es superar el resultado de la vez anterior."
+  ],
+  "easier": "Se saca al 80 % de la fuerza, pensando solo en meterla.",
+  "harder": "Cada primero fuera cuesta una vuelta corriendo alrededor del cuadro de saque.",
+  "cue": "Primero decidido pero seguro: lo que cuenta es meterlo.",
+  "stepCues": [
+   "Desde la derecha: ritmo tranquilo, lanzamiento siempre igual.",
+   "Ahora desde la izquierda: misma velocidad.",
+   "Otra vez desde la derecha.",
+   "Los últimos 5 desde la izquierda."
+  ],
+  "missTip": "Tres fuera seguidas: quita un poco de fuerza y piensa en el lanzamiento.",
+  "streakTip": "Cinco dentro seguidas: ahora añade un poco de velocidad."
+ },
+ "serve_body": {
+  "name": "Saque al cuerpo",
+  "goal": "Sacar directo a quien resta, para quitarle espacio para el golpe.",
+  "steps": [
+   "Paso 1: desde la derecha, saque hacia la cadera de quien resta.",
+   "Paso 2: desde la izquierda, mismo objetivo.",
+   "La bola va directa al cuerpo, no a la esquina.",
+   "Contar cuántos acaban en el objetivo."
+  ],
+  "easier": "Objetivo más grande, toda la parte central del cuadro.",
+  "harder": "Alguien resta: se cuenta si el resto es corto o se queda en la red.",
+  "cue": "Al cuerpo: quítale espacio a quien resta.",
+  "stepCues": [
+   "Desde la derecha: apunta a la cadera de quien resta.",
+   "Ahora desde la izquierda: mismo objetivo."
+  ],
+  "missTip": "Tres fuera seguidas: frena y busca solo el centro del cuadro.",
+  "streakTip": "Cinco dentro seguidas: ahora prueba con un poco más de velocidad."
+ },
+ "serve_pressure": {
+  "name": "Primero y segundo como en un partido",
+  "goal": "Sacar bajo presión: el primero fuerte a la T, el segundo liftado y seguro.",
+  "steps": [
+   "A saca 5 primeros a la T desde la derecha, luego 5 segundos desde la derecha.",
+   "Luego lo mismo desde la izquierda.",
+   "Cada segundo fuera cuenta como doble falta.",
+   "Se apuntan las dobles faltas: el objetivo es cero."
+  ],
+  "easier": "Los segundos se sacan más despacio, con mucho efecto.",
+  "harder": "Se saca un punto real: si el primero es fuera, se juega el segundo y luego el peloteo.",
+  "cue": "Primero fuerte a la T, segundo liftado y seguro.",
+  "stepCues": [
+   "Primero desde la derecha: decidido a la T.",
+   "Segundo desde la derecha: mucho efecto, alto sobre la red.",
+   "Primero desde la izquierda: decidido a la T.",
+   "Segundo desde la izquierda: brazo suelto."
+  ],
+  "missTip": "Tres fuera seguidas: respira, baja el ritmo y lanza siempre igual.",
+  "streakTip": "Cinco dentro seguidas: ahora prueba un primero un poco más rápido."
+ },
+ "return_block": {
+  "name": "Resto bloqueado",
+  "goal": "Restar el saque fuerte con un movimiento corto, mandando la bola profunda al centro.",
+  "steps": [
+   "B saca fuerte desde la derecha; A resta en el lado de iguales.",
+   "A hace el split step cuando B golpea y bloquea la bola con un movimiento corto.",
+   "El resto va profundo al centro.",
+   "Después de 10 restos se cambian los papeles."
+  ],
+  "easier": "B saca más despacio, o desde la línea de saque.",
+  "harder": "A se coloca un paso más dentro de la pista.",
+  "cue": "Movimiento corto: bloquea la bola al centro.",
+  "stepCues": [
+   "Split step cuando el otro golpea, luego raqueta delante y corta."
+  ],
+  "missTip": "Tres fuera seguidas: acorta aún más el movimiento y apunta al centro.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta restar más profundo."
+ },
+ "return_second_attack": {
+  "name": "Ataque al segundo saque",
+  "goal": "Aprovechar el segundo saque: entrar en la pista y atacar de derecha.",
+  "steps": [
+   "B saca segundos desde la izquierda; A resta en el lado de ventaja.",
+   "A se acerca un paso durante el lanzamiento de B.",
+   "A rodea la bola y ataca con derecha cruzada.",
+   "Después de 10 segundos saques se cambian los papeles."
+  ],
+  "easier": "B saca segundos lentos y altos.",
+  "harder": "Después del ataque se juega el punto.",
+  "cue": "Con el segundo saque, entra y ataca de derecha.",
+  "stepCues": [
+   "Entra mientras el otro lanza, rodea la bola y golpea cruzado."
+  ],
+  "missTip": "Tres fuera seguidas: ataca con más margen, la profundidad cuenta más que la fuerza.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta atacar más cerca de la línea."
+ },
+ "return_cross": {
+  "name": "Resto de revés cruzado",
+  "goal": "Restar en el lado de ventaja con el revés cruzado, lejos de quien saca.",
+  "steps": [
+   "B saca desde la izquierda; A resta en el lado de ventaja.",
+   "A resta con revés cruzado y profundo.",
+   "Después del resto, A vuelve al centro.",
+   "Después de 10 restos se cambian los papeles."
+  ],
+  "easier": "B saca más despacio, siempre al revés.",
+  "harder": "Se juega el punto después del resto.",
+  "cue": "Revés cruzado, lejos de quien saca.",
+  "stepCues": [
+   "Gira los hombros pronto y golpea delante, cruzado."
+  ],
+  "missTip": "Tres fuera seguidas: acorta el movimiento y deja más margen.",
+  "streakTip": "Cinco dentro seguidas: ahora busca más ángulo."
+ },
+ "return_lob": {
+  "name": "Resto con globo en dobles",
+  "goal": "Superar al jugador de la red con un resto en globo, cuando la pareja rival juega saque y volea.",
+  "steps": [
+   "B1 saca desde la derecha, B2 está en la red.",
+   "A resta con un globo alto por encima de B2.",
+   "B2 intenta alcanzarlo retrocediendo; si no lo consigue, el punto es para A.",
+   "Después de 10 restos se cambian los papeles."
+  ],
+  "easier": "B1 saca despacio; B2 se queda quieto.",
+  "harder": "A elige: globo o resto cruzado bajo, sin que se note antes."
+ },
+ "volley_low": {
+  "name": "Volea baja",
+  "goal": "Jugar la volea por debajo de la red: rodillas flexionadas, cara abierta, bola profunda.",
+  "steps": [
+   "A en la línea de saque; el entrenador lanza bajo, hacia los pies.",
+   "A baja con las piernas, abre un poco la cara y acompaña la bola hacia delante.",
+   "La volea debe pasar la red y caer profunda al centro.",
+   "Series de 10."
+  ],
+  "easier": "Bolas lanzadas más altas, por encima de la rodilla.",
+  "harder": "Después de la volea baja, una volea alta para cerrar avanzando.",
+  "cue": "Baja con las piernas, no con la raqueta.",
+  "stepCues": [
+   "Rodillas flexionadas, cara un poco abierta y acompaña hacia delante."
+  ],
+  "missTip": "Tres fuera seguidas: flexiona más las piernas y abre un poco la cara.",
+  "streakTip": "Cinco dentro seguidas: ahora busca más profundidad."
+ },
+ "volley_reflex": {
+  "name": "Volea contra volea",
+  "goal": "Reflejos y cara firme, los dos en la red.",
+  "steps": [
+   "A y B a un paso de la línea de saque, uno frente al otro.",
+   "Se juega volea contra volea, bolas rápidas pero controlables.",
+   "Contar los intercambios sin fallo.",
+   "Se vuelve a intentar para batir el resultado."
+  ],
+  "easier": "Más lejos de la red, bolas más lentas.",
+  "harder": "Se acercan un paso cada 10 voleas seguidas.",
+  "cue": "Cara firme y raqueta delante.",
+  "stepCues": [
+   "Raqueta siempre delante, golpes cortos y cara firme."
+  ],
+  "missTip": "Tres fuera seguidas: frenad, cuentan los intercambios, no la velocidad.",
+  "streakTip": "Cinco dentro seguidas: ahora acercaos medio paso."
+ },
+ "volley_drop": {
+  "name": "Volea dejada",
+  "goal": "La volea que muere justo después de la red, cuando el otro está en el fondo.",
+  "steps": [
+   "A en la red; el entrenador lanza desde el fondo.",
+   "A bloquea la bola con la cara abierta y la mano suave.",
+   "La bola debe caer dentro del cuadro de saque, cruzada.",
+   "Series de 10."
+  ],
+  "easier": "Objetivo más grande, todo el cuadro de saque.",
+  "harder": "El entrenador corre hacia delante después de cada dejada: si la alcanza, el punto es suyo.",
+  "cue": "Mano suave: la bola muere tras la red.",
+  "stepCues": [
+   "Cara abierta y muñeca suave: absorbe la bola en lugar de empujarla."
+  ],
+  "missTip": "Tres fuera seguidas: empuja menos, deja que la raqueta absorba la bola.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta que caiga aún más cerca de la red."
+ },
+ "half_volley": {
+  "name": "Media volea en la línea de saque",
+  "goal": "Jugar la bola justo después del bote, mientras se sube a la red.",
+  "steps": [
+   "A en la línea de saque; el entrenador lanza una bola que bota a los pies de A.",
+   "A baja con las piernas y golpea justo después del bote, profundo.",
+   "Después del golpe, A sigue hacia la red.",
+   "Series de 8."
+  ],
+  "easier": "Bola más lenta, que bota un paso delante de A.",
+  "harder": "Después de la media volea, el entrenador lanza una volea para cerrar.",
+  "cue": "Abajo con las piernas, golpea justo después del bote.",
+  "stepCues": [
+   "Raqueta baja y firme, acompaña hacia delante y luego ve a la red."
+  ],
+  "missTip": "Tres fuera seguidas: flexiona más las piernas, movimiento corto.",
+  "streakTip": "Cinco dentro seguidas: ahora intenta mandarla más profunda."
+ },
+ "volley_angle": {
+  "name": "Volea en ángulo",
+  "goal": "Cerrar el punto en la red con la volea en ángulo, de derecha y de revés.",
+  "steps": [
+   "A en la red, a mitad de camino entre la red y la línea de saque.",
+   "Paso 1: volea de derecha en ángulo, que sale por el lado de la pista.",
+   "Paso 2: volea de revés en ángulo hacia el otro lado.",
+   "10 por lado."
+  ],
+  "easier": "Bolas lanzadas más lentas y más altas.",
+  "harder": "El entrenador lanza al azar, derecha o revés.",
+  "cue": "Volea en ángulo: la bola sale por el lado de la pista.",
+  "stepCues": [
+   "Volea de derecha: raqueta delante, muñeca firme, hacia la esquina.",
+   "Ahora revés: hombro girado y cara hacia la esquina."
+  ],
+  "missTip": "Tres fuera seguidas: menos ángulo, apunta un poco más dentro de la pista.",
+  "streakTip": "Cinco dentro seguidas: ahora cierra aún más el ángulo."
+ },
+ "swing_volley": {
+  "name": "Volea de aproximación desde media pista",
+  "goal": "No dejar botar la bola alta y lenta: tomarla de volea y cerrar.",
+  "steps": [
+   "A sale de la línea de fondo; el entrenador lanza una bola alta y lenta.",
+   "A avanza y la golpea en el aire, con una derecha completa, antes del bote.",
+   "La bola va cruzada y profunda.",
+   "Series de 8."
+  ],
+  "easier": "Bola más baja, a la altura de los hombros.",
+  "harder": "Después de la volea, A va a la red para otra volea.",
+  "cue": "En el aire, sin esperar el bote.",
+  "stepCues": [
+   "Avanza, ponte debajo de la bola y golpea una derecha completa cruzada."
+  ],
+  "missTip": "Tres fuera seguidas: golpea delante, no encima de la cabeza, y acompaña hacia abajo.",
+  "streakTip": "Cinco dentro seguidas: ahora busca más profundidad."
+ },
+ "smash_bounce": {
+  "name": "Remate después del bote",
+  "goal": "Con un globo muy alto dejar botar la bola y rematar desde el fondo.",
+  "steps": [
+   "A en media pista; el entrenador lanza un globo muy alto y profundo.",
+   "A retrocede, deja botar la bola y se coloca debajo, con el brazo izquierdo arriba.",
+   "Remate profundo al centro, sin prisa.",
+   "Series de 8."
+  ],
+  "easier": "Globos menos profundos, que botan cerca de la línea de saque.",
+  "harder": "El entrenador decide en el último momento si lanza corto (remate en el aire) o largo (después del bote)."
+ },
+ "lob_smash": {
+  "name": "Globo y remate en parejas",
+  "goal": "Entrenar juntos globo y remate: quien está al fondo levanta, quien está en la red remata.",
+  "steps": [
+   "A en la red, B en el fondo.",
+   "B juega globos; A retrocede de lado y remata.",
+   "B intenta devolver el remate con otro globo.",
+   "Después de 10 remates se cambian los papeles."
+  ],
+  "easier": "B lanza los globos a mano.",
+  "harder": "Se juega el punto: B puede elegir globo o passing."
+ },
+ "volley_smash": {
+  "name": "Volea y remate",
+  "goal": "Después de la volea prepararse para el globo: retroceder y rematar.",
+  "steps": [
+   "Paso 1: A en la red juega una volea profunda.",
+   "Paso 2: el entrenador lanza enseguida un globo; A retrocede de lado y remata.",
+   "Después del remate, A vuelve a la red.",
+   "Series de 6 parejas de volea y remate."
+  ],
+  "easier": "Globos más bajos y menos profundos.",
+  "harder": "El entrenador alterna al azar volea, globo y bola al cuerpo."
+ },
+ "fw_cones": {
+  "name": "Eslalon entre conos",
+  "goal": "Pasos cortos y rápidos, cambios de dirección limpios.",
+  "steps": [
+   "Cinco conos en zigzag entre la línea de fondo y la de saque.",
+   "A rodea cada cono con pasos cortos, siempre de cara a la red.",
+   "Al llegar al final vuelve caminando.",
+   "Cuatro vueltas, con pausa."
+  ],
+  "easier": "Conos más separados, paso normal.",
+  "harder": "En cada cono un golpe simulado (derecha o revés) antes de volver a salir."
+ },
+ "fw_recover": {
+  "name": "Golpea y vuelve al centro",
+  "goal": "Acostumbrarse a volver al centro después de cada golpe, a derecha y a izquierda.",
+  "steps": [
+   "Paso 1: bola abierta a la derecha, A golpea cruzado y vuelve al centro.",
+   "Paso 2: bola abierta al revés, A golpea cruzado y vuelve al centro.",
+   "El lanzamiento siguiente sale cuando A está otra vez en el centro.",
+   "Series de 8 bolas, alternas."
+  ],
+  "easier": "Bolas menos abiertas y más tiempo entre un lanzamiento y otro.",
+  "harder": "El lanzamiento sale antes de que A haya vuelto al centro."
+ },
+ "fw_body_ball": {
+  "name": "Salir de la bola al cuerpo",
+  "goal": "Apartarse de la bola que viene encima con un paso lateral, para golpear de derecha.",
+  "steps": [
+   "A en el centro de la línea de fondo; el entrenador lanza directo a A.",
+   "A da un paso a la izquierda, deja la bola a su derecha y golpea de derecha.",
+   "La bola va profunda al centro.",
+   "Series de 10."
+  ],
+  "easier": "Bola más lenta y un poco desplazada.",
+  "harder": "El entrenador lanza al azar al cuerpo, a la derecha o a la izquierda."
+ },
+ "fw_forward_back": {
+  "name": "Adelante y atrás",
+  "goal": "Cubrir la pista en profundidad: primero la bola corta, luego la profunda.",
+  "steps": [
+   "Paso 1: bola corta, A entra en la pista y golpea.",
+   "Paso 2: enseguida una bola alta y profunda, A retrocede y golpea.",
+   "Retroceder de lado, no de espaldas.",
+   "Series de 6 parejas."
+  ],
+  "easier": "Más tiempo entre las dos bolas.",
+  "harder": "Después de la bola profunda, una tercera bola corta."
+ },
+ "fit_lines": {
+  "name": "Sprints a las líneas",
+  "goal": "Velocidad y cambios de dirección: sprints cada vez más largos con vuelta a la línea de fondo.",
+  "steps": [
+   "Desde la línea de fondo, sprint a la línea de saque y vuelta.",
+   "Luego sprint a mitad de camino entre la línea de saque y la red, y vuelta.",
+   "Luego sprint hasta la red y vuelta.",
+   "Tres series, con un minuto de pausa."
+  ],
+  "easier": "Se camina rápido en la vuelta.",
+  "harder": "Se toca la línea con la mano en cada cambio de dirección."
+ },
+ "fit_shadow": {
+  "name": "Golpes en vacío",
+  "goal": "Repetir los movimientos de los golpes sin bola, con ritmo, para calentar y fijar los gestos.",
+  "steps": [
+   "A en el centro de la línea de fondo, raqueta en mano.",
+   "Pasos laterales a la derecha, derecha en vacío, vuelta al centro.",
+   "Luego a la izquierda con el revés, luego adelante para una volea en vacío.",
+   "30 segundos de trabajo y 30 de pausa, 6 veces."
+  ],
+  "easier": "Más despacio, cuidando solo el gesto.",
+  "harder": "Trabajo de 45 segundos, pausa de 15."
+ },
+ "fit_box": {
+  "name": "El cuadro de saque",
+  "goal": "Moverse en todas las direcciones: de lado, hacia atrás, hacia delante.",
+  "steps": [
+   "Cuatro conos en las esquinas del cuadro de saque.",
+   "Pasos laterales a lo largo de la línea de saque, luego hacia atrás a lo largo de la línea lateral.",
+   "Pasos laterales a lo largo de la red, luego sprint hacia delante hasta la línea de saque.",
+   "Tres vueltas en cada sentido, con pausa."
+  ],
+  "easier": "Una vuelta cada vez, caminando.",
+  "harder": "Se cronometra la vuelta y se intenta batir el tiempo."
+ },
+ "tac_approach_pass": {
+  "name": "Ataque y passing",
+  "goal": "Aprender a elegir el ataque adecuado y, desde el otro lado, el passing.",
+  "steps": [
+   "Paso 1: B juega una bola corta, A ataca paralelo.",
+   "Paso 2: A va a la red, B intenta el passing paralelo o cruzado.",
+   "Se juega el punto hasta el final.",
+   "Partido a 7 puntos, luego se cambian los papeles."
+  ],
+  "easier": "B lanza la bola corta a mano; el passing se juega solo cruzado.",
+  "harder": "El punto vale doble si A gana con la primera volea."
+ },
+ "tac_middle": {
+  "name": "Dobles: por el centro",
+  "goal": "En dobles la bola al centro crea dudas entre los dos rivales y reduce los ángulos.",
+  "steps": [
+   "Se juega el dobles normalmente.",
+   "Durante todo el punto la pareja A juega solo en la franja central.",
+   "Se busca el centro también con el saque.",
+   "Partido a 10 puntos, luego le toca a la pareja B."
+  ],
+  "easier": "Se juega solo desde el fondo, sin voleas.",
+  "harder": "El punto vale doble si se gana con un golpe en la franja central."
+ },
+ "tac_high_low": {
+  "name": "Bola alta y bola plana",
+  "goal": "Cambiar el ritmo en el peloteo cruzado para quitar tiempo y referencias al otro.",
+  "steps": [
+   "A y B pelotean cruzado en la diagonal de iguales.",
+   "A alterna una bola alta y liftada y una plana y rápida.",
+   "B debe devolver todas las bolas profundas.",
+   "Después de 20 golpes se cambian los papeles."
+  ],
+  "easier": "Se cambia el ritmo cada dos golpes.",
+  "harder": "A decide al azar; el otro debe leerlo en la preparación.",
+  "cue": "Una alta, una plana: cambia el ritmo.",
+  "stepCues": [
+   "Alterna: alta y liftada sobre la red, luego plana y rápida."
+  ],
+  "missTip": "Tres fuera seguidas: deja más margen en la bola plana.",
+  "streakTip": "Cinco dentro seguidas: ahora haz que las dos caigan más profundas."
+ }
+}

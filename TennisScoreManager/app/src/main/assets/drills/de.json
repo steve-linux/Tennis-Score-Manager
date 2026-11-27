@@ -1,0 +1,987 @@
+{
+ "fh_cross": {
+  "name": "Vorhand cross in der Diagonale",
+  "goal": "Beständigkeit und Länge bei der Vorhand cross, der meistgespielten Diagonale im Ballwechsel.",
+  "steps": [
+   "A und B stellen sich auf die Einstand-Diagonale, hinter die Grundlinie.",
+   "Sie spielen nur Vorhand cross und zielen auf die Zone zwischen Aufschlaglinie und Grundlinie.",
+   "Zählt die Schläge: Ziel sind 10 Schläge hintereinander in der Zone.",
+   "Nach jeder Serie geht es wieder bei null los und der andere beginnt."
+  ],
+  "easier": "Gespielt wird von der Platzmitte, mit langsamerem Ball und mehr Höhe über dem Netz.",
+  "harder": "Der Ball muss hinter der Aufschlaglinie und höchstens einen Meter von der Seitenlinie landen.",
+  "cue": "Ball hoch über das Netz und weg von den Linien, lang cross.",
+  "stepCues": [
+   "Schultern früh drehen und den Schwung über der Schulter beenden."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: mehr Sicherheit, ziel einen Meter innerhalb der Linien und spiel höher.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, härter oder näher an die Linie zu spielen."
+ },
+ "bh_cross": {
+  "name": "Rückhand cross in der Diagonale",
+  "goal": "Eine sichere, lange Rückhand cross, ohne kurze Bälle zu verschenken.",
+  "steps": [
+   "A und B stellen sich auf die Vorteil-Diagonale, hinter die Grundlinie.",
+   "Nur Rückhand cross in die lange Zone.",
+   "Jeder kurze Ball (vor der Aufschlaglinie) setzt den Zähler auf null.",
+   "Drei Serien mit 10 guten Schlägen hintereinander."
+  ],
+  "easier": "Wenn nötig darf man um den Ball herumlaufen und Vorhand spielen; Ballwechsel von 5 reichen.",
+  "harder": "Topspin- und Slice-Rückhand abwechseln, immer cross.",
+  "cue": "Schultern gedreht und Fuß vor: der Ball geht lang cross.",
+  "stepCues": [
+   "Schläger früh vorbereiten und vor dem Körper treffen."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: triff weiter vorne und spiel den Ball etwas höher über das Netz.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt such mehr Winkel."
+ },
+ "line_cross": {
+  "name": "Einer longline, der andere cross",
+  "goal": "Sich entlang der Grundlinie bewegen und die Richtung wechseln: die Grundlage des echten Ballwechsels.",
+  "steps": [
+   "A spielt immer longline, B immer cross: der Ball zeichnet eine Acht.",
+   "Nach jedem Schlag geht es zurück Richtung Mitte der Grundlinie.",
+   "Nach 2 Minuten werden die Aufgaben getauscht.",
+   "Zählt, wie viele Schläge hintereinander ihr schafft."
+  ],
+  "easier": "Langsamerer und höherer Ball; zwei Aufsprünge sind erlaubt.",
+  "harder": "Wer die Richtung verfehlt, verliert den Punkt; gespielt wird bis 7.",
+  "cue": "Erst longline, dann cross: entscheide die Richtung vor dem Schlag.",
+  "stepCues": [
+   "Longline: Schultern parallel zur Linie und zum Ziel durchschwingen.",
+   "Jetzt cross: triff etwas früher, vor dem Körper."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: longline geht über den höheren Teil des Netzes, spiel mit mehr Sicherheit.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt wechsle die Richtung, ohne es zu verraten."
+ },
+ "deep_rally": {
+  "name": "Langer Ballwechsel",
+  "goal": "Sich an lange Bälle gewöhnen: jeder Ball hinter die Aufschlaglinie.",
+  "steps": [
+   "A und B in der Mitte, hinter der Grundlinie.",
+   "Freier Ballwechsel, aber jeder Ball muss zwischen Aufschlaglinie und Grundlinie landen.",
+   "Ein kurzer Ball gibt dem anderen einen Punkt: gespielt wird bis 11."
+  ],
+  "easier": "Auch ein Ball knapp vor der Aufschlaglinie zählt.",
+  "harder": "Kleinere Zone: die letzten anderthalb Meter vor der Grundlinie.",
+  "cue": "Langer Ball in die Mitte, hinter die Aufschlaglinie.",
+  "stepCues": [
+   "Schwing von unten nach oben und spiel den Ball hoch über das Netz."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: weniger Kraft, mehr Spin und mehr Höhe.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt lass ihn näher an der Grundlinie landen."
+ },
+ "mini_tennis": {
+  "name": "Kleinfeld-Tennis",
+  "goal": "Den Ball spüren und kontrollieren: zum Aufwärmen oder für Anfänger.",
+  "steps": [
+   "A und B in den Aufschlagfeldern, nahe am Netz.",
+   "Weicher Ballwechsel: der Ball muss in den Aufschlagfeldern bleiben.",
+   "Drei bis fünf Minuten Vorhand und Rückhand, dann ein paar Volleys.",
+   "Wer will, zählt die Ballwechsel oder spielt Punkte bis 11."
+  ],
+  "easier": "Druckreduzierter Ball (rot oder orange) und zwei Aufsprünge erlaubt.",
+  "harder": "Nur Slice-Schläge, oder nur Volleys, ohne den Ball aufspringen zu lassen.",
+  "cue": "Weiche Schläge in die Aufschlagfelder, kontrolliert.",
+  "stepCues": [
+   "Kurzer Schwung und ruhiger Schläger im Treffpunkt."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: langsamer, Schlägerfläche öffnen und den Ball begleiten.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt Vorhand und Rückhand abwechseln."
+ },
+ "serve_targets": {
+  "name": "Aufschlag auf drei Ziele",
+  "goal": "Die Aufschlagrichtung variieren: durch die Mitte, auf den Körper, nach außen.",
+  "steps": [
+   "Stell drei Hütchen ins Aufschlagfeld: nahe am T, in die Mitte und nahe an die Seitenlinie.",
+   "Schlag 5 Bälle auf jedes Hütchen von der Einstandseite, dann von der Vorteilseite auf.",
+   "Markiere bei jedem Aufschlag drin oder aus: die App zählt die Quote pro Ziel.",
+   "Zuerst Genauigkeit, dann etwas Tempo dazu."
+  ],
+  "easier": "Schlag von der Platzmitte auf, oder versuch nur zwei Ziele (T und außen).",
+  "harder": "Nur ein Ball pro Ziel, reihum: T, Körper, außen, ohne Wiederholung.",
+  "cue": "Gleicher Ballwurf für alle Ziele: nur die Richtung ändert sich.",
+  "stepCues": [
+   "Durch die Mitte, aufs T: ziel auf die Mittellinie.",
+   "Auf den Körper: ziel auf die Hüfte des Rückschlägers.",
+   "Außen: öffne den Winkel Richtung Seitenlinie.",
+   "Jetzt von links, durch die Mitte aufs T.",
+   "Von links, auf den Körper.",
+   "Von links, außen: öffne den Winkel."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: prüf den Ballwurf, er muss immer an derselben Stelle sein.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt ziel näher an die Linien."
+ },
+ "second_serve": {
+  "name": "Zweiter Aufschlag mit Sicherheit",
+  "goal": "Ein sicherer zweiter Aufschlag: mehr Spin, hoch über das Netz und lang.",
+  "steps": [
+   "Schlag nur zweite Aufschläge, in den hinteren Teil des Aufschlagfelds.",
+   "Such eine hohe Flugbahn über das Netz, die in die lange Zone fällt.",
+   "Zehn Aufschläge pro Seite, jeweils drin oder aus markieren.",
+   "Ziel: mindestens 8 von 10 drin."
+  ],
+  "easier": "Jede Stelle im Feld ist gut: es zählt die Höhe über dem Netz.",
+  "harder": "Zone auf das hinterste Drittel des Feldes verkleinert, zur Rückhand des Rückschlägers.",
+  "cue": "Zweiter Aufschlag mit Kick: viel Spin, der Ball geht hoch über das Netz.",
+  "stepCues": [
+   "Von rechts: bürste den Ball von unten nach oben.",
+   "Jetzt von links: gleiche Bewegung, lockerer Arm."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: mehr Spin, nicht mehr Kraft, und wirf den Ball etwas über den Kopf.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, ihn länger aufspringen zu lassen."
+ },
+ "return_deep": {
+  "name": "Langer Return in die Mitte",
+  "goal": "Lang und in die Mitte returnieren, um dem Aufschläger die Winkel zu nehmen.",
+  "steps": [
+   "B schlägt von der Einstandseite auf, A returniert von der anderen Seite.",
+   "A zielt in die lange mittlere Zone: kein Risiko an den Linien.",
+   "Nach 10 Returns wird die Aufschlagseite gewechselt, dann die Rollen.",
+   "Zählt die Returns in der Zone."
+  ],
+  "easier": "B schlägt langsamer auf, oder nur zweite Aufschläge.",
+  "harder": "Nach dem Return wird der Punkt ausgespielt: ein Return in der Zone zählt doppelt.",
+  "cue": "Langer Return in die Mitte: kurze, kompakte Bewegung.",
+  "stepCues": [
+   "Split-Step, wenn der andere schlägt, dann den Ball vorne blocken."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: verkürze die Bewegung und ziel in die Mitte, weg von den Linien.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, den Winkel zu öffnen."
+ },
+ "volley_feed": {
+  "name": "Vorhand- und Rückhandvolley",
+  "goal": "Feste, genaue Volleys mit ruhiger Schlägerfläche.",
+  "steps": [
+   "A am Netz, einen Schritt vor der Aufschlaglinie; der Trainer zuspielt aus der Mitte der anderen Hälfte.",
+   "Die Bälle kommen einmal rechts, einmal links: Vorhandvolley, dann Rückhandvolley.",
+   "Jeder Volley geht cross und lang.",
+   "Zwei Serien mit 10 pro Seite."
+  ],
+  "easier": "Bälle per Hand zugeworfen, langsam, auf Schulterhöhe.",
+  "harder": "Schnellere und tiefere Bälle; nach jedem Volley ein Schritt zurück und wieder vor.",
+  "cue": "Feste Volleys: ruhige Schlägerfläche, keine Ausholbewegung.",
+  "stepCues": [
+   "Vorhandvolley: Schläger vorne, mit einem Schritt nach vorn treffen.",
+   "Jetzt Rückhandvolley: Schulter gedreht und Handgelenk fest."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: block den Ball vor dem Körper, ohne auszuholen.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt such mehr Länge."
+ },
+ "approach_volley": {
+  "name": "Angriff und Volley",
+  "goal": "Den kurzen Ball erkennen, angreifen und am Netz abschließen.",
+  "steps": [
+   "Der Trainer spielt A einen kurzen Ball zu.",
+   "A rückt vor, greift longline an und läuft weiter ans Netz.",
+   "Während der Trainer schlägt, macht A den Split-Step und spielt dann den Volley cross.",
+   "Zurück zur Grundlinie und wiederholen: 10 Mal."
+  ],
+  "easier": "Kurzer Ball langsam und hoch; der Volley wird in die Mitte gespielt.",
+  "harder": "Der Trainer wechselt Passierschlag longline und Lob ab: A muss lesen und entscheiden.",
+  "cue": "Greif longline an, rück vor und schließ mit dem Volley ab.",
+  "stepCues": [
+   "Nach dem Angriff mit dem Split-Step stoppen, dann Volley cross."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: stopp vor dem Volley, nicht im Laufen schlagen.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, näher ans Netz zu kommen."
+ },
+ "smash": {
+  "name": "Schmetterball",
+  "goal": "Mit den richtigen Schritten zurückgehen und den Schmetterball im Gleichgewicht schlagen.",
+  "steps": [
+   "A berührt das Netz mit dem Schläger und geht dann seitlich zurück.",
+   "Der Trainer spielt einen Lob Richtung Aufschlaglinie.",
+   "A schmettert in die angegebene Zone und geht zurück ans Netz.",
+   "Zehn Schmetterbälle, dann wird die Zone gewechselt."
+  ],
+  "easier": "Niedrigere Lobs näher am Netz; A steht schon seitlich.",
+  "harder": "Längere Lobs: A schmettert im Sprung und geht sofort wieder ans Netz."
+ },
+ "one_vs_two": {
+  "name": "Einer am Netz gegen zwei",
+  "goal": "Reflexe und Position am Netz unter Druck.",
+  "steps": [
+   "A am Netz, B und C an der Grundlinie, jeder auf einer Hälfte.",
+   "B und C spielen auf A, der mit dem Volley zum anderen spielt.",
+   "Die Bälle wechseln: Vorhand und Rückhand, hoch und tief.",
+   "Nach 2 Minuten geht ein anderer ans Netz."
+  ],
+  "easier": "B und C spielen langsam und auf A.",
+  "harder": "B und C dürfen Passierschlag oder Lob versuchen: der Punkt wird ausgespielt.",
+  "cue": "Ein Volley pro Seite: schau, wer schlägt, und stopp vorher.",
+  "stepCues": [
+   "Vorhandvolley: ruhige Fläche und den Ball zum anderen Spieler.",
+   "Jetzt Rückhandvolley: Schulter gedreht, vorne treffen."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: weniger Kraft, versuch nur, ihn ins Feld zurückzuspielen.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt such die Lücke zwischen den beiden."
+ },
+ "drop_recover": {
+  "name": "Stoppball und Zurücklaufen",
+  "goal": "Nach vorn zum kurzen Ball sprinten und wieder in Position gehen.",
+  "steps": [
+   "A startet in der Mitte der Grundlinie, B spielt nahe am Netz.",
+   "B spielt einen Stoppball, A sprintet und spielt ihn diagonal zurück.",
+   "A läuft sofort zurück zur Grundlinie, seitlich oder rückwärts.",
+   "Acht Wiederholungen, dann Rollen tauschen."
+  ],
+  "easier": "Längerer, langsamerer Stoppball; A darf in der Platzmitte starten.",
+  "harder": "Nach dem Erlaufen spielt B einen Lob: A läuft zurück und spielt ihn.",
+  "cue": "Lauf zum kurzen Ball, schlag und geh sofort wieder nach hinten.",
+  "stepCues": [
+   "Tief in die Knie und kurz cross spielen."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: sei früher am Ball und geh tiefer in die Knie.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt lauf schneller zurück."
+ },
+ "spider": {
+  "name": "Die Spinne",
+  "goal": "Schnelligkeit und Richtungswechsel in alle Teile des Platzes.",
+  "steps": [
+   "Stell fünf Hütchen auf: die zwei Ecken der Grundlinie, die zwei Kreuzungen mit der Aufschlaglinie und das T.",
+   "Von der Mitte der Grundlinie zum ersten Hütchen laufen, berühren und zurück zur Mitte.",
+   "Dann zum zweiten, und so weiter bis zum fünften.",
+   "Drei Runden, mit 1-2 Minuten Pause zwischen den Runden."
+  ],
+  "easier": "Schnell gehen statt laufen, oder nur drei Hütchen.",
+  "harder": "Mit Schläger in der Hand und einem Schattenschlag an jedem Hütchen; Zeit stoppen."
+ },
+ "split_step": {
+  "name": "Split-Step",
+  "goal": "Bereit sein: ein kleiner Hüpfer, während der andere schlägt.",
+  "steps": [
+   "A in der Mitte der Grundlinie, der Trainer zuspielt aus der anderen Hälfte.",
+   "Wenn der Trainer schlägt, macht A einen kleinen Hüpfer mit breiten Füßen.",
+   "Sobald A landet, geht A zum Ball und spielt ihn.",
+   "Nach jedem Schlag zurück zur Mitte: 15 abwechselnde Bälle."
+  ],
+  "easier": "Bälle per Hand zugeworfen und vorher angesagt (rechts oder links).",
+  "harder": "Der Trainer wählt Seite und Länge zufällig."
+ },
+ "baseline_shuffle": {
+  "name": "Sidesteps an der Grundlinie",
+  "goal": "Kurze, schnelle Seitwärtsbewegungen, ohne die Füße zu kreuzen.",
+  "steps": [
+   "Stell drei Hütchen auf: in die Mitte der Grundlinie und in die zwei Ecken des Einzelfelds.",
+   "Von der Mitte mit Sidesteps bis zu einer Ecke: Hütchen berühren und zurück.",
+   "Dann die andere Ecke; eine Runde sind 4 Berührungen.",
+   "Drei Serien von 30 Sekunden mit 1 Minute Pause."
+  ],
+  "easier": "Langsamer und mit weniger Berührungen.",
+  "harder": "Mit Schläger in der Hand und einem Schattenschlag an jedem Hütchen."
+ },
+ "serve_plus_one": {
+  "name": "Aufschlag und erster Schlag",
+  "goal": "Den Schlag nach dem Aufschlag vorbereiten: den Platz öffnen und auf der anderen Seite abschließen.",
+  "steps": [
+   "A schlägt von der Einstandseite nach außen auf.",
+   "B returniert in die Mitte.",
+   "A macht einen Schritt nach vorn und spielt die Vorhand in die andere Hälfte, weg von B.",
+   "Dann wird der Punkt ausgespielt; zehn Aufschläge, dann Rollen tauschen."
+  ],
+  "easier": "B returniert langsam in die Mitte und der Punkt wird nicht ausgespielt.",
+  "harder": "B returniert, wohin er will: A muss den richtigen Schlag wählen.",
+  "cue": "Aufschlag nach außen, dann die Vorhand ins offene Feld.",
+  "stepCues": [
+   "Schlag von rechts nach außen auf und mach dich sofort für den nächsten Schlag bereit."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: weniger Winkel, ziel etwas weiter ins Feld.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt zählt auch die Vorhand nach dem Aufschlag."
+ },
+ "cross_points": {
+  "name": "Punkte nur in der Diagonale",
+  "goal": "Geduld und Schlagwahl auf kleinerem Raum.",
+  "steps": [
+   "Gespielt wird nur in der diagonalen Hälfte des Einzelfelds.",
+   "Begonnen wird mit einem Zuspiel von unten, dann freier Punkt in der Diagonale.",
+   "Wer den Ball aus der Diagonale spielt, verliert den Punkt.",
+   "Spiele bis 11, dann Diagonale wechseln."
+  ],
+  "easier": "Der Ball darf zweimal aufspringen.",
+  "harder": "Nach drei Schlägen darf man auch longline spielen, aber nur für einen Gewinnschlag.",
+  "cue": "Punkte nur in der Diagonale: Geduld und langer Ball.",
+  "stepCues": [
+   "Spiel cross mit Sicherheit und warte auf den kurzen Ball zum Angreifen."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: keine Eile, spiel den Ball hoch und lang zurück.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt such einen engeren Winkel."
+ },
+ "king_court": {
+  "name": "König des Platzes",
+  "goal": "Punkte unter Druck spielen, wie im Match, auch mit vielen Spielern.",
+  "steps": [
+   "A ist der König und bleibt auf seiner Seite; B fordert von der anderen Seite heraus, C und D warten draußen.",
+   "Es wird ein Punkt gespielt: gewinnt der Herausforderer, nimmt er den Platz des Königs ein.",
+   "Wer verliert, geht raus, und der Nächste in der Reihe kommt rein.",
+   "Gespielt wird 10-15 Minuten: es gewinnt, wer die meisten Punkte als König macht."
+  ],
+  "easier": "Jeder Punkt beginnt mit einem leichten Zuspiel von unten durch den Herausforderer.",
+  "harder": "Der König muss zwei Punkte hintereinander gewinnen, um zu bleiben."
+ },
+ "doubles_poach": {
+  "name": "Doppel: das Kreuzen am Netz",
+  "goal": "Als Paar spielen: der Netzspieler fängt den Cross-Return ab.",
+  "steps": [
+   "A1 schlägt auf und A2 steht am Netz; B1 returniert cross, B2 steht an der Aufschlaglinie.",
+   "Vor dem Aufschlag entscheiden A1 und A2, ob A2 kreuzt.",
+   "A2 startet, wenn B1 schlägt, fängt den Ball ab und spielt zwischen die beiden Gegner.",
+   "A1 deckt die frei gebliebene Seite; zehn Aufschläge, dann wird rotiert."
+  ],
+  "easier": "Ohne Aufschlag: der Trainer wirft den Ball für den Return zu.",
+  "harder": "B1 darf longline returnieren: A2 muss im richtigen Moment starten."
+ },
+ "fh_inside_out": {
+  "name": "Inside-out-Vorhand",
+  "goal": "Um die Rückhand herumlaufen und den Ballwechsel mit der Vorhand cross auf die Vorteilseite des anderen bestimmen.",
+  "steps": [
+   "A startet in der Mitte der Grundlinie; der Trainer spielt auf die Rückhand von A.",
+   "A geht mit schnellen Sidesteps nach links und lässt den Ball rechts von sich.",
+   "Lange Vorhand cross auf die Vorteilseite der anderen Hälfte.",
+   "Nach dem Schlag kurz zurück: ein Schritt Richtung Mitte, nicht mehr."
+  ],
+  "easier": "Der Ball kommt langsam und schon etwas links: ein halber Schritt reicht zum Herumlaufen.",
+  "harder": "Der Ball kommt schneller und näher zur Mitte; die Vorhand muss hinter der Aufschlaglinie landen.",
+  "cue": "Lauf um die Rückhand herum und spiel cross auf die Vorteilseite.",
+  "stepCues": [
+   "Schnelle Füße, lass den Ball rechts von dir und schwing zur Ecke durch."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: beweg dich früher, damit du vorne triffst, ohne dich zu strecken.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt such mehr Länge und mehr Winkel."
+ },
+ "fh_inside_in": {
+  "name": "Inside-in-Vorhand",
+  "goal": "Mit der Vorhand von der Vorteilseite die Richtung wechseln: longline, wenn der andere cross erwartet.",
+  "steps": [
+   "Wie bei der Inside-out: A läuft um den Ball herum, der auf die Rückhand kommt.",
+   "Gleiche Vorbereitung, aber die Vorhand geht longline, nahe an die linke Linie der anderen Hälfte.",
+   "Nach dem Schlag geht A Richtung Mitte zurück: longline öffnet dem anderen den Platz.",
+   "Serien von 10, dann Pause."
+  ],
+  "easier": "Größeres Ziel, weg von der Linie; langsames Zuspiel.",
+  "harder": "Der Trainer ruft im letzten Moment „drin“ oder „aus“: bei „drin“ cross, bei „aus“ longline.",
+  "cue": "Lauf um den Ball herum, aber diesmal longline.",
+  "stepCues": [
+   "Bereite vor wie für cross und schwing zur Linie durch."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: longline geht über den höheren Teil des Netzes, spiel mit mehr Sicherheit.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt etwas härter, ohne die Richtung zu verlieren."
+ },
+ "fh_topspin_height": {
+  "name": "Vorhand mit Topspin und Länge",
+  "goal": "Der Vorhand Spin geben: Ball hoch über das Netz, der ins Feld fällt und hoch abspringt.",
+  "steps": [
+   "A an der Grundlinie, der Trainer spielt bequeme Bälle auf die Vorhand.",
+   "Schwung von unten nach oben, der Schläger endet über der Schulter.",
+   "Der Ball muss ein, zwei Meter über das Netz gehen und hinter der Aufschlaglinie landen.",
+   "Zählen, wie viele von 20 in der langen Zone landen."
+  ],
+  "easier": "Begonnen wird von der Platzmitte, mit weniger Distanz und weniger Kraft.",
+  "harder": "Abwechselnd ein hoher Topspinball und ein flacher Ball, immer in der langen Zone.",
+  "cue": "Von unten nach oben: Ball hoch über das Netz und lang.",
+  "stepCues": [
+   "Bürste den Ball und beende mit dem Schläger über der Schulter."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: mehr Spin und weniger Kraft, der Ball muss runterkommen.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, ihn näher an der Grundlinie aufspringen zu lassen."
+ },
+ "fh_run_wide": {
+  "name": "Vorhand im Laufen",
+  "goal": "Den weiten Ball im Gleichgewicht erreichen, cross zurückspielen und sofort zur Mitte zurück.",
+  "steps": [
+   "A startet in der Mitte der Grundlinie.",
+   "Der Trainer spielt weit auf die Vorhand: A läuft, stoppt und spielt cross.",
+   "Direkt nach dem Schlag mit Sidesteps zurück zur Mitte.",
+   "Serien von 6 Bällen, dann eine Minute Pause."
+  ],
+  "easier": "Weniger weiter Ball, mit mehr Zeit zwischen den Zuspielen.",
+  "harder": "Das Zuspiel kommt, wenn A noch zurückläuft; die Vorhand muss hinter der Aufschlaglinie landen.",
+  "cue": "Lauf, stopp und spiel cross, dann zurück zur Mitte.",
+  "stepCues": [
+   "Kleine letzte Schritte, um stabil anzukommen, dann cross mit Sicherheit."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: du bist zu spät, starte früher und spiel mehr cross.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt geh schneller zurück zur Mitte."
+ },
+ "fh_short_angle": {
+  "name": "Kurz cross mit der Vorhand",
+  "goal": "Den anderen mit einem kurzen, engen Cross aus dem Platz treiben.",
+  "steps": [
+   "A und B spielen cross auf der Einstand-Diagonale.",
+   "Wenn der Ball bequem kommt, spielt A den kurzen Cross, der nahe am Netz seitlich rausgeht.",
+   "B läuft und versucht, ihn zurückzuspielen: der Ballwechsel geht weiter.",
+   "Nach 10 Winkeln werden die Rollen getauscht."
+  ],
+  "easier": "Der Winkel wird nur auf einen per Hand zugeworfenen Ball gespielt, im Stand.",
+  "harder": "Der Winkel wird nur auf einen langen Ball gespielt, nicht auf einen bequemen.",
+  "cue": "Kurz und eng cross: der Ball geht nahe am Netz seitlich raus.",
+  "stepCues": [
+   "Triff weiter vorne und schließ das Handgelenk Richtung Ecke."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: weniger Kraft und mehr Spin, der Ball muss früh fallen.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch ihn von einem längeren Ball."
+ },
+ "fh_approach_line": {
+  "name": "Vorhandangriff auf den kurzen Ball",
+  "goal": "Den kurzen Ball erkennen, ins Feld gehen und longline angreifen.",
+  "steps": [
+   "A startet an der Grundlinie; der Trainer spielt einen kurzen Ball auf die Vorhand.",
+   "A geht ins Feld und schlägt in der Vorwärtsbewegung longline und lang.",
+   "Nach dem Angriff läuft A weiter ans Netz und stoppt mit dem Split-Step.",
+   "Serien von 8, jedes Mal zurück zur Grundlinie."
+  ],
+  "easier": "Kurzer, hoher Ball, der länger in der Luft bleibt.",
+  "harder": "Nach dem Angriff spielt der Trainer einen Passierball: A muss mit dem Volley abschließen.",
+  "cue": "Geh ins Feld und greif longline an, dann ans Netz.",
+  "stepCues": [
+   "Schlag in der Vorwärtsbewegung, longline und lang."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: nimm Tempo raus, Länge zählt mehr als Kraft.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt muss der Angriff nahe an der Grundlinie landen."
+ },
+ "bh_line": {
+  "name": "Rückhand longline",
+  "goal": "Eine sichere Rückhand longline von der Vorteilseite, ohne den Körper zu weit zu öffnen.",
+  "steps": [
+   "A an der Grundlinie, Vorteilseite; der Trainer spielt auf die Rückhand.",
+   "Schultern gedreht und longline zum langen Ziel.",
+   "Nach jedem Schlag ein Schritt zurück Richtung Mitte.",
+   "Drei Serien von 10."
+  ],
+  "easier": "Größeres Ziel, weg von der Linie.",
+  "harder": "Abwechselnd eine Rückhand cross und eine longline, immer lang.",
+  "cue": "Schultern gedreht, lang longline.",
+  "stepCues": [
+   "Halte die Schultern bis zum Treffpunkt geschlossen und schwing zur Linie durch."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: mehr Abstand zur Linie und höher über das Netz.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt ziel näher an die Seitenlinie."
+ },
+ "bh_slice": {
+  "name": "Slice-Rückhand",
+  "goal": "Slice-Rückhand flach über das Netz und lang, die wenig abspringt.",
+  "steps": [
+   "Der Trainer spielt auf die Rückhand von A, Bälle in mittlerer Höhe.",
+   "Schläger hoch in der Vorbereitung, Bewegung von oben nach vorn, Fläche leicht offen.",
+   "Der Ball geht flach über das Netz und landet lang.",
+   "Zählen, wie viele von 20 in der Zone landen."
+  ],
+  "easier": "Langsamere, höhere Zuspiele, von der Platzmitte aus.",
+  "harder": "Abwechselnd ein langer Slice und ein kurzer Slice, der nach dem Netz liegen bleibt.",
+  "cue": "Slice flach über das Netz und lang.",
+  "stepCues": [
+   "Beginne mit dem Schläger hoch und begleite den Ball nach vorn, nicht nach unten."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: schwing mehr nach vorn und weniger nach unten.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch ihn noch flacher über das Netz."
+ },
+ "bh_cross_line": {
+  "name": "Rückhand cross und longline",
+  "goal": "Mit der Rückhand die Richtung wechseln, ohne die Vorbereitung zu ändern.",
+  "steps": [
+   "Schritt 1: der Trainer spielt auf die Rückhand und A spielt cross.",
+   "Schritt 2: gleicher Ball, A spielt longline.",
+   "Die Vorbereitung ist in beiden Fällen gleich: nur der Treffpunkt ändert sich.",
+   "10 cross, dann 10 longline."
+  ],
+  "easier": "Richtungswechsel alle 10 Schläge, immer langsam.",
+  "harder": "Der Trainer sagt die Richtung an, während der Ball in der Luft ist.",
+  "cue": "Gleiche Vorbereitung, zwei Richtungen.",
+  "stepCues": [
+   "Cross: triff etwas früher, vor dem Körper.",
+   "Jetzt longline: triff etwas später, Schultern geschlossen."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: langsamer, denk nur an die Richtung.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt das Tempo etwas erhöhen."
+ },
+ "bh_defense": {
+  "name": "Rückhand in der Defensive",
+  "goal": "In die Ecke gedrängt einen hohen, langen Ball spielen, um Zeit zu gewinnen und die Mitte zurückzuerobern.",
+  "steps": [
+   "A startet in der Mitte; der Trainer spielt lang und weit auf die Rückhand.",
+   "A läuft in die Ecke und spielt einen hohen, langen Ball in die Mitte.",
+   "Während der Ball fliegt, geht A zurück zur Mitte.",
+   "Serien von 6 Bällen."
+  ],
+  "easier": "Weniger weiter Ball; es reicht, ihn hoch ins Feld zu spielen.",
+  "harder": "Der Ball von A muss hinter der Aufschlaglinie landen, und der Trainer spielt sofort den nächsten zu.",
+  "cue": "In die Ecke gedrängt: hoch und lang, dann zurück zur Mitte.",
+  "stepCues": [
+   "Erreich den Ball, spiel ihn hoch über das Netz und geh sofort zurück zur Mitte."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: such nicht die Kraft, nur Höhe und Platzmitte.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt lass den Ball länger landen."
+ },
+ "bh_short_angle": {
+  "name": "Kurz cross mit der Rückhand",
+  "goal": "Den Platz mit der kurzen Rückhand cross auf der Vorteil-Diagonale öffnen.",
+  "steps": [
+   "A und B spielen Rückhand auf der Vorteil-Diagonale.",
+   "Bei einem bequemen Ball spielt A den kurzen, engen Cross.",
+   "B läuft hin und spielt zurück: der Ballwechsel geht weiter.",
+   "Nach 10 Winkeln werden die Rollen getauscht."
+  ],
+  "easier": "Der Winkel wird auf einen per Hand zugeworfenen Ball gespielt.",
+  "harder": "Nur lange Bälle: der Winkel muss aufgebaut, nicht geschenkt werden.",
+  "cue": "Rückhand kurz und eng cross.",
+  "stepCues": [
+   "Triff vorne und schließ Richtung Ecke nahe am Netz."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: weniger Kraft, mehr Spin: der Ball muss früh fallen.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, den Winkel noch enger zu machen."
+ },
+ "bh_first": {
+  "name": "Erste Rückhände",
+  "goal": "Die Rückhand im Stand lernen: Schultern gedreht, Treffpunkt vorne, Ball übers Netz.",
+  "steps": [
+   "A steht im Feld, knapp hinter der Aufschlaglinie.",
+   "Der Trainer wirft vom Netz aus langsame Bälle auf die Rückhand.",
+   "A dreht die Schultern, trifft vor dem Körper und spielt den Ball in die andere Hälfte.",
+   "Serien von 10, mit einer Pause zum Korrigieren."
+  ],
+  "easier": "Der Ball darf zweimal aufspringen, oder er wird von einem Hütchen geschlagen.",
+  "harder": "A macht vor jedem Schlag einen Schritt; der Ball muss hinter der Aufschlaglinie landen.",
+  "cue": "Schultern gedreht und Treffpunkt vorne.",
+  "stepCues": [
+   "Dreh die Schultern, sobald du den Ball siehst, und triff vor dem Körper."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: schlag sanfter und begleite den Ball nach oben.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, ihn weiter zu spielen."
+ },
+ "serve_ad_targets": {
+  "name": "Aufschlag von links auf die Ziele",
+  "goal": "Von der Vorteilseite durch die Mitte und nach außen aufschlagen, mit demselben Ballwurf.",
+  "steps": [
+   "A schlägt von links auf.",
+   "Schritt 1: 10 erste Aufschläge durch die Mitte, aufs T.",
+   "Schritt 2: 10 erste Aufschläge nach außen, Richtung Seitenlinie.",
+   "Zählen, wie viele im Ziel landen."
+  ],
+  "easier": "Größere Ziele: die ganze Hälfte des Feldes.",
+  "harder": "Abwechselnd ein Aufschlag durch die Mitte und einer nach außen, ohne den Ballwurf zu ändern.",
+  "cue": "Von links: gleicher Ballwurf, zwei Richtungen.",
+  "stepCues": [
+   "Durch die Mitte: ziel auf die Mittellinie.",
+   "Jetzt außen: öffne den Winkel Richtung Seitenlinie."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: prüf den Ballwurf, er muss immer an derselben Stelle sein.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt ziel näher an die Linien."
+ },
+ "serve_toss": {
+  "name": "Erste Aufschläge",
+  "goal": "Ein vollständiger, einfacher Aufschlag: ruhiger Ballwurf, Ball hoch getroffen, ins Feld.",
+  "steps": [
+   "Zuerst nur der Ballwurf: der Ball steigt und fällt vor dem linken Fuß herunter, ohne Schlag.",
+   "Dann der ganze Aufschlag, langsam, von rechts.",
+   "Nach 10 von rechts, 10 von links.",
+   "Es zählt der Ball im Feld, nicht das Tempo."
+  ],
+  "easier": "Aufschlag von der Aufschlaglinie, näher am Netz.",
+  "harder": "Der Ball muss in der Hälfte des Feldes landen, die am weitesten vom Netz entfernt ist.",
+  "cue": "Ruhiger Ballwurf und Ball hoch treffen.",
+  "stepCues": [
+   "Von rechts: Ballwurf vor den Fuß, Arm gestreckt im Treffpunkt.",
+   "Jetzt von links: gleicher Ballwurf, gleicher Rhythmus."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: wirf tiefer und weiter vorne und schlag sanfter.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, etwas härter aufzuschlagen."
+ },
+ "serve_first_pct": {
+  "name": "Zehn erste Aufschläge hintereinander",
+  "goal": "Die Quote beim ersten Aufschlag erhöhen: entschlossen, aber sicher, mit wechselnden Seiten.",
+  "steps": [
+   "A schlägt 5 erste Aufschläge von rechts, dann 5 von links auf, zweimal.",
+   "Nur der erste zählt: ist er aus, gibt es keinen zweiten.",
+   "Notiert, wie viele erste Aufschläge von 20 drin sind.",
+   "Ziel ist, das Ergebnis vom letzten Mal zu schlagen."
+  ],
+  "easier": "Aufschlag mit 80 % Kraft, nur ans Treffen denken.",
+  "harder": "Jeder erste Aufschlag im Aus kostet eine Runde um das Aufschlagfeld.",
+  "cue": "Erster Aufschlag entschlossen, aber sicher: es zählt, dass er reingeht.",
+  "stepCues": [
+   "Von rechts: ruhiger Rhythmus, Ballwurf immer gleich.",
+   "Jetzt von links: gleiches Tempo.",
+   "Wieder von rechts.",
+   "Die letzten 5 von links."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: nimm etwas Kraft raus und denk an den Ballwurf.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt etwas mehr Tempo."
+ },
+ "serve_body": {
+  "name": "Aufschlag auf den Körper",
+  "goal": "Direkt auf den Rückschläger aufschlagen, um ihm den Platz für den Schlag zu nehmen.",
+  "steps": [
+   "Schritt 1: von rechts, Aufschlag auf die Hüfte des Rückschlägers.",
+   "Schritt 2: von links, gleiches Ziel.",
+   "Der Ball geht direkt auf den Körper, nicht in die Ecke.",
+   "Zählen, wie viele im Ziel landen."
+  ],
+  "easier": "Größeres Ziel, der ganze mittlere Teil des Feldes.",
+  "harder": "Jemand returniert: es wird gezählt, ob der Return kurz ist oder im Netz landet.",
+  "cue": "Auf den Körper: nimm dem Rückschläger den Platz.",
+  "stepCues": [
+   "Von rechts: ziel auf die Hüfte des Rückschlägers.",
+   "Jetzt von links: gleiches Ziel."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: langsamer, und such nur die Mitte des Feldes.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt mit etwas mehr Tempo."
+ },
+ "serve_pressure": {
+  "name": "Erster und zweiter Aufschlag wie im Match",
+  "goal": "Unter Druck aufschlagen: der erste hart durch die Mitte, der zweite mit Spin und sicher.",
+  "steps": [
+   "A schlägt 5 erste Aufschläge von rechts durch die Mitte, dann 5 zweite von rechts.",
+   "Dann dasselbe von links.",
+   "Jeder zweite Aufschlag im Aus zählt als Doppelfehler.",
+   "Die Doppelfehler werden notiert: Ziel ist null."
+  ],
+  "easier": "Die zweiten Aufschläge werden langsamer geschlagen, mit viel Spin.",
+  "harder": "Es wird ein echter Punkt gespielt: ist der erste aus, kommt der zweite und dann der Ballwechsel.",
+  "cue": "Erster hart durch die Mitte, zweiter mit Spin und sicher.",
+  "stepCues": [
+   "Erster von rechts: entschlossen durch die Mitte.",
+   "Zweiter von rechts: viel Spin, hoch über das Netz.",
+   "Erster von links: entschlossen durch die Mitte.",
+   "Zweiter von links: lockerer Arm."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: atme durch, verlangsame den Rhythmus und wirf immer gleich.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch einen etwas schnelleren ersten."
+ },
+ "return_block": {
+  "name": "Geblockter Return",
+  "goal": "Den harten Aufschlag mit kurzer Bewegung returnieren und den Ball lang in die Mitte spielen.",
+  "steps": [
+   "B schlägt hart von rechts auf; A returniert auf der Einstandseite.",
+   "A macht den Split-Step, wenn B schlägt, und blockt den Ball mit kurzer Bewegung.",
+   "Der Return geht lang in die Mitte.",
+   "Nach 10 Returns werden die Rollen getauscht."
+  ],
+  "easier": "B schlägt langsamer auf, oder von der Aufschlaglinie.",
+  "harder": "A stellt sich einen Schritt weiter ins Feld.",
+  "cue": "Kurze Bewegung: block den Ball in die Mitte.",
+  "stepCues": [
+   "Split-Step, wenn der andere schlägt, dann Schläger vorne und kurz."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: verkürze die Bewegung noch mehr und ziel in die Mitte.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, länger zu returnieren."
+ },
+ "return_second_attack": {
+  "name": "Angriff auf den zweiten Aufschlag",
+  "goal": "Den zweiten Aufschlag nutzen: ins Feld gehen und mit der Vorhand angreifen.",
+  "steps": [
+   "B schlägt zweite Aufschläge von links auf; A returniert auf der Vorteilseite.",
+   "A geht während des Ballwurfs von B einen Schritt nach vorn.",
+   "A läuft um den Ball herum und greift mit der Vorhand cross an.",
+   "Nach 10 zweiten Aufschlägen werden die Rollen getauscht."
+  ],
+  "easier": "B schlägt langsame, hohe zweite Aufschläge.",
+  "harder": "Nach dem Angriff wird der Punkt ausgespielt.",
+  "cue": "Beim zweiten Aufschlag rein ins Feld und mit der Vorhand angreifen.",
+  "stepCues": [
+   "Geh während des Ballwurfs rein, lauf um den Ball herum und spiel cross."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: greif mit mehr Sicherheit an, Länge zählt mehr als Kraft.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, näher an der Linie anzugreifen."
+ },
+ "return_cross": {
+  "name": "Rückhand-Return cross",
+  "goal": "Auf der Vorteilseite mit der Rückhand cross returnieren, weg vom Aufschläger.",
+  "steps": [
+   "B schlägt von links auf; A returniert auf der Vorteilseite.",
+   "A returniert mit einer langen Rückhand cross.",
+   "Nach dem Return geht A zurück zur Mitte.",
+   "Nach 10 Returns werden die Rollen getauscht."
+  ],
+  "easier": "B schlägt langsamer auf, immer auf die Rückhand.",
+  "harder": "Nach dem Return wird der Punkt ausgespielt.",
+  "cue": "Rückhand cross, weg vom Aufschläger.",
+  "stepCues": [
+   "Schultern früh drehen und vorne treffen, cross."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: verkürze die Bewegung und spiel mit mehr Sicherheit.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch mehr Winkel."
+ },
+ "return_lob": {
+  "name": "Return-Lob im Doppel",
+  "goal": "Den Netzspieler mit einem Lob-Return überspielen, wenn das gegnerische Paar Serve-and-Volley spielt.",
+  "steps": [
+   "B1 schlägt von rechts auf, B2 steht am Netz.",
+   "A returniert mit einem hohen Lob über B2.",
+   "B2 versucht ihn rückwärts zu erreichen; schafft er es nicht, geht der Punkt an A.",
+   "Nach 10 Returns werden die Rollen getauscht."
+  ],
+  "easier": "B1 schlägt langsam auf; B2 bleibt stehen.",
+  "harder": "A wählt: Lob oder flacher Return cross, ohne es vorher zu verraten."
+ },
+ "volley_low": {
+  "name": "Tiefer Volley",
+  "goal": "Den Volley unterhalb der Netzkante spielen: Knie gebeugt, offene Fläche, langer Ball.",
+  "steps": [
+   "A an der Aufschlaglinie; der Trainer spielt tief, zu den Füßen.",
+   "A geht in die Knie, öffnet die Fläche etwas und begleitet den Ball nach vorn.",
+   "Der Volley muss übers Netz und lang in die Mitte gehen.",
+   "Serien von 10."
+  ],
+  "easier": "Höhere Zuspiele, über dem Knie.",
+  "harder": "Nach dem tiefen Volley ein hoher Volley, der in der Vorwärtsbewegung abgeschlossen wird.",
+  "cue": "Geh mit den Beinen runter, nicht mit dem Schläger.",
+  "stepCues": [
+   "Knie gebeugt, Fläche leicht offen und nach vorn begleiten."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: geh tiefer in die Knie und öffne die Fläche etwas.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt such mehr Länge."
+ },
+ "volley_reflex": {
+  "name": "Volley gegen Volley",
+  "goal": "Reflexe und ruhige Fläche, beide am Netz.",
+  "steps": [
+   "A und B einen Schritt vor der Aufschlaglinie, einander gegenüber.",
+   "Volley gegen Volley, schnelle, aber kontrollierbare Bälle.",
+   "Die Ballwechsel ohne Fehler zählen.",
+   "Neuer Versuch, um das Ergebnis zu schlagen."
+  ],
+  "easier": "Weiter weg vom Netz, langsamere Bälle.",
+  "harder": "Alle 10 Volleys hintereinander einen Schritt näher.",
+  "cue": "Ruhige Fläche und Schläger vorne.",
+  "stepCues": [
+   "Schläger immer vorne, kurze Schläge und ruhige Fläche."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: langsamer, es zählen die Ballwechsel, nicht das Tempo.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt einen halben Schritt näher."
+ },
+ "volley_drop": {
+  "name": "Stoppvolley",
+  "goal": "Der Volley, der direkt hinter dem Netz liegen bleibt, wenn der andere an der Grundlinie steht.",
+  "steps": [
+   "A am Netz; der Trainer spielt von der Grundlinie zu.",
+   "A blockt den Ball mit offener Fläche und weicher Hand.",
+   "Der Ball muss im Aufschlagfeld landen, cross.",
+   "Serien von 10."
+  ],
+  "easier": "Größeres Ziel, das ganze Aufschlagfeld.",
+  "harder": "Der Trainer läuft nach jedem Stoppvolley nach vorn: erreicht er ihn, gehört der Punkt ihm.",
+  "cue": "Weiche Hand: der Ball bleibt hinter dem Netz liegen.",
+  "stepCues": [
+   "Offene Fläche und weiches Handgelenk: nimm den Ball auf, statt ihn zu schieben."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: weniger schieben, lass den Schläger den Ball abfedern.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, ihn noch näher am Netz landen zu lassen."
+ },
+ "half_volley": {
+  "name": "Halbvolley an der Aufschlaglinie",
+  "goal": "Den Ball direkt nach dem Aufsprung spielen, während man ans Netz vorrückt.",
+  "steps": [
+   "A an der Aufschlaglinie; der Trainer spielt einen Ball, der vor den Füßen von A aufspringt.",
+   "A geht in die Knie und trifft direkt nach dem Aufsprung, lang.",
+   "Nach dem Schlag läuft A weiter ans Netz.",
+   "Serien von 8."
+  ],
+  "easier": "Langsamerer Ball, der einen Schritt vor A aufspringt.",
+  "harder": "Nach dem Halbvolley spielt der Trainer einen Volley zum Abschließen zu.",
+  "cue": "Runter in die Knie, direkt nach dem Aufsprung treffen.",
+  "stepCues": [
+   "Schläger tief und ruhig, nach vorn begleiten und dann ans Netz."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: tiefer in die Knie, kurze Bewegung.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch, ihn länger zu spielen."
+ },
+ "volley_angle": {
+  "name": "Angewinkelter Volley",
+  "goal": "Den Punkt am Netz mit dem angewinkelten Volley abschließen, Vorhand und Rückhand.",
+  "steps": [
+   "A am Netz, zwischen Netz und Aufschlaglinie.",
+   "Schritt 1: angewinkelter Vorhandvolley, der seitlich aus dem Platz geht.",
+   "Schritt 2: angewinkelter Rückhandvolley zur anderen Seite.",
+   "10 pro Seite."
+  ],
+  "easier": "Langsamere, höhere Zuspiele.",
+  "harder": "Der Trainer spielt zufällig auf Vorhand oder Rückhand.",
+  "cue": "Angewinkelter Volley: der Ball geht seitlich aus dem Platz.",
+  "stepCues": [
+   "Vorhandvolley: Schläger vorne, Handgelenk fest, Richtung Ecke.",
+   "Jetzt Rückhand: Schulter gedreht und Fläche zur Ecke."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: weniger Winkel, ziel etwas weiter ins Feld.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt den Winkel noch enger machen."
+ },
+ "swing_volley": {
+  "name": "Volley aus dem Mittelfeld",
+  "goal": "Den hohen, langsamen Ball nicht aufspringen lassen: aus der Luft nehmen und abschließen.",
+  "steps": [
+   "A startet an der Grundlinie; der Trainer spielt einen hohen, langsamen Ball.",
+   "A rückt vor und schlägt ihn aus der Luft, mit einer vollen Vorhand, vor dem Aufsprung.",
+   "Der Ball geht cross und lang.",
+   "Serien von 8."
+  ],
+  "easier": "Niedrigerer Ball, auf Schulterhöhe.",
+  "harder": "Nach dem Volley aus dem Mittelfeld geht A ans Netz für einen Volley.",
+  "cue": "Aus der Luft, ohne auf den Aufsprung zu warten.",
+  "stepCues": [
+   "Rück vor, geh unter den Ball und schlag eine volle Vorhand cross."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: triff vorne, nicht über dem Kopf, und schwing nach unten durch.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt versuch mehr Länge."
+ },
+ "smash_bounce": {
+  "name": "Schmetterball nach dem Aufsprung",
+  "goal": "Bei einem sehr hohen Lob den Ball aufspringen lassen und von hinten schmettern.",
+  "steps": [
+   "A in der Platzmitte; der Trainer spielt einen sehr hohen, langen Lob.",
+   "A geht zurück, lässt den Ball aufspringen und stellt sich darunter, linker Arm hoch.",
+   "Langer Schmetterball in die Mitte, ohne Eile.",
+   "Serien von 8."
+  ],
+  "easier": "Kürzere Lobs, die nahe der Aufschlaglinie aufspringen.",
+  "harder": "Der Trainer entscheidet im letzten Moment, ob er kurz (Schmetterball aus der Luft) oder lang (nach dem Aufsprung) spielt."
+ },
+ "lob_smash": {
+  "name": "Lob und Schmetterball zu zweit",
+  "goal": "Lob und Schmetterball zusammen üben: hinten wird gelobbt, am Netz geschmettert.",
+  "steps": [
+   "A am Netz, B an der Grundlinie.",
+   "B spielt Lobs; A geht seitlich zurück und schmettert.",
+   "B versucht, den Schmetterball mit einem weiteren Lob zurückzuspielen.",
+   "Nach 10 Schmetterbällen werden die Rollen getauscht."
+  ],
+  "easier": "B wirft die Lobs per Hand.",
+  "harder": "Der Punkt wird ausgespielt: B darf zwischen Lob und Passierschlag wählen."
+ },
+ "volley_smash": {
+  "name": "Volley und Schmetterball",
+  "goal": "Nach dem Volley auf den Lob gefasst sein: zurückgehen und schmettern.",
+  "steps": [
+   "Schritt 1: A am Netz spielt einen langen Volley.",
+   "Schritt 2: der Trainer spielt sofort einen Lob; A geht seitlich zurück und schmettert.",
+   "Nach dem Schmetterball geht A zurück ans Netz.",
+   "Serien von 6 Paaren Volley und Schmetterball."
+  ],
+  "easier": "Niedrigere, kürzere Lobs.",
+  "harder": "Der Trainer wechselt zufällig zwischen Volley, Lob und Ball auf den Körper."
+ },
+ "fw_cones": {
+  "name": "Slalom um die Hütchen",
+  "goal": "Kurze, schnelle Schritte und saubere Richtungswechsel.",
+  "steps": [
+   "Fünf Hütchen im Zickzack zwischen Grundlinie und Aufschlaglinie.",
+   "A läuft mit kurzen Schritten um jedes Hütchen, immer mit Blick zum Netz.",
+   "Am Ende geht A zurück.",
+   "Vier Runden, mit Pause."
+  ],
+  "easier": "Hütchen weiter auseinander, normales Tempo.",
+  "harder": "An jedem Hütchen ein Schattenschlag (Vorhand oder Rückhand), bevor es weitergeht."
+ },
+ "fw_recover": {
+  "name": "Schlagen und zurück zur Mitte",
+  "goal": "Sich angewöhnen, nach jedem Schlag zur Mitte zurückzugehen, rechts und links.",
+  "steps": [
+   "Schritt 1: weiter Ball auf die Vorhand, A spielt cross und geht zurück zur Mitte.",
+   "Schritt 2: weiter Ball auf die Rückhand, A spielt cross und geht zurück zur Mitte.",
+   "Das nächste Zuspiel kommt, wenn A wieder in der Mitte ist.",
+   "Serien von 8 abwechselnden Bällen."
+  ],
+  "easier": "Weniger weite Bälle und mehr Zeit zwischen den Zuspielen.",
+  "harder": "Das Zuspiel kommt, bevor A zurück in der Mitte ist."
+ },
+ "fw_body_ball": {
+  "name": "Raus aus dem Körperball",
+  "goal": "Dem Ball, der direkt auf einen zukommt, mit einem Seitschritt ausweichen, um Vorhand zu spielen.",
+  "steps": [
+   "A in der Mitte der Grundlinie; der Trainer spielt direkt auf A.",
+   "A macht einen Schritt nach links, lässt den Ball rechts von sich und spielt Vorhand.",
+   "Der Ball geht lang in die Mitte.",
+   "Serien von 10."
+  ],
+  "easier": "Langsamerer Ball, etwas neben den Körper.",
+  "harder": "Der Trainer spielt zufällig auf den Körper, nach rechts oder nach links."
+ },
+ "fw_forward_back": {
+  "name": "Vor und zurück",
+  "goal": "Den Platz in der Tiefe abdecken: erst der kurze Ball, dann der lange.",
+  "steps": [
+   "Schritt 1: kurzer Ball, A geht ins Feld und schlägt.",
+   "Schritt 2: sofort ein hoher, langer Ball, A geht zurück und schlägt.",
+   "Seitlich zurückgehen, nicht rückwärts mit dem Rücken zum Netz.",
+   "Serien von 6 Paaren."
+  ],
+  "easier": "Mehr Zeit zwischen den zwei Bällen.",
+  "harder": "Nach dem langen Ball ein dritter, kurzer Ball."
+ },
+ "fit_lines": {
+  "name": "Sprints zu den Linien",
+  "goal": "Schnelligkeit und Richtungswechsel: immer längere Sprints mit Rückkehr zur Grundlinie.",
+  "steps": [
+   "Von der Grundlinie Sprint zur Aufschlaglinie und zurück.",
+   "Dann Sprint bis zur Hälfte zwischen Aufschlaglinie und Netz und zurück.",
+   "Dann Sprint bis zum Netz und zurück.",
+   "Drei Serien, mit einer Minute Pause."
+  ],
+  "easier": "Auf dem Rückweg schnell gehen.",
+  "harder": "Bei jedem Richtungswechsel die Linie mit der Hand berühren."
+ },
+ "fit_shadow": {
+  "name": "Schattenschläge",
+  "goal": "Die Schlagbewegungen ohne Ball im Rhythmus wiederholen, zum Aufwärmen und zum Festigen der Technik.",
+  "steps": [
+   "A in der Mitte der Grundlinie, Schläger in der Hand.",
+   "Sidesteps nach rechts, Vorhand ohne Ball, zurück zur Mitte.",
+   "Dann nach links mit der Rückhand, dann nach vorn für einen Volley ohne Ball.",
+   "30 Sekunden Arbeit und 30 Pause, 6 Mal."
+  ],
+  "easier": "Langsamer, nur auf die Technik achten.",
+  "harder": "45 Sekunden Arbeit, 15 Pause."
+ },
+ "fit_box": {
+  "name": "Das Aufschlagfeld",
+  "goal": "Sich in alle Richtungen bewegen: seitlich, rückwärts, vorwärts.",
+  "steps": [
+   "Vier Hütchen an den Ecken des Aufschlagfelds.",
+   "Sidesteps entlang der Aufschlaglinie, dann rückwärts entlang der Seitenlinie.",
+   "Sidesteps entlang des Netzes, dann Sprint nach vorn bis zur Aufschlaglinie.",
+   "Drei Runden in jede Richtung, mit Pause."
+  ],
+  "easier": "Eine Runde nach der anderen, gehend.",
+  "harder": "Die Runde stoppen und versuchen, die Zeit zu schlagen."
+ },
+ "tac_approach_pass": {
+  "name": "Angriff und Passierschlag",
+  "goal": "Lernen, den richtigen Angriff zu wählen und auf der anderen Seite den Passierschlag.",
+  "steps": [
+   "Schritt 1: B spielt einen kurzen Ball, A greift longline an.",
+   "Schritt 2: A geht ans Netz, B versucht den Passierschlag longline oder cross.",
+   "Der Punkt wird bis zum Ende gespielt.",
+   "Spiel bis 7 Punkte, dann Rollen tauschen."
+  ],
+  "easier": "B wirft den kurzen Ball per Hand; der Passierschlag wird nur cross gespielt.",
+  "harder": "Der Punkt zählt doppelt, wenn A mit dem ersten Volley gewinnt."
+ },
+ "tac_middle": {
+  "name": "Doppel: durch die Mitte",
+  "goal": "Im Doppel sorgt der Ball durch die Mitte für Unsicherheit zwischen den Gegnern und verringert die Winkel.",
+  "steps": [
+   "Es wird normal Doppel gespielt.",
+   "Den ganzen Punkt lang spielt Paar A nur im mittleren Streifen.",
+   "Auch beim Aufschlag wird die Mitte gesucht.",
+   "Spiel bis 10 Punkte, dann ist Paar B dran."
+  ],
+  "easier": "Gespielt wird nur von der Grundlinie, ohne Volleys.",
+  "harder": "Der Punkt zählt doppelt, wenn er mit einem Schlag in den mittleren Streifen gewonnen wird."
+ },
+ "tac_high_low": {
+  "name": "Hoher Ball und flacher Ball",
+  "goal": "Im Cross-Ballwechsel den Rhythmus wechseln, um dem anderen Zeit und Rhythmus zu nehmen.",
+  "steps": [
+   "A und B spielen cross auf der Einstand-Diagonale.",
+   "A wechselt einen hohen Topspinball und einen flachen, schnellen Ball ab.",
+   "B muss alle Bälle lang zurückspielen.",
+   "Nach 20 Schlägen werden die Rollen getauscht."
+  ],
+  "easier": "Rhythmuswechsel alle zwei Schläge.",
+  "harder": "A entscheidet zufällig; der andere muss es an der Vorbereitung erkennen.",
+  "cue": "Ein hoher, ein flacher Ball: wechsle den Rhythmus.",
+  "stepCues": [
+   "Abwechselnd: hoch und mit Topspin über das Netz, dann flach und schnell."
+  ],
+  "missTip": "Dreimal hintereinander im Aus: mehr Sicherheit beim flachen Ball.",
+  "streakTip": "Fünfmal hintereinander im Feld: jetzt lass beide länger landen."
+ }
+}

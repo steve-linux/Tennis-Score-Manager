@@ -271,13 +271,14 @@ class CameraActivity : ComponentActivity() {
         s.drillSayNext(s.drillStepOf(step + 1, d.steps.size) + ": " + stepLabel(s, d.steps[step])) + (coach?.step(step)?.let { ". $it" } ?: "")
 
     /**
-     * Gli esercizi presi dalla raccolta parlano anche di come si fa: i loro testi ci sono solo in italiano, quindi
-     * questo vale con l'app in italiano (nelle altre lingue restano gli annunci di sempre).
+     * Gli esercizi presi dalla raccolta parlano anche di come si fa, nella lingua dell'app (se manca il suo file, in
+     * italiano).
      */
     private fun coachFor(d: com.tennis.scoremanager.data.Drill?): com.tennis.scoremanager.data.DrillLibrary.Coach? {
-        if (d == null || controller.options.value.lang != com.tennis.scoremanager.model.Lang.IT) return null
+        if (d == null) return null
         val id = com.tennis.scoremanager.data.DrillLibrary.itemIdOf(d.id) ?: return null
-        val text = runCatching { com.tennis.scoremanager.data.DrillLibrary.texts(assets.open("drills/it.json").bufferedReader().use { it.readText() })[id] }.getOrNull()
+        fun load(code: String) = runCatching { com.tennis.scoremanager.data.DrillLibrary.texts(assets.open("drills/$code.json").bufferedReader().use { it.readText() })[id] }.getOrNull()
+        val text = load(controller.options.value.lang.code) ?: load("it")
         return text?.let { com.tennis.scoremanager.data.DrillLibrary.Coach(it) }
     }
     /** Servizio riconosciuto e non ancora segnato (dentro o fuori). */

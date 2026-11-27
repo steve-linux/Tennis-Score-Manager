@@ -69,8 +69,7 @@ fun DrillLibraryScreen(c: MatchController) {
     val context = LocalContext.current
     BackHandler { c.back() }
     val lang = c.options.collectAsState().value.lang
-    // I testi degli esercizi ci sono per ora solo in italiano: nelle altre lingue si vedono quelli (se un giorno c'è il
-    // file della lingua dell'app, si usa quello).
+    // I testi degli esercizi nella lingua dell'app (se un giorno ne manca uno, quelli italiani).
     val texts = remember(lang) {
         runCatching { DrillLibrary.texts(context.assets.open("drills/${lang.code}.json").bufferedReader().readText()) }
             .recoverCatching { DrillLibrary.texts(context.assets.open("drills/it.json").bufferedReader().readText()) }.getOrDefault(emptyMap())
