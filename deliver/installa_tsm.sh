@@ -18378,6 +18378,659 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
   ],
   "easier": "Senza servizio: l'allenatore lancia la palla della risposta.",
   "harder": "B1 può rispondere lungolinea: A2 deve partire al momento giusto."
+ },
+ "fh_inside_out": {
+  "name": "Dritto inside-out",
+  "goal": "Girare attorno al rovescio e comandare lo scambio col dritto incrociato verso il vantaggio dell'altro.",
+  "steps": [
+   "A parte dal centro della linea di fondo; l'allenatore lancia verso il rovescio di A.",
+   "A si sposta a sinistra con passi laterali veloci, lasciando la palla alla sua destra.",
+   "Dritto incrociato profondo verso il lato del vantaggio dell'altra metà.",
+   "Dopo il colpo, un recupero breve: un passo verso il centro, non di più."
+  ],
+  "easier": "La palla arriva lenta e già un po' spostata a sinistra: basta mezzo passo per girarci attorno.",
+  "harder": "La palla arriva più veloce e più vicina al centro; il dritto deve cadere oltre la linea del servizio.",
+  "cue": "Gira attorno al rovescio e tira incrociato verso il vantaggio.",
+  "stepCues": [
+   "Piedi veloci, lascia la palla alla tua destra e chiudi il colpo verso l'angolo."
+  ],
+  "missTip": "Tre fuori di fila: spostati prima, così colpisci davanti senza allungarti.",
+  "streakTip": "Cinque dentro di fila: ora cerca più profondità e più angolo."
+ },
+ "fh_inside_in": {
+  "name": "Dritto inside-in",
+  "goal": "Cambiare direzione col dritto dal lato del vantaggio: lungolinea, quando l'altro aspetta l'incrociato.",
+  "steps": [
+   "Come nell'inside-out: A gira attorno alla palla lanciata sul rovescio.",
+   "Stessa preparazione, ma il dritto va lungolinea, vicino alla riga di sinistra dell'altra metà.",
+   "Dopo il colpo A torna verso il centro: il lungolinea apre il campo all'altro.",
+   "Serie da 10, poi si riposa."
+  ],
+  "easier": "Bersaglio più largo e lontano dalla riga; palla lanciata lenta.",
+  "harder": "L'allenatore dice all'ultimo \"dentro\" o \"fuori\": su \"dentro\" incrociato, su \"fuori\" lungolinea.",
+  "cue": "Gira attorno alla palla, ma stavolta lungolinea.",
+  "stepCues": [
+   "Prepara come per l'incrociato e chiudi il colpo verso la riga."
+  ],
+  "missTip": "Tre fuori di fila: il lungolinea passa dove la rete è più alta, tieni più margine.",
+  "streakTip": "Cinque dentro di fila: ora tira un po' più forte, senza perdere la direzione."
+ },
+ "fh_topspin_height": {
+  "name": "Dritto carico e profondo",
+  "goal": "Dare rotazione al dritto: palla alta sopra la rete che scende dentro e rimbalza alta.",
+  "steps": [
+   "A a fondo campo, l'allenatore lancia palle comode sul dritto.",
+   "Movimento dal basso verso l'alto, racchetta che finisce sopra la spalla.",
+   "La palla deve passare un paio di metri sopra la rete e cadere oltre la linea del servizio.",
+   "Contare quante cadono nella zona profonda su 20."
+  ],
+  "easier": "Si comincia da metà campo, con meno distanza e meno forza.",
+  "harder": "Si alternano una palla carica alta e una tesa, sempre nella zona profonda.",
+  "cue": "Dal basso verso l'alto: palla alta sopra la rete e profonda.",
+  "stepCues": [
+   "Spazzola la palla e finisci con la racchetta sopra la spalla."
+  ],
+  "missTip": "Tre fuori di fila: più rotazione e meno forza, la palla deve scendere.",
+  "streakTip": "Cinque dentro di fila: ora prova a farla rimbalzare più vicino alla riga di fondo."
+ },
+ "fh_run_wide": {
+  "name": "Dritto in corsa",
+  "goal": "Arrivare in equilibrio sulla palla larga, rimetterla incrociata e tornare subito al centro.",
+  "steps": [
+   "A parte dal centro della linea di fondo.",
+   "L'allenatore lancia larga sul dritto: A corre, si ferma e colpisce incrociato.",
+   "Subito dopo il colpo, ritorno al centro con passi laterali.",
+   "Serie da 6 palle, poi un minuto di pausa."
+  ],
+  "easier": "Palla meno larga, con più tempo tra un lancio e l'altro.",
+  "harder": "Il lancio parte quando A è ancora in ritorno; il dritto deve cadere oltre la linea del servizio.",
+  "cue": "Corri, fermati e colpisci incrociato, poi torna al centro.",
+  "stepCues": [
+   "Ultimi passi piccoli per arrivare fermo, poi colpo incrociato con margine."
+  ],
+  "missTip": "Tre fuori di fila: arrivi in ritardo, parti prima e colpisci più incrociato.",
+  "streakTip": "Cinque dentro di fila: ora torna al centro più in fretta."
+ },
+ "fh_short_angle": {
+  "name": "Angolo corto di dritto",
+  "goal": "Portare l'altro fuori dal campo con un incrociato corto e stretto.",
+  "steps": [
+   "A e B palleggiano incrociato sulla diagonale del pari.",
+   "Quando la palla arriva comoda, A gioca l'incrociato corto che esce vicino alla rete.",
+   "B corre e prova a rimetterla: si continua lo scambio.",
+   "Dopo 10 angoli si cambiano i ruoli."
+  ],
+  "easier": "L'angolo si gioca solo su palla lanciata a mano, ferma.",
+  "harder": "L'angolo si gioca solo su palla profonda, non comoda.",
+  "cue": "Incrociato corto e stretto: la palla esce vicino alla rete.",
+  "stepCues": [
+   "Colpisci più davanti e chiudi il polso verso l'angolo."
+  ],
+  "missTip": "Tre fuori di fila: meno forza e più rotazione, la palla deve scendere presto.",
+  "streakTip": "Cinque dentro di fila: ora prova a farlo partire da una palla più profonda."
+ },
+ "fh_approach_line": {
+  "name": "Attacco di dritto sulla palla corta",
+  "goal": "Riconoscere la palla corta, entrare in campo e attaccare lungolinea.",
+  "steps": [
+   "A parte dalla linea di fondo; l'allenatore lancia una palla corta sul dritto.",
+   "A entra in campo, colpisce in avanzamento lungolinea e profondo.",
+   "Dopo l'attacco, A continua verso la rete e si ferma con lo split step.",
+   "Serie da 8, si torna ogni volta sulla linea di fondo."
+  ],
+  "easier": "Palla corta e alta, che resta in aria più a lungo.",
+  "harder": "Dopo l'attacco l'allenatore lancia un passante: A deve chiudere con la volée.",
+  "cue": "Entra in campo e attacca lungolinea, poi vai a rete.",
+  "stepCues": [
+   "Colpisci camminando in avanti, lungolinea e profondo."
+  ],
+  "missTip": "Tre fuori di fila: rallenta l'attacco, conta più la profondità della forza.",
+  "streakTip": "Cinque dentro di fila: ora l'attacco deve cadere vicino alla riga di fondo."
+ },
+ "bh_line": {
+  "name": "Rovescio lungolinea",
+  "goal": "Rovescio lungolinea sicuro dal lato del vantaggio, senza aprire troppo il corpo.",
+  "steps": [
+   "A sulla linea di fondo, lato del vantaggio; l'allenatore lancia sul rovescio.",
+   "Spalle girate e colpo lungolinea verso il bersaglio profondo.",
+   "Dopo ogni colpo, un passo di ritorno verso il centro.",
+   "Tre serie da 10."
+  ],
+  "easier": "Bersaglio più largo, lontano dalla riga.",
+  "harder": "Si alterna un rovescio incrociato e uno lungolinea, sempre profondi.",
+  "cue": "Spalle girate, lungolinea profondo.",
+  "stepCues": [
+   "Tieni le spalle chiuse fino all'impatto e accompagna verso la riga."
+  ],
+  "missTip": "Tre fuori di fila: tieni più margine dalla riga e passa più alto sulla rete.",
+  "streakTip": "Cinque dentro di fila: ora punta più vicino alla riga laterale."
+ },
+ "bh_slice": {
+  "name": "Rovescio tagliato",
+  "goal": "Rovescio in back basso sopra la rete e profondo, che rimbalza poco.",
+  "steps": [
+   "L'allenatore lancia sul rovescio di A, palle di media altezza.",
+   "Racchetta alta in preparazione, movimento dall'alto in avanti, piatto un po' aperto.",
+   "La palla passa bassa sopra la rete e cade profonda.",
+   "Contare quante cadono nella zona su 20."
+  ],
+  "easier": "Palle lanciate più lente e più alte, da metà campo.",
+  "harder": "Si alternano un back profondo e un back corto, che muore dopo la rete.",
+  "cue": "Back basso sopra la rete e profondo.",
+  "stepCues": [
+   "Parti con la racchetta alta e accompagna la palla in avanti, non in basso."
+  ],
+  "missTip": "Tre fuori di fila: accompagna di più in avanti e meno verso il basso.",
+  "streakTip": "Cinque dentro di fila: ora prova a tenerlo ancora più basso sopra la rete."
+ },
+ "bh_cross_line": {
+  "name": "Rovescio incrociato e lungolinea",
+  "goal": "Saper cambiare direzione col rovescio senza cambiare la preparazione.",
+  "steps": [
+   "Passo 1: l'allenatore lancia sul rovescio e A gioca incrociato.",
+   "Passo 2: stessa palla, A gioca lungolinea.",
+   "La preparazione è la stessa nei due casi: cambia solo il punto d'impatto.",
+   "10 incrociati, poi 10 lungolinea."
+  ],
+  "easier": "Si cambia direzione ogni 10 colpi, sempre lenti.",
+  "harder": "L'allenatore dice la direzione mentre la palla è in volo.",
+  "cue": "Stessa preparazione, due direzioni.",
+  "stepCues": [
+   "Incrociato: colpisci un po' prima, davanti al corpo.",
+   "Ora lungolinea: colpisci un po' dopo, spalle chiuse."
+  ],
+  "missTip": "Tre fuori di fila: rallenta e pensa solo alla direzione.",
+  "streakTip": "Cinque dentro di fila: ora aumenta un po' la velocità."
+ },
+ "bh_defense": {
+  "name": "Rovescio in difesa",
+  "goal": "Quando si è spinti nell'angolo, rimettere una palla alta e profonda per riprendere il centro.",
+  "steps": [
+   "A parte dal centro; l'allenatore lancia profondo e largo sul rovescio.",
+   "A corre nell'angolo e gioca una palla alta e profonda al centro.",
+   "Mentre la palla vola, A torna al centro.",
+   "Serie da 6 palle."
+  ],
+  "easier": "Palla meno larga; basta rimetterla in campo alta.",
+  "harder": "La palla di A deve cadere oltre la linea del servizio, e l'allenatore lancia subito la successiva.",
+  "cue": "Spinto nell'angolo: palla alta e profonda, poi torna al centro.",
+  "stepCues": [
+   "Arriva sulla palla, alzala tanto sopra la rete e torna subito al centro."
+  ],
+  "missTip": "Tre fuori di fila: non cercare la forza, solo altezza e centro del campo.",
+  "streakTip": "Cinque dentro di fila: ora fai cadere la palla più profonda."
+ },
+ "bh_short_angle": {
+  "name": "Angolo corto di rovescio",
+  "goal": "Aprire il campo col rovescio incrociato corto nella diagonale del vantaggio.",
+  "steps": [
+   "A e B palleggiano di rovescio sulla diagonale del vantaggio.",
+   "Sulla palla comoda A gioca l'incrociato corto e stretto.",
+   "B rincorre e rimette: lo scambio continua.",
+   "Dopo 10 angoli si cambiano i ruoli."
+  ],
+  "easier": "L'angolo si gioca su palla lanciata a mano.",
+  "harder": "Solo palle profonde: l'angolo va costruito, non regalato.",
+  "cue": "Rovescio incrociato corto e stretto.",
+  "stepCues": [
+   "Colpisci davanti e chiudi verso l'angolo vicino alla rete."
+  ],
+  "missTip": "Tre fuori di fila: meno forza, più rotazione: la palla deve scendere presto.",
+  "streakTip": "Cinque dentro di fila: ora prova a stringere ancora l'angolo."
+ },
+ "bh_first": {
+  "name": "Primi rovesci",
+  "goal": "Imparare il rovescio da fermi: spalle girate, impatto davanti, palla oltre la rete.",
+  "steps": [
+   "A sta dentro il campo, poco dietro la linea del servizio.",
+   "L'allenatore lancia a mano palle lente sul rovescio, da vicino alla rete.",
+   "A gira le spalle, colpisce davanti al corpo e manda la palla nella metà dell'altro.",
+   "Serie da 10, con una pausa per correggere."
+  ],
+  "easier": "La palla si lascia rimbalzare due volte, o si colpisce da ferma su un cono.",
+  "harder": "A si sposta di un passo prima di ogni colpo; la palla deve cadere oltre la linea del servizio.",
+  "cue": "Spalle girate e impatto davanti.",
+  "stepCues": [
+   "Gira le spalle appena vedi la palla e colpisci davanti al corpo."
+  ],
+  "missTip": "Tre fuori di fila: colpisci più piano e accompagna la palla verso l'alto.",
+  "streakTip": "Cinque dentro di fila: ora prova a mandarla più lontana."
+ },
+ "serve_ad_targets": {
+  "name": "Servizio da sinistra sui bersagli",
+  "goal": "Servire dal lato del vantaggio al centro e all'esterno con lo stesso lancio.",
+  "steps": [
+   "A serve da sinistra.",
+   "Passo 1: 10 prime al centro, sulla T.",
+   "Passo 2: 10 prime all'esterno, verso la riga laterale.",
+   "Contare quante finiscono nel bersaglio."
+  ],
+  "easier": "Bersagli più grandi: tutta la metà del quadrato.",
+  "harder": "Si alterna un servizio al centro e uno all'esterno, senza cambiare il lancio.",
+  "cue": "Da sinistra: stesso lancio, due direzioni.",
+  "stepCues": [
+   "Al centro: punta la linea centrale.",
+   "Ora esterno: apri l'angolo verso la riga laterale."
+  ],
+  "missTip": "Tre fuori di fila: controlla il lancio, deve essere sempre nello stesso punto.",
+  "streakTip": "Cinque dentro di fila: ora punta più vicino alle righe."
+ },
+ "serve_toss": {
+  "name": "Primi servizi",
+  "goal": "Servizio completo e semplice: lancio fermo, palla colpita in alto, dentro il quadrato.",
+  "steps": [
+   "Prima solo il lancio: la palla sale e ricade davanti al piede sinistro, senza colpire.",
+   "Poi il servizio completo, piano, da destra.",
+   "Dopo 10 da destra, 10 da sinistra.",
+   "Conta la palla dentro, non la velocità."
+  ],
+  "easier": "Si serve dalla linea del servizio, più vicino alla rete.",
+  "harder": "La palla deve cadere nella metà del quadrato più lontana dalla rete.",
+  "cue": "Lancio fermo e palla colpita in alto.",
+  "stepCues": [
+   "Da destra: lancio davanti al piede, braccio disteso all'impatto.",
+   "Ora da sinistra: stesso lancio, stesso ritmo."
+  ],
+  "missTip": "Tre fuori di fila: lancia più basso e più davanti, e colpisci più piano.",
+  "streakTip": "Cinque dentro di fila: ora prova a servire un po' più forte."
+ },
+ "serve_first_pct": {
+  "name": "Dieci prime di fila",
+  "goal": "Alzare la percentuale di prime: servizio deciso ma sicuro, alternando i lati.",
+  "steps": [
+   "A serve 5 prime da destra, poi 5 da sinistra, due volte.",
+   "Conta solo la prima: se è fuori, non si serve la seconda.",
+   "Si segna quante prime entrano su 20.",
+   "L'obiettivo è superare il risultato della volta prima."
+  ],
+  "easier": "Si serve con l'80% della forza, pensando solo a farla entrare.",
+  "harder": "Ogni prima fuori costa un giro di corsa attorno al quadrato del servizio.",
+  "cue": "Prima decisa ma sicura: conta farla entrare.",
+  "stepCues": [
+   "Da destra: ritmo tranquillo, lancio sempre uguale.",
+   "Ora da sinistra: stessa velocità.",
+   "Di nuovo da destra.",
+   "Ultimi 5 da sinistra."
+  ],
+  "missTip": "Tre fuori di fila: togli un po' di forza e pensa al lancio.",
+  "streakTip": "Cinque dentro di fila: ora aggiungi un po' di velocità."
+ },
+ "serve_body": {
+  "name": "Servizio al corpo",
+  "goal": "Servire addosso a chi risponde, per togliergli spazio per il colpo.",
+  "steps": [
+   "Passo 1: da destra, servizio verso l'anca di chi risponde.",
+   "Passo 2: da sinistra, stesso bersaglio.",
+   "La palla va diretta al corpo, non all'angolo.",
+   "Contare quante finiscono nel bersaglio."
+  ],
+  "easier": "Bersaglio più largo, tutta la parte centrale del quadrato.",
+  "harder": "Si mette qualcuno a rispondere: conta se la risposta è corta o in rete.",
+  "cue": "Al corpo: togli spazio a chi risponde.",
+  "stepCues": [
+   "Da destra: punta l'anca di chi risponde.",
+   "Ora da sinistra: stesso bersaglio."
+  ],
+  "missTip": "Tre fuori di fila: rallenta e cerca solo il centro del quadrato.",
+  "streakTip": "Cinque dentro di fila: ora prova con un po' più di velocità."
+ },
+ "serve_pressure": {
+  "name": "Prima e seconda come in partita",
+  "goal": "Servire sotto pressione: prima forte al centro, seconda carica e sicura.",
+  "steps": [
+   "A serve 5 prime al centro da destra, poi 5 seconde da destra.",
+   "Poi lo stesso da sinistra.",
+   "Ogni seconda fuori conta come un doppio fallo.",
+   "Si segnano i doppi falli: l'obiettivo è zero."
+  ],
+  "easier": "Le seconde si servono più piano, con tanta rotazione.",
+  "harder": "Si serve un punto vero: se la prima è fuori, si gioca la seconda e poi lo scambio.",
+  "cue": "Prima forte al centro, seconda carica e sicura.",
+  "stepCues": [
+   "Prima da destra: decisa al centro.",
+   "Seconda da destra: tanta rotazione, alta sopra la rete.",
+   "Prima da sinistra: decisa al centro.",
+   "Seconda da sinistra: braccio sciolto."
+  ],
+  "missTip": "Tre fuori di fila: respira, rallenta il ritmo e lancia sempre uguale.",
+  "streakTip": "Cinque dentro di fila: ora prova una prima un po' più veloce."
+ },
+ "return_block": {
+  "name": "Risposta bloccata",
+  "goal": "Rispondere al servizio forte con un movimento corto, mandando la palla profonda al centro.",
+  "steps": [
+   "B serve forte da destra; A risponde sul lato del pari.",
+   "A fa lo split step quando B colpisce e blocca la palla con un movimento corto.",
+   "La risposta va profonda al centro.",
+   "Dopo 10 risposte si cambiano i ruoli."
+  ],
+  "easier": "B serve più piano, o dalla linea del servizio.",
+  "harder": "A si mette un passo più dentro il campo.",
+  "cue": "Movimento corto: blocca la palla al centro.",
+  "stepCues": [
+   "Split step quando l'altro colpisce, poi racchetta davanti e corta."
+  ],
+  "missTip": "Tre fuori di fila: accorcia ancora il movimento e punta al centro.",
+  "streakTip": "Cinque dentro di fila: ora prova a rispondere più profondo."
+ },
+ "return_second_attack": {
+  "name": "Attacco sulla seconda",
+  "goal": "Approfittare della seconda di servizio: entrare in campo e attaccare di dritto.",
+  "steps": [
+   "B serve seconde da sinistra; A risponde sul lato del vantaggio.",
+   "A si avvicina di un passo durante il lancio di B.",
+   "A gira attorno alla palla e attacca di dritto incrociato.",
+   "Dopo 10 seconde si cambiano i ruoli."
+  ],
+  "easier": "B serve seconde lente e alte.",
+  "harder": "Dopo l'attacco si gioca il punto.",
+  "cue": "Sulla seconda entra e attacca di dritto.",
+  "stepCues": [
+   "Entra mentre l'altro lancia, gira attorno alla palla e colpisci incrociato."
+  ],
+  "missTip": "Tre fuori di fila: attacca con più margine, la profondità conta più della forza.",
+  "streakTip": "Cinque dentro di fila: ora prova ad attaccare più vicino alla riga."
+ },
+ "return_cross": {
+  "name": "Risposta di rovescio incrociata",
+  "goal": "Rispondere sul lato del vantaggio col rovescio incrociato, lontano da chi serve.",
+  "steps": [
+   "B serve da sinistra; A risponde sul lato del vantaggio.",
+   "A risponde di rovescio incrociato e profondo.",
+   "Dopo la risposta, A torna al centro.",
+   "Dopo 10 risposte si cambiano i ruoli."
+  ],
+  "easier": "B serve più piano, sempre sul rovescio.",
+  "harder": "Si gioca il punto dopo la risposta.",
+  "cue": "Rovescio incrociato, lontano da chi serve.",
+  "stepCues": [
+   "Spalle girate presto e colpisci davanti, verso l'incrociato."
+  ],
+  "missTip": "Tre fuori di fila: accorcia il movimento e tieni più margine.",
+  "streakTip": "Cinque dentro di fila: ora prova più angolo."
+ },
+ "return_lob": {
+  "name": "Risposta con pallonetto nel doppio",
+  "goal": "Superare chi è a rete con una risposta in pallonetto, quando la coppia avversaria gioca serve e volée.",
+  "steps": [
+   "B1 serve da destra, B2 è a rete.",
+   "A risponde con un pallonetto alto sopra B2.",
+   "B2 prova a raggiungerla arretrando; se non ci riesce, il punto va ad A.",
+   "Dopo 10 risposte si cambiano i ruoli."
+  ],
+  "easier": "B1 serve piano; B2 resta fermo.",
+  "harder": "A sceglie: pallonetto o risposta incrociata bassa, senza farlo capire prima."
+ },
+ "volley_low": {
+  "name": "Volée bassa",
+  "goal": "Giocare la volée sotto la rete: ginocchia piegate, piatto aperto, palla profonda.",
+  "steps": [
+   "A sulla linea del servizio; l'allenatore lancia basso, verso i piedi.",
+   "A scende sulle gambe, apre un po' il piatto e accompagna la palla in avanti.",
+   "La volée deve passare la rete e cadere profonda al centro.",
+   "Serie da 10."
+  ],
+  "easier": "Palle lanciate più alte, sopra il ginocchio.",
+  "harder": "Dopo la volée bassa, una volée alta da chiudere in avanti.",
+  "cue": "Scendi sulle gambe, non con la racchetta.",
+  "stepCues": [
+   "Ginocchia piegate, piatto un po' aperto e accompagna in avanti."
+  ],
+  "missTip": "Tre fuori di fila: piegati di più sulle gambe e apri un po' il piatto.",
+  "streakTip": "Cinque dentro di fila: ora cerca più profondità."
+ },
+ "volley_reflex": {
+  "name": "Volée contro volée",
+  "goal": "Riflessi e piatto fermo, tutti e due a rete.",
+  "steps": [
+   "A e B a un passo dalla linea del servizio, uno di fronte all'altro.",
+   "Si gioca volée contro volée, palle tese ma controllabili.",
+   "Contare gli scambi senza errori.",
+   "Si riprova per battere il risultato."
+  ],
+  "easier": "Più lontani dalla rete, palle più lente.",
+  "harder": "Si avvicinano di un passo ogni 10 volée di fila.",
+  "cue": "Piatto fermo e racchetta davanti.",
+  "stepCues": [
+   "Racchetta sempre davanti, colpi corti e piatto fermo."
+  ],
+  "missTip": "Tre fuori di fila: rallentate, contano gli scambi, non la velocità.",
+  "streakTip": "Cinque dentro di fila: ora avvicinatevi di mezzo passo."
+ },
+ "volley_drop": {
+  "name": "Volée smorzata",
+  "goal": "La volée che muore subito dopo la rete, quando l'altro è a fondo campo.",
+  "steps": [
+   "A a rete; l'allenatore lancia da fondo campo.",
+   "A blocca la palla con il piatto aperto e la mano morbida.",
+   "La palla deve cadere entro il quadrato del servizio, incrociata.",
+   "Serie da 10."
+  ],
+  "easier": "Bersaglio più grande, tutto il quadrato del servizio.",
+  "harder": "L'allenatore corre in avanti dopo ogni smorzata: se la prende, il punto è suo.",
+  "cue": "Mano morbida: la palla muore dopo la rete.",
+  "stepCues": [
+   "Piatto aperto e polso morbido: assorbi la palla invece di spingerla."
+  ],
+  "missTip": "Tre fuori di fila: meno spinta, lascia che la racchetta assorba la palla.",
+  "streakTip": "Cinque dentro di fila: ora prova a farla cadere ancora più vicina alla rete."
+ },
+ "half_volley": {
+  "name": "Demi-volée sulla linea del servizio",
+  "goal": "Giocare la palla subito dopo il rimbalzo, quando si avanza verso la rete.",
+  "steps": [
+   "A sulla linea del servizio; l'allenatore lancia una palla che rimbalza ai piedi di A.",
+   "A scende sulle gambe e colpisce subito dopo il rimbalzo, profondo.",
+   "Dopo il colpo, A continua verso la rete.",
+   "Serie da 8."
+  ],
+  "easier": "Palla più lenta, che rimbalza un passo davanti ad A.",
+  "harder": "Dopo la demi-volée, l'allenatore lancia una volée da chiudere.",
+  "cue": "Giù sulle gambe, colpisci subito dopo il rimbalzo.",
+  "stepCues": [
+   "Racchetta bassa e ferma, accompagna avanti e poi vai a rete."
+  ],
+  "missTip": "Tre fuori di fila: più piegato sulle gambe, movimento corto.",
+  "streakTip": "Cinque dentro di fila: ora prova a mandarla più profonda."
+ },
+ "volley_angle": {
+  "name": "Volée angolata",
+  "goal": "Chiudere il punto a rete con la volée angolata, di dritto e di rovescio.",
+  "steps": [
+   "A a rete, a metà tra la rete e la linea del servizio.",
+   "Passo 1: volée di dritto angolata, che esce dal lato del campo.",
+   "Passo 2: volée di rovescio angolata dall'altra parte.",
+   "10 per parte."
+  ],
+  "easier": "Palle lanciate più lente e più alte.",
+  "harder": "L'allenatore lancia a caso, dritto o rovescio.",
+  "cue": "Volée angolata: la palla esce dal lato del campo.",
+  "stepCues": [
+   "Volée di dritto: racchetta davanti, polso fermo, verso l'angolo.",
+   "Ora rovescio: spalla girata e piatto verso l'angolo."
+  ],
+  "missTip": "Tre fuori di fila: meno angolo, punta un po' più dentro il campo.",
+  "streakTip": "Cinque dentro di fila: ora stringi ancora l'angolo."
+ },
+ "swing_volley": {
+  "name": "Volée al volo da metà campo",
+  "goal": "Non lasciar rimbalzare la palla alta e lenta: prenderla al volo e chiudere.",
+  "steps": [
+   "A parte dalla linea di fondo; l'allenatore lancia una palla alta e lenta.",
+   "A avanza e colpisce al volo, con un dritto pieno, prima del rimbalzo.",
+   "La palla va incrociata e profonda.",
+   "Serie da 8."
+  ],
+  "easier": "Palla più bassa, all'altezza delle spalle.",
+  "harder": "Dopo il colpo al volo, A va a rete per una volée.",
+  "cue": "Al volo, senza aspettare il rimbalzo.",
+  "stepCues": [
+   "Avanza, mettiti sotto la palla e colpisci con un dritto pieno incrociato."
+  ],
+  "missTip": "Tre fuori di fila: colpisci davanti, non sopra la testa, e accompagna verso il basso.",
+  "streakTip": "Cinque dentro di fila: ora prova più profondità."
+ },
+ "smash_bounce": {
+  "name": "Smash dopo il rimbalzo",
+  "goal": "Sul pallonetto molto alto lasciar rimbalzare la palla e schiacciare da fondo campo.",
+  "steps": [
+   "A a metà campo; l'allenatore lancia un pallonetto molto alto e profondo.",
+   "A arretra, lascia rimbalzare la palla e si mette sotto, col braccio sinistro alto.",
+   "Smash profondo al centro, senza fretta.",
+   "Serie da 8."
+  ],
+  "easier": "Pallonetti meno profondi, che rimbalzano vicino alla linea del servizio.",
+  "harder": "L'allenatore decide all'ultimo se lanciare corto (smash al volo) o lungo (dopo il rimbalzo)."
+ },
+ "lob_smash": {
+  "name": "Pallonetto e smash a coppie",
+  "goal": "Allenare insieme pallonetto e smash: chi è a fondo alza, chi è a rete schiaccia.",
+  "steps": [
+   "A a rete, B a fondo campo.",
+   "B gioca pallonetti; A arretra di lato e schiaccia.",
+   "B prova a rimettere lo smash con un altro pallonetto.",
+   "Dopo 10 smash si cambiano i ruoli."
+  ],
+  "easier": "B lancia i pallonetti a mano.",
+  "harder": "Si gioca il punto: B può scegliere pallonetto o passante."
+ },
+ "volley_smash": {
+  "name": "Volée e smash",
+  "goal": "Dopo la volée prepararsi al pallonetto: arretrare e schiacciare.",
+  "steps": [
+   "Passo 1: A a rete gioca una volée profonda.",
+   "Passo 2: l'allenatore lancia subito un pallonetto; A arretra di lato e schiaccia.",
+   "Dopo lo smash, A torna a rete.",
+   "Serie da 6 coppie volée e smash."
+  ],
+  "easier": "Pallonetti più bassi e meno profondi.",
+  "harder": "L'allenatore alterna a caso volée, pallonetto e palla al corpo."
+ },
+ "fw_cones": {
+  "name": "Slalom tra i coni",
+  "goal": "Passi corti e veloci, cambi di direzione puliti.",
+  "steps": [
+   "Cinque coni a zig-zag tra la linea di fondo e quella del servizio.",
+   "A passa attorno a ogni cono con passi corti, sempre fronte alla rete.",
+   "Arrivato in fondo torna camminando.",
+   "Quattro giri, con pausa."
+  ],
+  "easier": "Coni più distanti, passo normale.",
+  "harder": "A ogni cono un colpo a vuoto (dritto o rovescio) prima di ripartire."
+ },
+ "fw_recover": {
+  "name": "Colpisci e torna al centro",
+  "goal": "Abituarsi a tornare al centro dopo ogni colpo, a destra e a sinistra.",
+  "steps": [
+   "Passo 1: palla larga sul dritto, A colpisce incrociato e torna al centro.",
+   "Passo 2: palla larga sul rovescio, A colpisce incrociato e torna al centro.",
+   "Il lancio successivo parte quando A è di nuovo al centro.",
+   "Serie da 8 palle, alternate."
+  ],
+  "easier": "Palle meno larghe e più tempo tra un lancio e l'altro.",
+  "harder": "Il lancio parte prima che A sia tornato al centro."
+ },
+ "fw_body_ball": {
+  "name": "Fuori dalla palla al corpo",
+  "goal": "Togliersi dalla palla che arriva addosso con un passo di lato, per colpire di dritto.",
+  "steps": [
+   "A al centro della linea di fondo; l'allenatore lancia dritto addosso ad A.",
+   "A fa un passo a sinistra, lascia la palla alla sua destra e colpisce di dritto.",
+   "La palla va profonda al centro.",
+   "Serie da 10."
+  ],
+  "easier": "Palla più lenta e un po' spostata.",
+  "harder": "L'allenatore lancia a caso addosso, a destra o a sinistra."
+ },
+ "fw_forward_back": {
+  "name": "Avanti e indietro",
+  "goal": "Coprire il campo in profondità: prima la palla corta, poi quella profonda.",
+  "steps": [
+   "Passo 1: palla corta, A entra in campo e colpisce.",
+   "Passo 2: subito una palla alta e profonda, A arretra e colpisce.",
+   "Arretrare di lato, non di spalle.",
+   "Serie da 6 coppie."
+  ],
+  "easier": "Più tempo tra le due palle.",
+  "harder": "Dopo la palla profonda, una terza palla corta."
+ },
+ "fit_lines": {
+  "name": "Scatti alle linee",
+  "goal": "Velocità e cambi di direzione: scatti sempre più lunghi con ritorno alla linea di fondo.",
+  "steps": [
+   "Dalla linea di fondo, scatto alla linea del servizio e ritorno.",
+   "Poi scatto a metà tra servizio e rete e ritorno.",
+   "Poi scatto fino alla rete e ritorno.",
+   "Tre serie, con un minuto di pausa."
+  ],
+  "easier": "Si cammina veloce nel ritorno.",
+  "harder": "Si tocca la linea con la mano a ogni cambio di direzione."
+ },
+ "fit_shadow": {
+  "name": "Colpi a vuoto",
+  "goal": "Ripetere i movimenti dei colpi senza palla, a ritmo, per scaldarsi e fissare i gesti.",
+  "steps": [
+   "A al centro della linea di fondo, racchetta in mano.",
+   "Passi laterali verso destra, dritto a vuoto, ritorno al centro.",
+   "Poi a sinistra col rovescio, poi avanti per una volée a vuoto.",
+   "30 secondi di lavoro e 30 di pausa, 6 volte."
+  ],
+  "easier": "Più lento, curando solo il gesto.",
+  "harder": "Lavoro di 45 secondi, pausa di 15."
+ },
+ "fit_box": {
+  "name": "Il quadrato del servizio",
+  "goal": "Muoversi in tutte le direzioni: di lato, indietro, avanti.",
+  "steps": [
+   "Quattro coni agli angoli del quadrato del servizio.",
+   "Passi laterali lungo la linea del servizio, poi indietro lungo la riga laterale.",
+   "Passi laterali lungo la rete, poi scatto in avanti fino alla linea del servizio.",
+   "Tre giri per verso, con pausa."
+  ],
+  "easier": "Un giro alla volta, camminando.",
+  "harder": "Si cronometra il giro e si prova a battere il tempo."
+ },
+ "tac_approach_pass": {
+  "name": "Attacco e passante",
+  "goal": "Imparare a scegliere l'attacco giusto e, dall'altra parte, il passante.",
+  "steps": [
+   "Passo 1: B gioca una palla corta, A attacca lungolinea.",
+   "Passo 2: A va a rete, B prova il passante lungolinea o incrociato.",
+   "Si gioca il punto fino alla fine.",
+   "Partita ai 7 punti, poi si cambiano i ruoli."
+  ],
+  "easier": "B lancia la palla corta a mano; il passante si gioca solo incrociato.",
+  "harder": "Il punto vale doppio se A vince con la prima volée."
+ },
+ "tac_middle": {
+  "name": "Doppio: al centro",
+  "goal": "Nel doppio la palla al centro crea dubbi tra i due avversari e riduce gli angoli.",
+  "steps": [
+   "Si gioca il doppio normalmente.",
+   "Per tutto il punto la coppia A gioca solo nella fascia centrale.",
+   "Si cerca il centro anche col servizio.",
+   "Partita ai 10 punti, poi tocca alla coppia B."
+  ],
+  "easier": "Si gioca solo da fondo campo, senza volée.",
+  "harder": "Il punto vale doppio se si vince con un colpo nella fascia centrale."
+ },
+ "tac_high_low": {
+  "name": "Palla alta e palla tesa",
+  "goal": "Cambiare ritmo nel palleggio incrociato per togliere tempo e riferimenti all'altro.",
+  "steps": [
+   "A e B palleggiano incrociato sulla diagonale del pari.",
+   "A alterna una palla alta e carica e una tesa e veloce.",
+   "B deve rimettere tutte le palle profonde.",
+   "Dopo 20 colpi si cambiano i ruoli."
+  ],
+  "easier": "Si cambia ritmo ogni due colpi.",
+  "harder": "A decide a caso; l'altro deve capirlo dalla preparazione.",
+  "cue": "Una palla alta, una tesa: cambia ritmo.",
+  "stepCues": [
+   "Alterna: alta e carica sopra la rete, poi tesa e veloce."
+  ],
+  "missTip": "Tre fuori di fila: tieni più margine sulla palla tesa.",
+  "streakTip": "Cinque dentro di fila: ora fai cadere più profonde tutte e due."
  }
 }
 TSM_EOF
@@ -18781,7 +19434,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - Eine **Übung** ist ein Schlag mit Schritten nacheinander: zum Beispiel *20 Vorhand cross, dann 20 longline*, oder beim Aufschlag *10 erste Aufschläge von der Einstandseite durch die Mitte, dann 10 nach außen…*. Es gibt vier fertige Beispiele, eines pro Schlag.
 - **Übungen** (über die Auswahl **Übung** unter *Starten*, im Schlagtraining): **Neue Übung**, Name, Schlag und Schritte; für jeden Schritt wie viele Schläge (− und + in Fünferschritten) und je nach Schlag Seite, erster oder zweiter Aufschlag und Ziel, Richtung, Volley mit Vorhand oder Rückhand (*—* = so lassen). Eine Übung antippen, um sie zu ändern oder zu löschen.
 - Unter **Trainieren**, unter den Schlägen, wählt **Übung** die zu folgende (oder *Frei*). Im Training stellt die App die Auswahl des Schritts selbst ein, zeigt oben *Schritt 1 von 2 · 7/20*, am Ende eines Schritts sagt die Stimme den nächsten an (und das Armband zeigt ihn) und am Ende *Übung beendet*. Wird ein Schlag rückgängig gemacht, geht es zum richtigen Schritt zurück. Die Übersicht zählt nach Richtung und Ziel, und die Einheit merkt sich den Namen der Übung.
-- **Übungssammlung** (unter **Trainieren**, im Tab **Schüler** des Trainers und oben in den *Übungen*): 20 illustrierte Übungen, für die App geschrieben (Vorhand, Rückhand, Aufschlag, Return, Volley, Schmetterball, Beinarbeit, Taktik, Kondition), mit Filtern nach Thema, Niveau und Spielerzahl. Jede hat eine Platzzeichnung von hinter A gesehen, wie auf dem Platz (der Ball im Bogen, eine Farbe pro Schlag in der Reihenfolge mit seiner Nummer; nummerierte Ovale: wo er landen soll; gestrichelt wer läuft und, im gestrichelten Feld, wohin man nach dem Schlag zurückgeht; Figuren mit dem Schläger auf der Seite des Schlags; orange mit Korb wer zuspielt; Dreiecke die Hütchen; in der Liste eine Miniatur von oben; Übungen mit vielen Schlägen sind in Schritte geteilt, *Schritt 1 von 2 · Schläge 1-2*, untereinander; die Flugbahnen beginnen und enden am Schläger des Spielers), das Ziel, die Schritte und eine leichtere und eine schwerere Variante. Übungen für einen einzelnen Schlag haben zwei Tasten: **Übung starten** geht zurück zum Training, Schlag und Übung sind schon gewählt (einfach **Starten** drücken, oder vom Platz aus KEY1 am Armband oder ein Klick der Fernbedienung); **Zu meinen Übungen hinzufügen** legt sie nur in die Liste der geführten Übungen und du bleibst in der Sammlung (ist sie schon da, steht auf der Taste *Schon in meinen Übungen*, Kopien gibt es nicht). Hast du mehrere Übungen für einen Schlag, zeigt die Zeile *Übung* die gewählte und wie viele es sind; die anderen wählst du mit *Ändern*. Vorerst sind die Texte nur auf Italienisch.
+- **Übungssammlung** (unter **Trainieren**, im Tab **Schüler** des Trainers und oben in den *Übungen*): 60 illustrierte Übungen, für die App geschrieben (Vorhand, Rückhand, Aufschlag, Return, Volley, Schmetterball, Beinarbeit, Taktik, Kondition), mit Filtern nach Thema, Niveau und Spielerzahl. Jede hat eine Platzzeichnung von hinter A gesehen, wie auf dem Platz (der Ball im Bogen, eine Farbe pro Schlag in der Reihenfolge mit seiner Nummer; nummerierte Ovale: wo er landen soll; gestrichelt wer läuft und, im gestrichelten Feld, wohin man nach dem Schlag zurückgeht; Figuren mit dem Schläger auf der Seite des Schlags; orange mit Korb wer zuspielt; Dreiecke die Hütchen; in der Liste eine Miniatur von oben; Übungen mit vielen Schlägen sind in Schritte geteilt, *Schritt 1 von 2 · Schläge 1-2*, untereinander; die Flugbahnen beginnen und enden am Schläger des Spielers), das Ziel, die Schritte und eine leichtere und eine schwerere Variante. Übungen für einen einzelnen Schlag haben zwei Tasten: **Übung starten** geht zurück zum Training, Schlag und Übung sind schon gewählt (einfach **Starten** drücken, oder vom Platz aus KEY1 am Armband oder ein Klick der Fernbedienung); **Zu meinen Übungen hinzufügen** legt sie nur in die Liste der geführten Übungen und du bleibst in der Sammlung (ist sie schon da, steht auf der Taste *Schon in meinen Übungen*, Kopien gibt es nicht). Hast du mehrere Übungen für einen Schlag, zeigt die Zeile *Übung* die gewählte und wie viele es sind; die anderen wählst du mit *Ändern*. Vorerst sind die Texte nur auf Italienisch.
 - **Die Stimme bei den Übungen der Sammlung** (mit eingeschaltetem Ton und der App auf Italienisch): am Anfang sagt sie Name, Ziel und Kernsatz der Übung und den ersten Schritt; bei jedem Schritt sagt sie auch, wie er geht (*Jetzt Rückhand-Volley: Schulter gedreht, Handgelenk fest*); nach drei Schlägen hintereinander im Aus gibt sie einen Tipp, nach fünf hintereinander im Feld schlägt sie vor, die Übung schwerer zu machen (einmal pro Schritt). Bei anderen Übungen und in anderen Sprachen bleiben die üblichen Ansagen.
 
 ### 7.11 Vereinsmitglieder
@@ -19422,7 +20075,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - A **drill** is a stroke and steps in a row: for example *20 cross-court forehands, then 20 down the line*, or for the serve *10 first serves from the deuce side to the T, then 10 wide…*. There are four ready examples, one per stroke.
 - **Drills** (from the **Drill** choice under *Start*, in stroke practice): **New drill**, name, stroke and steps; for each step how many shots (− and + by 5) and, depending on the stroke, side, first or second and target, direction, forehand or backhand volley (*—* = leave as it is). Tap a drill to change or delete it.
 - In **Practice**, under the strokes, **Drill** picks the one to follow (or *Free*). During practice the app sets the step's choices by itself, shows *Step 1 of 2 · 7/20* at the top, at the end of a step the voice says the next one (and the wristband shows it) and at the end *Drill finished*. Undoing a shot goes back to the right step. The summary counts by direction and target, and the session remembers the drill's name.
-- **Drill library** (in **Practice**, in the coach's **Students** tab and at the top of *Drills*): 20 illustrated drills written for the app (forehand, backhand, serve, return, volley, overhead, footwork, tactics, fitness), with filters by topic, level and number of players. Each one has a court drawing seen from behind A, as on court (the ball in an arc, one colour per shot in order with its number; numbered ovals: where it should land; dashed who moves and, in the dashed box, where to recover after the shot; figures holding the racket on the side of the stroke; orange with a basket who feeds; triangles the cones; a top-down thumbnail in the list; drills with many shots are split into steps, *Step 1 of 2 · Shots 1-2*, one below the other; paths start and end on the hitter's racket), the goal, the steps and an easier and a harder version. Those for a single stroke have two buttons: **Start drill** goes back to practice with the stroke and drill already picked (just press **Start**, or from the court the band's KEY1 or a click of the remote); **Add to my drills** only puts it in the list of guided drills and you stay in the library (if it is already there the button says *Already in my drills*, and no copies are made). If you have several drills for a stroke, the *Drill* row shows the chosen one and how many there are; pick another with *Change*. For now the texts are in Italian only.
+- **Drill library** (in **Practice**, in the coach's **Students** tab and at the top of *Drills*): 60 illustrated drills written for the app (forehand, backhand, serve, return, volley, overhead, footwork, tactics, fitness), with filters by topic, level and number of players. Each one has a court drawing seen from behind A, as on court (the ball in an arc, one colour per shot in order with its number; numbered ovals: where it should land; dashed who moves and, in the dashed box, where to recover after the shot; figures holding the racket on the side of the stroke; orange with a basket who feeds; triangles the cones; a top-down thumbnail in the list; drills with many shots are split into steps, *Step 1 of 2 · Shots 1-2*, one below the other; paths start and end on the hitter's racket), the goal, the steps and an easier and a harder version. Those for a single stroke have two buttons: **Start drill** goes back to practice with the stroke and drill already picked (just press **Start**, or from the court the band's KEY1 or a click of the remote); **Add to my drills** only puts it in the list of guided drills and you stay in the library (if it is already there the button says *Already in my drills*, and no copies are made). If you have several drills for a stroke, the *Drill* row shows the chosen one and how many there are; pick another with *Change*. For now the texts are in Italian only.
 - **The voice in library drills** (with audio on and the app in Italian): at the start it says the drill's name, goal and key phrase and the first step; at each step it also says how to do it (*Now backhand volley: shoulder turned, firm wrist*); after three shots out in a row it gives a tip and after five in a row in it suggests making the drill harder (once per step). In other drills and other languages the usual announcements remain.
 
 ### 7.11 Club members
@@ -20062,7 +20715,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - Un **ejercicio** es un golpe y unos pasos seguidos: por ejemplo *20 derechas cruzadas, luego 20 paralelas*, o en el saque *10 primeros desde el lado de iguales a la T, luego 10 abiertos…*. Hay cuatro ejemplos listos, uno por golpe.
 - **Ejercicios** (desde la elección **Ejercicio** bajo *Empezar*, en el entrenamiento de golpes): **Ejercicio nuevo**, nombre, golpe y pasos; para cada paso cuántos golpes (− y + de 5 en 5) y, según el golpe, lado, primero o segundo y objetivo, dirección, volea de derecha o de revés (*—* = dejar como está). Toca un ejercicio para cambiarlo o borrarlo.
 - En **Entrenar**, bajo los golpes, **Ejercicio** elige el que seguir (o *Libre*). Durante el entrenamiento la app pone sola las opciones del paso, arriba muestra *Paso 1 de 2 · 7/20*, al acabar un paso la voz dice el siguiente (y la pulsera lo muestra) y al final *Ejercicio terminado*. Anulando un golpe se vuelve al paso correcto. El resumen cuenta por dirección y objetivo, y la sesión recuerda el nombre del ejercicio.
-- **Colección de ejercicios** (en **Entrenar**, en la pestaña **Alumnos** del entrenador y arriba en *Ejercicios*): 20 ejercicios ilustrados escritos para la app (derecha, revés, saque, resto, volea, remate, juego de pies, táctica, físico), con filtros por tema, nivel y número de jugadores. Cada uno tiene el dibujo de la pista visto desde detrás de A, como en la pista (la bola en arco, un color por golpe en orden con su número; óvalos numerados: dónde debe caer; discontinua quien se mueve y, en el recuadro discontinuo, dónde volver tras el golpe; figuras con la raqueta del lado del golpe; en naranja con el cesto quien lanza; triángulos los conos; en la lista una miniatura vista desde arriba; los ejercicios con muchos golpes se dividen en pasos, *Paso 1 de 2 · Golpes 1-2*, uno debajo del otro; las trayectorias salen y llegan a la raqueta de quien golpea), el objetivo, los pasos y una versión más fácil y otra más difícil. Los de un solo golpe tienen dos botones: **Iniciar ejercicio** vuelve al entrenamiento con el golpe y el ejercicio ya elegidos (basta con pulsar **Empezar**, o desde la pista KEY1 de la pulsera o un clic del mando); **Añadir a mis ejercicios** solo lo pone en la lista de ejercicios guiados y te quedas en la colección (si ya está, el botón dice *Ya en mis ejercicios* y no se hacen copias). Si tienes varios ejercicios para un golpe, la fila *Ejercicio* muestra el elegido y cuántos hay; los demás se eligen con *Cambiar*. Por ahora los textos están solo en italiano.
+- **Colección de ejercicios** (en **Entrenar**, en la pestaña **Alumnos** del entrenador y arriba en *Ejercicios*): 60 ejercicios ilustrados escritos para la app (derecha, revés, saque, resto, volea, remate, juego de pies, táctica, físico), con filtros por tema, nivel y número de jugadores. Cada uno tiene el dibujo de la pista visto desde detrás de A, como en la pista (la bola en arco, un color por golpe en orden con su número; óvalos numerados: dónde debe caer; discontinua quien se mueve y, en el recuadro discontinuo, dónde volver tras el golpe; figuras con la raqueta del lado del golpe; en naranja con el cesto quien lanza; triángulos los conos; en la lista una miniatura vista desde arriba; los ejercicios con muchos golpes se dividen en pasos, *Paso 1 de 2 · Golpes 1-2*, uno debajo del otro; las trayectorias salen y llegan a la raqueta de quien golpea), el objetivo, los pasos y una versión más fácil y otra más difícil. Los de un solo golpe tienen dos botones: **Iniciar ejercicio** vuelve al entrenamiento con el golpe y el ejercicio ya elegidos (basta con pulsar **Empezar**, o desde la pista KEY1 de la pulsera o un clic del mando); **Añadir a mis ejercicios** solo lo pone en la lista de ejercicios guiados y te quedas en la colección (si ya está, el botón dice *Ya en mis ejercicios* y no se hacen copias). Si tienes varios ejercicios para un golpe, la fila *Ejercicio* muestra el elegido y cuántos hay; los demás se eligen con *Cambiar*. Por ahora los textos están solo en italiano.
 - **La voz en los ejercicios de la colección** (con el audio activado y la app en italiano): al principio dice el nombre, el objetivo y la frase clave del ejercicio y el primer paso; en cada paso dice también cómo hacerlo (*Ahora volea de revés: hombro girado y muñeca firme*); tras tres golpes fuera seguidos da un consejo y tras cinco dentro seguidos propone hacer el ejercicio más difícil (una vez por paso). En los demás ejercicios y en los demás idiomas quedan los avisos de siempre.
 
 ### 7.11 Socios del club
@@ -20702,7 +21355,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - Un **exercice** est un coup et des étapes à la suite : par exemple *20 coups droits croisés, puis 20 le long de la ligne*, ou pour le service *10 premières côté égalité au T, puis 10 extérieures…*. Il y a quatre exemples prêts, un par coup.
 - **Exercices** (depuis le choix **Exercice** sous *Commencer*, dans l'entraînement des coups) : **Nouvel exercice**, nom, coup et étapes ; pour chaque étape combien de coups (− et + de 5 en 5) et, selon le coup, côté, première ou seconde et cible, direction, volée de coup droit ou de revers (*—* = laisser tel quel). Touchez un exercice pour le modifier ou le supprimer.
 - Dans **S'entraîner**, sous les coups, **Exercice** choisit celui à suivre (ou *Libre*). Pendant l'entraînement l'appli règle toute seule les choix de l'étape, affiche en haut *Étape 1 sur 2 · 7/20*, à la fin d'une étape la voix annonce la suivante (et le bracelet l'affiche) et à la fin *Exercice terminé*. En annulant un coup on revient à la bonne étape. Le bilan compte par direction et par cible, et la séance garde le nom de l'exercice.
-- **Recueil d'exercices** (dans **S'entraîner**, dans l'onglet **Élèves** de l'entraîneur et en haut des *Exercices*) : 20 exercices illustrés écrits pour l'appli (coup droit, revers, service, retour, volée, smash, jeu de jambes, tactique, physique), avec des filtres par sujet, niveau et nombre de joueurs. Chacun a le dessin du court vu de derrière A, comme sur le terrain (la balle en arc, une couleur par coup dans l'ordre avec son numéro ; ovales numérotés : où elle doit tomber ; pointillés qui se déplace et, dans le cadre en pointillés, où se replacer après le coup ; des silhouettes tenant la raquette du côté du coup ; en orange avec le panier qui lance les balles ; triangles les plots ; dans la liste une vignette vue de dessus ; les exercices avec beaucoup de coups sont divisés en étapes, *Étape 1 sur 2 · Coups 1-2*, l'une sous l'autre ; les trajectoires partent et arrivent sur la raquette de celui qui frappe), l'objectif, les étapes et une version plus facile et une plus difficile. Ceux d'un seul coup ont deux boutons : **Lancer l'exercice** revient à l'entraînement avec le coup et l'exercice déjà choisis (il suffit d'appuyer sur **Commencer**, ou depuis le court KEY1 du bracelet ou un clic de la télécommande) ; **Ajouter à mes exercices** le met seulement dans la liste des exercices guidés et vous restez dans la bibliothèque (s'il y est déjà, le bouton indique *Déjà dans mes exercices*, et aucune copie n'est faite). Si vous avez plusieurs exercices pour un coup, la ligne *Exercice* montre celui choisi et combien il y en a ; les autres se choisissent avec *Changer*. Pour l'instant les textes sont seulement en italien.
+- **Recueil d'exercices** (dans **S'entraîner**, dans l'onglet **Élèves** de l'entraîneur et en haut des *Exercices*) : 60 exercices illustrés écrits pour l'appli (coup droit, revers, service, retour, volée, smash, jeu de jambes, tactique, physique), avec des filtres par sujet, niveau et nombre de joueurs. Chacun a le dessin du court vu de derrière A, comme sur le terrain (la balle en arc, une couleur par coup dans l'ordre avec son numéro ; ovales numérotés : où elle doit tomber ; pointillés qui se déplace et, dans le cadre en pointillés, où se replacer après le coup ; des silhouettes tenant la raquette du côté du coup ; en orange avec le panier qui lance les balles ; triangles les plots ; dans la liste une vignette vue de dessus ; les exercices avec beaucoup de coups sont divisés en étapes, *Étape 1 sur 2 · Coups 1-2*, l'une sous l'autre ; les trajectoires partent et arrivent sur la raquette de celui qui frappe), l'objectif, les étapes et une version plus facile et une plus difficile. Ceux d'un seul coup ont deux boutons : **Lancer l'exercice** revient à l'entraînement avec le coup et l'exercice déjà choisis (il suffit d'appuyer sur **Commencer**, ou depuis le court KEY1 du bracelet ou un clic de la télécommande) ; **Ajouter à mes exercices** le met seulement dans la liste des exercices guidés et vous restez dans la bibliothèque (s'il y est déjà, le bouton indique *Déjà dans mes exercices*, et aucune copie n'est faite). Si vous avez plusieurs exercices pour un coup, la ligne *Exercice* montre celui choisi et combien il y en a ; les autres se choisissent avec *Changer*. Pour l'instant les textes sont seulement en italien.
 - **La voix dans les exercices de la bibliothèque** (avec le son activé et l'appli en italien) : au début elle dit le nom, l'objectif et la phrase clé de l'exercice et la première étape ; à chaque étape elle dit aussi comment la faire (*Maintenant volée de revers : épaule tournée, poignet ferme*) ; après trois coups dehors d'affilée elle donne un conseil et après cinq dedans d'affilée elle propose de rendre l'exercice plus difficile (une fois par étape). Dans les autres exercices et les autres langues, les annonces habituelles restent.
 
 ### 7.11 Adhérents du club
@@ -21342,7 +21995,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - Un **esercizio** è un colpo e dei passi in fila: per esempio *20 dritti incrociati, poi 20 lungolinea*, o per il servizio *10 prime da destra al T, poi 10 esterne…*. Ci sono quattro esempi pronti, uno per colpo.
 - **Esercizi** (dalla scelta **Esercizio** sotto *Inizia*, nell'allenamento dei colpi): **Nuovo esercizio**, nome, colpo e passi; per ogni passo quanti colpi (− e + di 5 in 5) e, secondo il colpo, lato, prima o seconda e bersaglio, direzione, volée di dritto o di rovescio (*—* = lascia com'è). Toccando un esercizio lo cambi o lo elimini.
 - In **Allenati**, sotto i colpi, **Esercizio** sceglie quello da seguire (o *Libero*). Durante l'allenamento l'app imposta da sola le scelte del passo, in alto mostra *Passo 1 di 2 · 7/20*, a fine passo la voce dice il prossimo (e il braccialetto lo mostra) e alla fine *Esercizio finito*. Annullando un colpo si torna al passo giusto. Il riepilogo conta per direzione e bersaglio, e la sessione ricorda il nome dell'esercizio.
-- **Raccolta di esercizi** (in **Allenati**, nella scheda **Allievi** dell'allenatore e in cima agli *Esercizi*): 20 esercizi illustrati, scritti per l'app (dritto, rovescio, servizio, risposta, volée, smash, gioco di gambe, tattica, fisico), con filtri per argomento, livello e numero di giocatori. Ognuno ha il disegno del campo visto da dietro A, come in campo (la palla ad arco, un colore per ogni colpo in ordine col suo numero; gli ovali col numero: dove deve arrivare; tratteggio chi si sposta e, nel riquadro tratteggiato, dove tornare dopo il colpo; gli omini con la racchetta dalla parte del colpo; in arancio col cesto chi lancia le palle; triangoli i coni; nell'elenco una miniatura vista dall'alto; gli esercizi con tanti colpi sono divisi in passi, *Passo 1 di 2 · Colpi 1-2*, uno sotto l'altro; le traiettorie partono e finiscono sulla racchetta di chi colpisce), l'obiettivo, i passi e una versione più facile e una più difficile. Quelli di un colpo solo hanno due tasti: **Avvia esercizio** torna all'allenamento col colpo e l'esercizio già scelti (basta premere **Inizia**, oppure dal campo KEY1 del braccialetto o un clic del telecomando); **Aggiungi ai miei esercizi** lo mette solo nella lista degli esercizi guidati e resti nella raccolta (se c'è già il tasto dice *Già nei miei esercizi*, e non si fanno copie). Se per un colpo hai più esercizi, la riga *Esercizio* mostra quello scelto e quanti sono; gli altri si scelgono con *Cambia*. Per ora i testi sono solo in italiano.
+- **Raccolta di esercizi** (in **Allenati**, nella scheda **Allievi** dell'allenatore e in cima agli *Esercizi*): 60 esercizi illustrati, scritti per l'app (dritto, rovescio, servizio, risposta, volée, smash, gioco di gambe, tattica, fisico), con filtri per argomento, livello e numero di giocatori. Ognuno ha il disegno del campo visto da dietro A, come in campo (la palla ad arco, un colore per ogni colpo in ordine col suo numero; gli ovali col numero: dove deve arrivare; tratteggio chi si sposta e, nel riquadro tratteggiato, dove tornare dopo il colpo; gli omini con la racchetta dalla parte del colpo; in arancio col cesto chi lancia le palle; triangoli i coni; nell'elenco una miniatura vista dall'alto; gli esercizi con tanti colpi sono divisi in passi, *Passo 1 di 2 · Colpi 1-2*, uno sotto l'altro; le traiettorie partono e finiscono sulla racchetta di chi colpisce), l'obiettivo, i passi e una versione più facile e una più difficile. Quelli di un colpo solo hanno due tasti: **Avvia esercizio** torna all'allenamento col colpo e l'esercizio già scelti (basta premere **Inizia**, oppure dal campo KEY1 del braccialetto o un clic del telecomando); **Aggiungi ai miei esercizi** lo mette solo nella lista degli esercizi guidati e resti nella raccolta (se c'è già il tasto dice *Già nei miei esercizi*, e non si fanno copie). Se per un colpo hai più esercizi, la riga *Esercizio* mostra quello scelto e quanti sono; gli altri si scelgono con *Cambia*. Per ora i testi sono solo in italiano.
 - **La voce negli esercizi della raccolta** (con l'audio acceso e l'app in italiano): all'inizio dice nome, obiettivo e la frase chiave dell'esercizio e il primo passo; a ogni passo dice anche come farlo (*Ora volée di rovescio: spalla girata e polso fermo*); dopo tre colpi fuori di fila dà un consiglio e dopo cinque dentro di fila propone di rendere l'esercizio più difficile (una volta per passo). Negli altri esercizi e nelle altre lingue restano gli annunci di sempre.
 
 ### 7.11 Soci del circolo
@@ -21982,7 +22635,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - Um **exercício** é um golpe e passos em sequência: por exemplo *20 forehands cruzados, depois 20 na paralela*, ou no saque *10 primeiros do lado de iguais no T, depois 10 abertos…*. Há quatro exemplos prontos, um por golpe.
 - **Exercícios** (na escolha **Exercício** embaixo de *Começar*, no treino de golpes): **Novo exercício**, nome, golpe e passos; para cada passo quantos golpes (− e + de 5 em 5) e, conforme o golpe, lado, primeiro ou segundo e alvo, direção, voleio de forehand ou de backhand (*—* = deixar como está). Toque num exercício para mudar ou apagar.
 - Em **Treinar**, embaixo dos golpes, **Exercício** escolhe o que seguir (ou *Livre*). Durante o treino o app ajusta sozinho as escolhas do passo, no alto mostra *Passo 1 de 2 · 7/20*, no fim de um passo a voz diz o próximo (e a pulseira mostra) e no fim *Exercício terminado*. Desfazendo um golpe volta-se ao passo certo. O resumo conta por direção e alvo, e a sessão lembra o nome do exercício.
-- **Coleção de exercícios** (em **Treinar**, na aba **Alunos** do treinador e no alto de *Exercícios*): 20 exercícios ilustrados feitos para o app (forehand, backhand, saque, devolução, voleio, smash, trabalho de pernas, tática, físico), com filtros por tema, nível e número de jogadores. Cada um tem o desenho da quadra visto de trás de A, como na quadra (a bola em arco, uma cor por golpe na ordem com seu número; ovais numerados: onde deve cair; tracejada quem se move e, no quadro tracejado, para onde voltar depois do golpe; bonecos com a raquete do lado do golpe; em laranja com o cesto quem lança as bolas; triângulos os cones; na lista uma miniatura vista de cima; os exercícios com muitos golpes são divididos em etapas, *Etapa 1 de 2 · Golpes 1-2*, uma embaixo da outra; as trajetórias saem e chegam na raquete de quem bate), o objetivo, os passos e uma versão mais fácil e outra mais difícil. Os de um só golpe têm dois botões: **Iniciar exercício** volta ao treino com o golpe e o exercício já escolhidos (basta tocar em **Começar**, ou do campo KEY1 da pulseira ou um clique do comando); **Adicionar aos meus exercícios** só o põe na lista de exercícios guiados e ficas na coleção (se já estiver lá, o botão diz *Já nos meus exercícios* e não se fazem cópias). Se tens vários exercícios para um golpe, a linha *Exercício* mostra o escolhido e quantos são; os outros escolhem-se com *Trocar*. Por enquanto os textos estão só em italiano.
+- **Coleção de exercícios** (em **Treinar**, na aba **Alunos** do treinador e no alto de *Exercícios*): 60 exercícios ilustrados feitos para o app (forehand, backhand, saque, devolução, voleio, smash, trabalho de pernas, tática, físico), com filtros por tema, nível e número de jogadores. Cada um tem o desenho da quadra visto de trás de A, como na quadra (a bola em arco, uma cor por golpe na ordem com seu número; ovais numerados: onde deve cair; tracejada quem se move e, no quadro tracejado, para onde voltar depois do golpe; bonecos com a raquete do lado do golpe; em laranja com o cesto quem lança as bolas; triângulos os cones; na lista uma miniatura vista de cima; os exercícios com muitos golpes são divididos em etapas, *Etapa 1 de 2 · Golpes 1-2*, uma embaixo da outra; as trajetórias saem e chegam na raquete de quem bate), o objetivo, os passos e uma versão mais fácil e outra mais difícil. Os de um só golpe têm dois botões: **Iniciar exercício** volta ao treino com o golpe e o exercício já escolhidos (basta tocar em **Começar**, ou do campo KEY1 da pulseira ou um clique do comando); **Adicionar aos meus exercícios** só o põe na lista de exercícios guiados e ficas na coleção (se já estiver lá, o botão diz *Já nos meus exercícios* e não se fazem cópias). Se tens vários exercícios para um golpe, a linha *Exercício* mostra o escolhido e quantos são; os outros escolhem-se com *Trocar*. Por enquanto os textos estão só em italiano.
 - **A voz nos exercícios da coleção** (com o áudio ligado e a app em italiano): no início diz o nome, o objetivo e a frase-chave do exercício e o primeiro passo; em cada passo diz também como fazê-lo (*Agora vólei de esquerda: ombro rodado e pulso firme*); depois de três pancadas fora seguidas dá um conselho e depois de cinco dentro seguidas propõe tornar o exercício mais difícil (uma vez por passo). Nos outros exercícios e nas outras línguas ficam os avisos de sempre.
 
 ### 7.11 Sócios do clube
@@ -24199,6 +24852,8 @@ class MatchController(
      * telecomando la avviano come il tasto Inizia ([trainStartRequests], raccolto dalla pagina).
      */
     @Volatile var trainStartReady = false
+    /** Arrivati da "Avvia esercizio" della raccolta: la pagina dell'allenamento scorre fino all'esercizio e a Inizia. */
+    val trainFocus = MutableStateFlow(false)
     val trainStartRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     @Volatile var serveTraining = false
@@ -33908,7 +34563,7 @@ object DrillLibrary {
 
     /** Un bersaglio ovale largo [w] e lungo [h] metri attorno a ([x], [y]), col numero del colpo. */
     private fun target(x: Float, y: Float, label: String = "", w: Float = 2.4f, h: Float = 2.4f, frame: Int? = null) = Zone(p(x - w / 2, y - h / 2), p(x + w / 2, y + h / 2), label, frame = frame)
-    private fun area(x1: Float, y1: Float, x2: Float, y2: Float) = Zone(p(x1, y1), p(x2, y2), area = true)
+    private fun area(x1: Float, y1: Float, x2: Float, y2: Float, frame: Int? = null) = Zone(p(x1, y1), p(x2, y2), area = true, frame = frame)
     private fun recover(x: Float, y: Float) = Zone(p(x - 0.8f, y - 0.7f), p(x + 0.8f, y + 0.7f))
 
     val ITEMS: List<Item> = listOf(
@@ -34161,6 +34816,501 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(0f, -7.5f, "3", 2f, 2.4f, frame = 2)),
             ),
+        ),
+
+        // ------------------------------------------------------------ altri 40 (27 nov)
+
+        // Dritto inside-out: A gira attorno alla palla sul lato del vantaggio e tira il dritto incrociato verso il
+        // vantaggio dell'altro.
+        Item(
+            "fh_inside_out", Topic.FOREHAND, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(-3f, 12.1f), "A"), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    move(p(0.2f, 13.4f), p(-2.7f, 13.1f)),
+                    ball(p(0f, -8f), p(-2.2f, 11.8f), order = 1), ball(p(-2.2f, 11.8f), p(2.8f, -9f), order = 2),
+                ),
+                zones = listOf(target(2.8f, -9f, "2")),
+                recover = listOf(recover(-1f, 12.6f)),
+            ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
+        ),
+        // Dritto inside-in: dallo stesso punto, ma lungolinea.
+        Item(
+            "fh_inside_in", Topic.FOREHAND, Level.ADVANCED, 1, 15,
+            Diagram(
+                listOf(Who(p(-3f, 12.1f), "A"), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    move(p(0.2f, 13.4f), p(-2.7f, 13.1f)),
+                    ball(p(0f, -8f), p(-2.2f, 11.8f), order = 1), ball(p(-2.2f, 11.8f), p(-3f, -9.2f), order = 2),
+                ),
+                zones = listOf(target(-3f, -9.2f, "2", 2f, 2.6f)),
+                recover = listOf(recover(-0.6f, 12.6f)),
+            ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.LINE)),
+        ),
+        // Dritto carico: la palla passa alta sopra la rete e cade profonda.
+        Item(
+            "fh_topspin_height", Topic.FOREHAND, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(1.5f, 12.2f), "A"), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(ball(p(0f, -8f), p(2.2f, 11.7f), order = 1), ball(p(2.2f, 11.7f), p(0.4f, -9.9f), order = 2, arc = 3.2f)),
+                zones = listOf(target(0.4f, -9.9f, "2", 5f, 2.6f)),
+            ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
+        ),
+        // Dritto in corsa: palla larga sul dritto, colpo incrociato e ritorno al centro.
+        Item(
+            "fh_run_wide", Topic.FOREHAND, Level.ADVANCED, 1, 15,
+            Diagram(
+                listOf(Who(p(3.6f, 11.8f), "A"), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    move(p(-0.2f, 13.4f), p(3.2f, 12.9f)),
+                    ball(p(0f, -8f), p(4.3f, 11.4f), order = 1), ball(p(4.3f, 11.4f), p(-2.5f, -9f), order = 2),
+                    move(p(3.4f, 12.5f), p(0.6f, 12.7f)),
+                ),
+                zones = listOf(target(-2.5f, -9f, "2")),
+                recover = listOf(recover(0f, 12.6f)),
+            ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
+        ),
+        // Angolo corto di dritto: nel palleggio incrociato, la palla che esce dal campo vicino alla rete.
+        Item(
+            "fh_short_angle", Topic.FOREHAND, Level.ADVANCED, 2, 15,
+            Diagram(
+                listOf(Who(p(2.1f, 12.1f), "A"), Who(p(-3f, -12.2f), "B")),
+                paths = listOf(
+                    ball(p(-3f, -12.2f), p(2.7f, 11.7f), order = 1), ball(p(2.7f, 11.7f), p(-3.6f, -4.2f), order = 2, arc = 0.9f),
+                    move(p(-3f, -11.6f), p(-4.6f, -6.4f)),
+                ),
+                zones = listOf(target(-3.6f, -4.2f, "2", 1.6f, 2f)),
+            ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
+        ),
+        // Palla corta: A entra in campo e attacca di dritto lungolinea.
+        Item(
+            "fh_approach_line", Topic.FOREHAND, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(1.9f, 7.3f), "A"), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    move(p(1.4f, 12.2f), p(1.8f, 7.9f)),
+                    ball(p(0f, -8f), p(2.6f, 7f), order = 1, arc = 1f), ball(p(2.6f, 7f), p(3.3f, -9.4f), order = 2),
+                    move(p(1.8f, 6.7f), p(1.5f, 4f)),
+                ),
+                zones = listOf(target(3.3f, -9.4f, "2", 2f, 2.6f)),
+                recover = listOf(recover(1.4f, 3.4f)),
+            ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.LINE)),
+        ),
+        // Rovescio lungolinea dal lato del vantaggio.
+        Item(
+            "bh_line", Topic.BACKHAND, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(-2.9f, 12.1f), "A", backhand = true), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(ball(p(0f, -8f), p(-3.6f, 11.7f), order = 1), ball(p(-3.6f, 11.7f), p(-3.2f, -9.4f), order = 2)),
+                zones = listOf(target(-3.2f, -9.4f, "2", 2f, 2.6f)),
+                recover = listOf(recover(-0.8f, 12.6f)),
+            ),
+            guided = TrainedStroke.BACKHAND to listOf(DrillStep(20, direction = ShotDirection.LINE)),
+        ),
+        // Rovescio tagliato: basso sopra la rete e profondo.
+        Item(
+            "bh_slice", Topic.BACKHAND, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(-1.5f, 12.1f), "A", backhand = true), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(ball(p(0f, -8f), p(-2.2f, 11.6f), order = 1), ball(p(-2.2f, 11.6f), p(-0.4f, -10.1f), order = 2, arc = 0.5f)),
+                zones = listOf(target(-0.4f, -10.1f, "2", 4.4f, 2.4f)),
+            ),
+            guided = TrainedStroke.BACKHAND to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
+        ),
+        // Rovescio incrociato e lungolinea, a serie.
+        Item(
+            "bh_cross_line", Topic.BACKHAND, Level.ADVANCED, 1, 20,
+            Diagram(
+                listOf(Who(p(-2.6f, 12.1f), "A", backhand = true), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    ball(p(0f, -8f), p(-3.3f, 11.7f), order = 1, frame = 1), ball(p(-3.3f, 11.7f), p(3f, -9.3f), order = 2, frame = 1),
+                    ball(p(0f, -8f), p(-3.3f, 11.7f), order = 3, frame = 2), ball(p(-3.3f, 11.7f), p(-3.2f, -9.3f), order = 4, frame = 2),
+                ),
+                zones = listOf(target(3f, -9.3f, "2", frame = 1), target(-3.2f, -9.3f, "4", 2f, 2.6f, frame = 2)),
+            ),
+            guided = TrainedStroke.BACKHAND to listOf(DrillStep(10, direction = ShotDirection.CROSS), DrillStep(10, direction = ShotDirection.LINE)),
+        ),
+        // Rovescio in difesa: spinti nell'angolo, palla alta e profonda per riprendere tempo.
+        Item(
+            "bh_defense", Topic.BACKHAND, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(-4.1f, 12.3f), "A", backhand = true), Who(p(1.5f, -6.6f), "", feeder = true)),
+                paths = listOf(
+                    move(p(-0.4f, 13.4f), p(-3.7f, 13.1f)),
+                    ball(p(1.5f, -6.6f), p(-4.8f, 11.9f), order = 1, arc = 2f), ball(p(-4.8f, 11.9f), p(-0.6f, -10.2f), order = 2, arc = 4.5f),
+                ),
+                zones = listOf(target(-0.6f, -10.2f, "2", 4f, 2.4f)),
+                recover = listOf(recover(0f, 12.6f)),
+            ),
+            guided = TrainedStroke.BACKHAND to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
+        ),
+        // Angolo corto di rovescio, nella diagonale del vantaggio.
+        Item(
+            "bh_short_angle", Topic.BACKHAND, Level.ADVANCED, 2, 15,
+            Diagram(
+                listOf(Who(p(-2.4f, 12.1f), "A", backhand = true), Who(p(3f, -12.2f), "B", backhand = true)),
+                paths = listOf(
+                    ball(p(3f, -12.2f), p(-3.1f, 11.7f), order = 1), ball(p(-3.1f, 11.7f), p(3.6f, -4.2f), order = 2, arc = 0.9f),
+                    move(p(3f, -11.6f), p(4.6f, -6.4f)),
+                ),
+                zones = listOf(target(3.6f, -4.2f, "2", 1.6f, 2f)),
+            ),
+            guided = TrainedStroke.BACKHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
+        ),
+        // Primi rovesci: palle lente lanciate da vicino, A dentro il campo.
+        Item(
+            "bh_first", Topic.BACKHAND, Level.BEGINNER, 1, 10,
+            Diagram(
+                listOf(Who(p(-0.6f, 9f), "A", backhand = true), Who(p(0f, -4.5f), "", feeder = true)),
+                paths = listOf(ball(p(0f, -4.5f), p(-1.3f, 8.6f), order = 1, arc = 1.4f), ball(p(-1.3f, 8.6f), p(0f, -8f), order = 2, arc = 1.4f)),
+                zones = listOf(area(-SINGLES, -BASE, SINGLES, -SERVICE)),
+            ),
+            guided = TrainedStroke.BACKHAND to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
+        ),
+        // Servizio da sinistra: al centro e esterno.
+        Item(
+            "serve_ad_targets", Topic.SERVE, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(-0.8f, 12.3f), "A")),
+                paths = listOf(ball(p(-0.8f, 12.3f), p(0.7f, -5.4f), order = 1), ball(p(-0.8f, 12.3f), p(3.4f, -5.4f), order = 2)),
+                zones = listOf(target(0.7f, -5.3f, "1", 1.3f, 2f), target(3.4f, -5.3f, "2", 1.3f, 2f)),
+            ),
+            guided = TrainedStroke.SERVE to listOf(
+                DrillStep(10, side = ServeSide.AD, kind = ServeKind.FIRST, target = ServeTarget.T),
+                DrillStep(10, side = ServeSide.AD, kind = ServeKind.FIRST, target = ServeTarget.WIDE),
+            ),
+        ),
+        // Primi servizi: lancio fermo e movimento completo, palla dentro il quadrato.
+        Item(
+            "serve_toss", Topic.SERVE, Level.BEGINNER, 1, 10,
+            Diagram(
+                listOf(Who(p(0.8f, 12.3f), "A")),
+                paths = listOf(ball(p(0.8f, 12.3f), p(-2f, -4f), arc = 1.6f)),
+                zones = listOf(area(-SINGLES, -SERVICE, 0f, 0f)),
+            ),
+            guided = TrainedStroke.SERVE to listOf(DrillStep(10, side = ServeSide.DEUCE, kind = ServeKind.FIRST), DrillStep(10, side = ServeSide.AD, kind = ServeKind.FIRST)),
+        ),
+        // Prime di fila: da destra e da sinistra, si contano quelle dentro.
+        Item(
+            "serve_first_pct", Topic.SERVE, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(0.8f, 12.3f), "A", frame = 1), Who(p(-0.8f, 12.3f), "A", frame = 2)),
+                paths = listOf(ball(p(0.8f, 12.3f), p(-2f, -4.4f), order = 1, frame = 1), ball(p(-0.8f, 12.3f), p(2f, -4.4f), order = 2, frame = 2)),
+                zones = listOf(area(-SINGLES, -SERVICE, 0f, 0f, frame = 1), area(0f, -SERVICE, SINGLES, 0f, frame = 2)),
+            ),
+            guided = TrainedStroke.SERVE to listOf(
+                DrillStep(5, side = ServeSide.DEUCE, kind = ServeKind.FIRST), DrillStep(5, side = ServeSide.AD, kind = ServeKind.FIRST),
+                DrillStep(5, side = ServeSide.DEUCE, kind = ServeKind.FIRST), DrillStep(5, side = ServeSide.AD, kind = ServeKind.FIRST),
+            ),
+        ),
+        // Servizio al corpo di chi risponde, dai due lati.
+        Item(
+            "serve_body", Topic.SERVE, Level.ADVANCED, 1, 15,
+            Diagram(
+                listOf(Who(p(0.8f, 12.3f), "A", frame = 1), Who(p(-0.8f, 12.3f), "A", frame = 2)),
+                paths = listOf(ball(p(0.8f, 12.3f), p(-2.1f, -5.5f), order = 1, frame = 1), ball(p(-0.8f, 12.3f), p(2.1f, -5.5f), order = 2, frame = 2)),
+                zones = listOf(target(-2.1f, -5.4f, "1", 1.3f, 1.8f, frame = 1), target(2.1f, -5.4f, "2", 1.3f, 1.8f, frame = 2)),
+            ),
+            guided = TrainedStroke.SERVE to listOf(
+                DrillStep(10, side = ServeSide.DEUCE, kind = ServeKind.FIRST, target = ServeTarget.BODY),
+                DrillStep(10, side = ServeSide.AD, kind = ServeKind.FIRST, target = ServeTarget.BODY),
+            ),
+        ),
+        // Prima e seconda come in partita: la prima forte al centro, la seconda carica e sicura.
+        Item(
+            "serve_pressure", Topic.SERVE, Level.ADVANCED, 1, 20,
+            Diagram(
+                listOf(Who(p(0.8f, 12.3f), "A")),
+                paths = listOf(ball(p(0.8f, 12.3f), p(-0.6f, -5.4f), order = 1, arc = 0.8f), ball(p(0.8f, 12.3f), p(-2.4f, -4.8f), order = 2, arc = 2.4f)),
+                zones = listOf(target(-0.7f, -5.3f, "1", 1.3f, 2f), target(-2.6f, -4.6f, "2", 2.6f, 2.4f)),
+            ),
+            guided = TrainedStroke.SERVE to listOf(
+                DrillStep(5, side = ServeSide.DEUCE, kind = ServeKind.FIRST, target = ServeTarget.T),
+                DrillStep(5, side = ServeSide.DEUCE, kind = ServeKind.SECOND),
+                DrillStep(5, side = ServeSide.AD, kind = ServeKind.FIRST, target = ServeTarget.T),
+                DrillStep(5, side = ServeSide.AD, kind = ServeKind.SECOND),
+            ),
+        ),
+        // Risposta bloccata contro il servizio forte: movimento corto, palla al centro.
+        Item(
+            "return_block", Topic.RETURN, Level.INTERMEDIATE, 2, 15,
+            Diagram(
+                listOf(Who(p(-0.8f, -12.3f), "B"), Who(p(3.1f, 12f), "A")),
+                paths = listOf(ball(p(-0.8f, -12.3f), p(3.8f, 11.6f), order = 1, arc = 0.8f), ball(p(3.8f, 11.6f), p(0f, -9.4f), order = 2)),
+                zones = listOf(target(0f, -9.4f, "2", 3.6f, 3f)),
+            ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
+        ),
+        // Sulla seconda di servizio A entra in campo, gira attorno alla palla e attacca di dritto.
+        Item(
+            "return_second_attack", Topic.RETURN, Level.ADVANCED, 2, 15,
+            Diagram(
+                listOf(Who(p(0.8f, -12.3f), "B"), Who(p(-3.2f, 10.8f), "A")),
+                paths = listOf(
+                    move(p(-3.4f, 12.8f), p(-3.2f, 11.4f)),
+                    ball(p(0.8f, -12.3f), p(-2.5f, 10.4f), order = 1, arc = 2.2f), ball(p(-2.5f, 10.4f), p(3f, -9f), order = 2),
+                ),
+                zones = listOf(target(3f, -9f, "2")),
+            ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
+        ),
+        // Risposta di rovescio incrociata dal lato del vantaggio.
+        Item(
+            "return_cross", Topic.RETURN, Level.INTERMEDIATE, 2, 15,
+            Diagram(
+                listOf(Who(p(0.8f, -12.3f), "B"), Who(p(-2.8f, 12.2f), "A", backhand = true)),
+                paths = listOf(ball(p(0.8f, -12.3f), p(-3.5f, 11.7f), order = 1), ball(p(-3.5f, 11.7f), p(3f, -9.3f), order = 2)),
+                zones = listOf(target(3f, -9.3f, "2")),
+            ),
+            guided = TrainedStroke.BACKHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
+        ),
+        // Doppio: risposta con pallonetto sopra chi è a rete.
+        Item(
+            "return_lob", Topic.RETURN, Level.ADVANCED, 3, 15,
+            Diagram(
+                listOf(Who(p(-1f, -12.3f), "B1"), Who(p(2.4f, -3.8f), "B2"), Who(p(3f, 12.1f), "A")),
+                paths = listOf(
+                    ball(p(-1f, -12.3f), p(3.6f, 11.7f), order = 1), ball(p(3.6f, 11.7f), p(2.8f, -10f), order = 2, arc = 6f),
+                    move(p(2.4f, -4.4f), p(2.7f, -7.4f)),
+                ),
+                zones = listOf(target(2.8f, -10f, "2", 2.6f, 2.4f)),
+            ),
+        ),
+        // Volée bassa: palla sui piedi, ginocchia piegate, profonda al centro.
+        Item(
+            "volley_low", Topic.VOLLEY, Level.INTERMEDIATE, 1, 10,
+            Diagram(
+                listOf(Who(p(0.5f, 5.6f), "A"), Who(p(0f, -7f), "", feeder = true)),
+                paths = listOf(ball(p(0f, -7f), p(1.2f, 5.4f), order = 1, arc = 0.5f), ball(p(1.2f, 5.4f), p(0f, -9.2f), order = 2, arc = 0.8f)),
+                zones = listOf(target(0f, -9.2f, "2", 3.6f, 2.6f)),
+            ),
+            guided = TrainedStroke.VOLLEY to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
+        ),
+        // Volée contro volée, tutti e due a rete: riflessi e piatto fermo.
+        Item(
+            "volley_reflex", Topic.VOLLEY, Level.INTERMEDIATE, 2, 10,
+            Diagram(
+                listOf(Who(p(0.3f, 2.8f), "A"), Who(p(-0.3f, -2.8f), "B")),
+                paths = listOf(ball(p(0.3f, 2.8f), p(-0.9f, -2.6f), order = 1, arc = 0.3f), ball(p(-0.9f, -2.6f), p(0.9f, 2.6f), order = 2, arc = 0.3f)),
+            ),
+            guided = TrainedStroke.VOLLEY to listOf(DrillStep(20)),
+        ),
+        // Volée smorzata: la palla muore subito dopo la rete.
+        Item(
+            "volley_drop", Topic.VOLLEY, Level.ADVANCED, 1, 10,
+            Diagram(
+                listOf(Who(p(0.5f, 3.6f), "A"), Who(p(0f, -9f), "", feeder = true)),
+                paths = listOf(ball(p(0f, -9f), p(1.3f, 3.3f), order = 1, arc = 0.6f), ball(p(1.3f, 3.3f), p(-1.8f, -2f), order = 2, arc = 0.35f)),
+                zones = listOf(target(-1.8f, -2f, "2", 2.4f, 2.2f)),
+            ),
+            guided = TrainedStroke.VOLLEY to listOf(DrillStep(20, wing = Wing.FOREHAND, direction = ShotDirection.CROSS)),
+        ),
+        // Demi-volée sulla linea del servizio, poi avanti a rete.
+        Item(
+            "half_volley", Topic.VOLLEY, Level.ADVANCED, 1, 10,
+            Diagram(
+                listOf(Who(p(0.3f, 6.8f), "A"), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    ball(p(0f, -8f), p(0.9f, 6.5f), order = 1, arc = 0.8f), ball(p(0.9f, 6.5f), p(0f, -9.6f), order = 2, arc = 1f),
+                    move(p(0.2f, 6.2f), p(0.2f, 3.9f)),
+                ),
+                zones = listOf(target(0f, -9.6f, "2", 3.6f, 2.4f)),
+                recover = listOf(recover(0.2f, 3.4f)),
+            ),
+            guided = TrainedStroke.VOLLEY to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
+        ),
+        // Volée angolata per chiudere il punto: di dritto, poi di rovescio.
+        Item(
+            "volley_angle", Topic.VOLLEY, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(0.3f, 3f), "A"), Who(p(0f, -6f), "", feeder = true)),
+                paths = listOf(
+                    ball(p(0f, -6f), p(1.1f, 2.9f), order = 1, arc = 0.5f, frame = 1), ball(p(1.1f, 2.9f), p(-4f, -2.6f), order = 2, arc = 0.4f, frame = 1),
+                    ball(p(0f, -6f), p(-0.5f, 2.9f), order = 3, arc = 0.5f, frame = 2), ball(p(-0.5f, 2.9f), p(4f, -2.6f), order = 4, arc = 0.4f, frame = 2),
+                ),
+                zones = listOf(target(-4f, -2.6f, "2", 1.5f, 2f, frame = 1), target(4f, -2.6f, "4", 1.5f, 2f, frame = 2)),
+            ),
+            guided = TrainedStroke.VOLLEY to listOf(
+                DrillStep(10, wing = Wing.FOREHAND, direction = ShotDirection.CROSS),
+                DrillStep(10, wing = Wing.BACKHAND, direction = ShotDirection.CROSS),
+            ),
+        ),
+        // Volée al volo da metà campo: la palla alta e lenta non si lascia rimbalzare.
+        Item(
+            "swing_volley", Topic.VOLLEY, Level.ADVANCED, 1, 10,
+            Diagram(
+                listOf(Who(p(1.2f, 7.6f), "A"), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    move(p(1f, 11.8f), p(1.2f, 8.2f)),
+                    ball(p(0f, -8f), p(2f, 7.3f), order = 1, arc = 3.5f), ball(p(2f, 7.3f), p(-2.8f, -9f), order = 2),
+                ),
+                zones = listOf(target(-2.8f, -9f, "2")),
+            ),
+            guided = TrainedStroke.VOLLEY to listOf(DrillStep(20, wing = Wing.FOREHAND, direction = ShotDirection.CROSS)),
+        ),
+        // Smash da fondo: il pallonetto profondo si lascia rimbalzare, poi smash.
+        Item(
+            "smash_bounce", Topic.OVERHEAD, Level.INTERMEDIATE, 1, 10,
+            Diagram(
+                listOf(Who(p(0.5f, 11.2f), "A"), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    move(p(0.4f, 6.4f), p(0.5f, 10.6f)),
+                    ball(p(0f, -8f), p(0.9f, 11f), order = 1, arc = 8f), ball(p(0.9f, 11f), p(1.6f, -9.4f), order = 2, arc = 0.8f),
+                ),
+                zones = listOf(target(1.6f, -9.4f, "2", 3f, 2.6f)),
+            ),
+        ),
+        // Pallonetto e smash a coppie: B tira il pallonetto, A a rete arretra e schiaccia.
+        Item(
+            "lob_smash", Topic.OVERHEAD, Level.INTERMEDIATE, 2, 15,
+            Diagram(
+                listOf(Who(p(0.6f, 5.6f), "A"), Who(p(-0.5f, -12.2f), "B")),
+                paths = listOf(
+                    move(p(0.4f, 3.2f), p(0.6f, 5f)),
+                    ball(p(-0.5f, -12.2f), p(1.3f, 5.3f), order = 1, arc = 7f), ball(p(1.3f, 5.3f), p(2.6f, -8.4f), order = 2, arc = 0.4f),
+                ),
+                zones = listOf(target(2.6f, -8.4f, "2")),
+            ),
+        ),
+        // Volée e smash: prima una volée, poi il pallonetto da schiacciare.
+        Item(
+            "volley_smash", Topic.OVERHEAD, Level.INTERMEDIATE, 1, 15,
+            Diagram(
+                listOf(Who(p(0.5f, 4.2f), "A", frame = 1), Who(p(0.6f, 6.8f), "A", frame = 2), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    ball(p(0f, -8f), p(1.2f, 4f), order = 1, arc = 0.6f, frame = 1), ball(p(1.2f, 4f), p(-2.5f, -9f), order = 2, frame = 1),
+                    move(p(0.5f, 4.4f), p(0.6f, 6.3f), frame = 2),
+                    ball(p(0f, -8f), p(1.2f, 6.6f), order = 3, arc = 7f, frame = 2), ball(p(1.2f, 6.6f), p(2.6f, -8.5f), order = 4, arc = 0.4f, frame = 2),
+                ),
+                zones = listOf(target(-2.5f, -9f, "2", frame = 1), target(2.6f, -8.5f, "4", frame = 2)),
+            ),
+        ),
+        // Slalom tra i coni a passi corti.
+        Item(
+            "fw_cones", Topic.FOOTWORK, Level.BEGINNER, 1, 8,
+            Diagram(
+                listOf(Who(p(-3.9f, 12.2f), "A")),
+                paths = listOf(move(p(-3.6f, 11.7f), p(-3f, 10.3f), p(-1.5f, 8.8f), p(0f, 10.3f), p(1.5f, 8.8f), p(3f, 10.3f))),
+                cones = listOf(p(-3f, 10f), p(-1.5f, 8.5f), p(0f, 10f), p(1.5f, 8.5f), p(3f, 10f)),
+                half = true,
+            ),
+        ),
+        // Colpisci e torna: palle larghe a destra e a sinistra, dopo ogni colpo al centro.
+        Item(
+            "fw_recover", Topic.FOOTWORK, Level.INTERMEDIATE, 1, 10,
+            Diagram(
+                listOf(Who(p(2.9f, 11.9f), "A", frame = 1), Who(p(-2.9f, 11.9f), "A", backhand = true, frame = 2), Who(p(0f, -7f), "", feeder = true)),
+                paths = listOf(
+                    ball(p(0f, -7f), p(3.6f, 11.5f), order = 1, frame = 1), ball(p(3.6f, 11.5f), p(-2.5f, -9f), order = 2, frame = 1),
+                    move(p(2.7f, 12.5f), p(0.6f, 12.7f), frame = 1),
+                    ball(p(0f, -7f), p(-3.6f, 11.5f), order = 3, frame = 2), ball(p(-3.6f, 11.5f), p(2.5f, -9f), order = 4, frame = 2),
+                    move(p(-2.7f, 12.5f), p(-0.6f, 12.7f), frame = 2),
+                ),
+                recover = listOf(recover(0f, 12.6f)),
+            ),
+        ),
+        // Fuori dalla palla al corpo: un passo di lato per colpire di dritto.
+        Item(
+            "fw_body_ball", Topic.FOOTWORK, Level.BEGINNER, 1, 10,
+            Diagram(
+                listOf(Who(p(-0.8f, 12.2f), "A"), Who(p(0f, -7f), "", feeder = true)),
+                paths = listOf(
+                    move(p(0f, 12.7f), p(-0.6f, 12.7f)),
+                    ball(p(0f, -7f), p(0f, 11.8f), order = 1), ball(p(0f, 11.8f), p(0f, -9.4f), order = 2),
+                ),
+                zones = listOf(target(0f, -9.4f, "2", 3.6f, 2.6f)),
+            ),
+        ),
+        // Avanti e indietro: prima la palla corta, poi quella profonda.
+        Item(
+            "fw_forward_back", Topic.FOOTWORK, Level.INTERMEDIATE, 1, 10,
+            Diagram(
+                listOf(Who(p(0.8f, 7.4f), "A", frame = 1), Who(p(1f, 11.2f), "A", frame = 2), Who(p(0f, -8f), "", feeder = true)),
+                paths = listOf(
+                    move(p(0.5f, 12.3f), p(0.7f, 8f), frame = 1),
+                    ball(p(0f, -8f), p(1.4f, 7f), order = 1, arc = 1f, frame = 1), ball(p(1.4f, 7f), p(-2f, -9f), order = 2, frame = 1),
+                    move(p(0.8f, 7.8f), p(1f, 10.6f), frame = 2),
+                    ball(p(0f, -8f), p(1.6f, 10.8f), order = 3, arc = 5f, frame = 2), ball(p(1.6f, 10.8f), p(2f, -9f), order = 4, frame = 2),
+                ),
+                zones = listOf(target(-2f, -9f, "2", frame = 1), target(2f, -9f, "4", frame = 2)),
+            ),
+        ),
+        // Scatti alle linee: linea del servizio, rete, metà, sempre ritorno alla linea di fondo.
+        Item(
+            "fit_lines", Topic.FITNESS, Level.INTERMEDIATE, 1, 8,
+            Diagram(
+                listOf(Who(p(0f, 12.6f), "A")),
+                paths = listOf(move(p(-1.2f, 12.1f), p(-1.2f, SERVICE + 0.2f)), move(p(0f, 12.1f), p(0f, 0.6f)), move(p(1.2f, 12.1f), p(1.2f, 3.4f))),
+                cones = listOf(p(-1.2f, SERVICE), p(0f, 0.3f), p(1.2f, 3.1f)),
+                half = true,
+            ),
+        ),
+        // Colpi a vuoto: dritto, rovescio e avanti, a intervalli, senza palla.
+        Item(
+            "fit_shadow", Topic.FITNESS, Level.BEGINNER, 1, 8,
+            Diagram(
+                listOf(Who(p(0f, 12.2f), "A")),
+                paths = listOf(move(p(0.3f, 12.4f), p(2.6f, 12f)), move(p(-0.3f, 12.4f), p(-2.6f, 12f)), move(p(0f, 11.6f), p(0.4f, 8.6f))),
+                recover = listOf(recover(0f, 12.6f)),
+                half = true,
+            ),
+        ),
+        // Il quadrato del servizio: di lato, indietro, di lato, avanti, attorno ai coni.
+        Item(
+            "fit_box", Topic.FITNESS, Level.INTERMEDIATE, 1, 8,
+            Diagram(
+                listOf(Who(p(-0.4f, 7f), "A")),
+                paths = listOf(
+                    move(p(0.3f, 6.7f), p(3.8f, 6.7f)), move(p(4f, 6.2f), p(4f, 1.3f)),
+                    move(p(3.7f, 1f), p(0.5f, 1f)), move(p(0.2f, 1.3f), p(0.2f, 6.1f)),
+                ),
+                cones = listOf(p(0.2f, 6.4f), p(4f, 6.4f), p(4f, 1f), p(0.2f, 1f)),
+                half = true,
+            ),
+        ),
+        // Attacco e passante: A attacca lungolinea e va a rete, B prova il passante; poi si gioca il punto.
+        Item(
+            "tac_approach_pass", Topic.TACTICS, Level.INTERMEDIATE, 2, 20,
+            Diagram(
+                listOf(
+                    Who(p(1.3f, 7.4f), "A", frame = 1), Who(p(1.2f, 3.6f), "A", frame = 2),
+                    Who(p(-0.5f, -12.2f), "B", frame = 1), Who(p(3.4f, -10.2f), "B", backhand = true, frame = 2),
+                ),
+                paths = listOf(
+                    ball(p(-0.5f, -12.2f), p(1.9f, 7.1f), order = 1, arc = 1f, frame = 1), ball(p(1.9f, 7.1f), p(3.3f, -9.4f), order = 2, frame = 1),
+                    move(p(1.3f, 7f), p(1.2f, 4.1f), frame = 2),
+                    ball(p(3.3f, -9.4f), p(3.8f, 8.6f), order = 3, frame = 2),
+                ),
+                zones = listOf(target(3.3f, -9.4f, "2", 2f, 2.6f, frame = 1), target(3.8f, 8.6f, "3", 1.6f, 2.6f, frame = 2)),
+            ),
+        ),
+        // Doppio: tutto al centro, tra i due avversari.
+        Item(
+            "tac_middle", Topic.TACTICS, Level.INTERMEDIATE, 4, 20,
+            Diagram(
+                listOf(Who(p(1.6f, 12.2f), "A1"), Who(p(-2.2f, 3.6f), "A2"), Who(p(-1.6f, -12.2f), "B1"), Who(p(2.2f, -3.6f), "B2")),
+                paths = listOf(ball(p(1.6f, 12.2f), p(0f, -8.8f), order = 1)),
+                zones = listOf(area(-1f, -BASE, 1f, -1f)),
+            ),
+        ),
+        // Palla alta e palla tesa: cambiare ritmo nel palleggio incrociato.
+        Item(
+            "tac_high_low", Topic.TACTICS, Level.INTERMEDIATE, 2, 15,
+            Diagram(
+                listOf(Who(p(2.5f, 12.2f), "A"), Who(p(-2.5f, -12.2f), "B")),
+                paths = listOf(
+                    ball(p(2.5f, 12.2f), p(-2f, -10.2f), order = 1, arc = 4.5f, frame = 1),
+                    ball(p(2.5f, 12.2f), p(-2.4f, -9.2f), order = 2, arc = 0.6f, frame = 2),
+                ),
+                zones = listOf(target(-2f, -10.2f, "1", frame = 1), target(-2.4f, -9.2f, "2", frame = 2)),
+            ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
         ),
     )
 }
@@ -58276,6 +59426,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -58425,15 +59576,27 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == trainee }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
             strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
         )
-        DrillRow(c, stroke)
+        // Da "Avvia esercizio" della raccolta: si scorre fin qui, esercizio e Inizia in vista.
+        val focus = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
+        val wantFocus by c.trainFocus.collectAsState()
+        LaunchedEffect(wantFocus) {
+            if (wantFocus) {
+                kotlinx.coroutines.delay(300)
+                focus.bringIntoView()
+                c.trainFocus.value = false
+            }
+        }
         val start = {
             context.startActivity(
                 Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_STROKE, stroke.name),
             )
         }
-        BigButton(s.serveStart, Icons.Filled.Videocam, start, Modifier.fillMaxWidth())
-        // Si avvia anche dal campo: KEY1 del braccialetto o un clic del telecomando, finché questa pagina è aperta.
-        Text(s.trainStartKeys, color = TsmColors.TextDim, fontSize = 12.sp)
+        Column(Modifier.fillMaxWidth().bringIntoViewRequester(focus), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            DrillRow(c, stroke)
+            BigButton(s.serveStart, Icons.Filled.Videocam, start, Modifier.fillMaxWidth())
+            // Si avvia anche dal campo: KEY1 del braccialetto o un clic del telecomando, finché questa pagina è aperta.
+            Text(s.trainStartKeys, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
         DisposableEffect(Unit) {
             c.trainStartReady = true
             onDispose { c.trainStartReady = false }
@@ -83945,6 +85108,7 @@ private fun DrillDetail(c: MatchController, item: DrillLibrary.Item, t: DrillLib
                     }
                     android.widget.Toast.makeText(context, s.dlReady(com.tennis.scoremanager.ui.strokeLabel(s, stroke)), android.widget.Toast.LENGTH_LONG).show()
                     onDone()
+                    c.trainFocus.value = true
                     c.home()
                 }, Modifier.fillMaxWidth(), color = area, onColor = TsmColors.OnArea)
                 GhostButton(if (existing != null) s.dlInList else s.dlAdd, if (existing != null) Icons.Filled.Check else Icons.Filled.Add, {

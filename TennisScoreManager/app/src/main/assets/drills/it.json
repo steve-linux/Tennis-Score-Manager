@@ -330,5 +330,658 @@
   ],
   "easier": "Senza servizio: l'allenatore lancia la palla della risposta.",
   "harder": "B1 può rispondere lungolinea: A2 deve partire al momento giusto."
+ },
+ "fh_inside_out": {
+  "name": "Dritto inside-out",
+  "goal": "Girare attorno al rovescio e comandare lo scambio col dritto incrociato verso il vantaggio dell'altro.",
+  "steps": [
+   "A parte dal centro della linea di fondo; l'allenatore lancia verso il rovescio di A.",
+   "A si sposta a sinistra con passi laterali veloci, lasciando la palla alla sua destra.",
+   "Dritto incrociato profondo verso il lato del vantaggio dell'altra metà.",
+   "Dopo il colpo, un recupero breve: un passo verso il centro, non di più."
+  ],
+  "easier": "La palla arriva lenta e già un po' spostata a sinistra: basta mezzo passo per girarci attorno.",
+  "harder": "La palla arriva più veloce e più vicina al centro; il dritto deve cadere oltre la linea del servizio.",
+  "cue": "Gira attorno al rovescio e tira incrociato verso il vantaggio.",
+  "stepCues": [
+   "Piedi veloci, lascia la palla alla tua destra e chiudi il colpo verso l'angolo."
+  ],
+  "missTip": "Tre fuori di fila: spostati prima, così colpisci davanti senza allungarti.",
+  "streakTip": "Cinque dentro di fila: ora cerca più profondità e più angolo."
+ },
+ "fh_inside_in": {
+  "name": "Dritto inside-in",
+  "goal": "Cambiare direzione col dritto dal lato del vantaggio: lungolinea, quando l'altro aspetta l'incrociato.",
+  "steps": [
+   "Come nell'inside-out: A gira attorno alla palla lanciata sul rovescio.",
+   "Stessa preparazione, ma il dritto va lungolinea, vicino alla riga di sinistra dell'altra metà.",
+   "Dopo il colpo A torna verso il centro: il lungolinea apre il campo all'altro.",
+   "Serie da 10, poi si riposa."
+  ],
+  "easier": "Bersaglio più largo e lontano dalla riga; palla lanciata lenta.",
+  "harder": "L'allenatore dice all'ultimo \"dentro\" o \"fuori\": su \"dentro\" incrociato, su \"fuori\" lungolinea.",
+  "cue": "Gira attorno alla palla, ma stavolta lungolinea.",
+  "stepCues": [
+   "Prepara come per l'incrociato e chiudi il colpo verso la riga."
+  ],
+  "missTip": "Tre fuori di fila: il lungolinea passa dove la rete è più alta, tieni più margine.",
+  "streakTip": "Cinque dentro di fila: ora tira un po' più forte, senza perdere la direzione."
+ },
+ "fh_topspin_height": {
+  "name": "Dritto carico e profondo",
+  "goal": "Dare rotazione al dritto: palla alta sopra la rete che scende dentro e rimbalza alta.",
+  "steps": [
+   "A a fondo campo, l'allenatore lancia palle comode sul dritto.",
+   "Movimento dal basso verso l'alto, racchetta che finisce sopra la spalla.",
+   "La palla deve passare un paio di metri sopra la rete e cadere oltre la linea del servizio.",
+   "Contare quante cadono nella zona profonda su 20."
+  ],
+  "easier": "Si comincia da metà campo, con meno distanza e meno forza.",
+  "harder": "Si alternano una palla carica alta e una tesa, sempre nella zona profonda.",
+  "cue": "Dal basso verso l'alto: palla alta sopra la rete e profonda.",
+  "stepCues": [
+   "Spazzola la palla e finisci con la racchetta sopra la spalla."
+  ],
+  "missTip": "Tre fuori di fila: più rotazione e meno forza, la palla deve scendere.",
+  "streakTip": "Cinque dentro di fila: ora prova a farla rimbalzare più vicino alla riga di fondo."
+ },
+ "fh_run_wide": {
+  "name": "Dritto in corsa",
+  "goal": "Arrivare in equilibrio sulla palla larga, rimetterla incrociata e tornare subito al centro.",
+  "steps": [
+   "A parte dal centro della linea di fondo.",
+   "L'allenatore lancia larga sul dritto: A corre, si ferma e colpisce incrociato.",
+   "Subito dopo il colpo, ritorno al centro con passi laterali.",
+   "Serie da 6 palle, poi un minuto di pausa."
+  ],
+  "easier": "Palla meno larga, con più tempo tra un lancio e l'altro.",
+  "harder": "Il lancio parte quando A è ancora in ritorno; il dritto deve cadere oltre la linea del servizio.",
+  "cue": "Corri, fermati e colpisci incrociato, poi torna al centro.",
+  "stepCues": [
+   "Ultimi passi piccoli per arrivare fermo, poi colpo incrociato con margine."
+  ],
+  "missTip": "Tre fuori di fila: arrivi in ritardo, parti prima e colpisci più incrociato.",
+  "streakTip": "Cinque dentro di fila: ora torna al centro più in fretta."
+ },
+ "fh_short_angle": {
+  "name": "Angolo corto di dritto",
+  "goal": "Portare l'altro fuori dal campo con un incrociato corto e stretto.",
+  "steps": [
+   "A e B palleggiano incrociato sulla diagonale del pari.",
+   "Quando la palla arriva comoda, A gioca l'incrociato corto che esce vicino alla rete.",
+   "B corre e prova a rimetterla: si continua lo scambio.",
+   "Dopo 10 angoli si cambiano i ruoli."
+  ],
+  "easier": "L'angolo si gioca solo su palla lanciata a mano, ferma.",
+  "harder": "L'angolo si gioca solo su palla profonda, non comoda.",
+  "cue": "Incrociato corto e stretto: la palla esce vicino alla rete.",
+  "stepCues": [
+   "Colpisci più davanti e chiudi il polso verso l'angolo."
+  ],
+  "missTip": "Tre fuori di fila: meno forza e più rotazione, la palla deve scendere presto.",
+  "streakTip": "Cinque dentro di fila: ora prova a farlo partire da una palla più profonda."
+ },
+ "fh_approach_line": {
+  "name": "Attacco di dritto sulla palla corta",
+  "goal": "Riconoscere la palla corta, entrare in campo e attaccare lungolinea.",
+  "steps": [
+   "A parte dalla linea di fondo; l'allenatore lancia una palla corta sul dritto.",
+   "A entra in campo, colpisce in avanzamento lungolinea e profondo.",
+   "Dopo l'attacco, A continua verso la rete e si ferma con lo split step.",
+   "Serie da 8, si torna ogni volta sulla linea di fondo."
+  ],
+  "easier": "Palla corta e alta, che resta in aria più a lungo.",
+  "harder": "Dopo l'attacco l'allenatore lancia un passante: A deve chiudere con la volée.",
+  "cue": "Entra in campo e attacca lungolinea, poi vai a rete.",
+  "stepCues": [
+   "Colpisci camminando in avanti, lungolinea e profondo."
+  ],
+  "missTip": "Tre fuori di fila: rallenta l'attacco, conta più la profondità della forza.",
+  "streakTip": "Cinque dentro di fila: ora l'attacco deve cadere vicino alla riga di fondo."
+ },
+ "bh_line": {
+  "name": "Rovescio lungolinea",
+  "goal": "Rovescio lungolinea sicuro dal lato del vantaggio, senza aprire troppo il corpo.",
+  "steps": [
+   "A sulla linea di fondo, lato del vantaggio; l'allenatore lancia sul rovescio.",
+   "Spalle girate e colpo lungolinea verso il bersaglio profondo.",
+   "Dopo ogni colpo, un passo di ritorno verso il centro.",
+   "Tre serie da 10."
+  ],
+  "easier": "Bersaglio più largo, lontano dalla riga.",
+  "harder": "Si alterna un rovescio incrociato e uno lungolinea, sempre profondi.",
+  "cue": "Spalle girate, lungolinea profondo.",
+  "stepCues": [
+   "Tieni le spalle chiuse fino all'impatto e accompagna verso la riga."
+  ],
+  "missTip": "Tre fuori di fila: tieni più margine dalla riga e passa più alto sulla rete.",
+  "streakTip": "Cinque dentro di fila: ora punta più vicino alla riga laterale."
+ },
+ "bh_slice": {
+  "name": "Rovescio tagliato",
+  "goal": "Rovescio in back basso sopra la rete e profondo, che rimbalza poco.",
+  "steps": [
+   "L'allenatore lancia sul rovescio di A, palle di media altezza.",
+   "Racchetta alta in preparazione, movimento dall'alto in avanti, piatto un po' aperto.",
+   "La palla passa bassa sopra la rete e cade profonda.",
+   "Contare quante cadono nella zona su 20."
+  ],
+  "easier": "Palle lanciate più lente e più alte, da metà campo.",
+  "harder": "Si alternano un back profondo e un back corto, che muore dopo la rete.",
+  "cue": "Back basso sopra la rete e profondo.",
+  "stepCues": [
+   "Parti con la racchetta alta e accompagna la palla in avanti, non in basso."
+  ],
+  "missTip": "Tre fuori di fila: accompagna di più in avanti e meno verso il basso.",
+  "streakTip": "Cinque dentro di fila: ora prova a tenerlo ancora più basso sopra la rete."
+ },
+ "bh_cross_line": {
+  "name": "Rovescio incrociato e lungolinea",
+  "goal": "Saper cambiare direzione col rovescio senza cambiare la preparazione.",
+  "steps": [
+   "Passo 1: l'allenatore lancia sul rovescio e A gioca incrociato.",
+   "Passo 2: stessa palla, A gioca lungolinea.",
+   "La preparazione è la stessa nei due casi: cambia solo il punto d'impatto.",
+   "10 incrociati, poi 10 lungolinea."
+  ],
+  "easier": "Si cambia direzione ogni 10 colpi, sempre lenti.",
+  "harder": "L'allenatore dice la direzione mentre la palla è in volo.",
+  "cue": "Stessa preparazione, due direzioni.",
+  "stepCues": [
+   "Incrociato: colpisci un po' prima, davanti al corpo.",
+   "Ora lungolinea: colpisci un po' dopo, spalle chiuse."
+  ],
+  "missTip": "Tre fuori di fila: rallenta e pensa solo alla direzione.",
+  "streakTip": "Cinque dentro di fila: ora aumenta un po' la velocità."
+ },
+ "bh_defense": {
+  "name": "Rovescio in difesa",
+  "goal": "Quando si è spinti nell'angolo, rimettere una palla alta e profonda per riprendere il centro.",
+  "steps": [
+   "A parte dal centro; l'allenatore lancia profondo e largo sul rovescio.",
+   "A corre nell'angolo e gioca una palla alta e profonda al centro.",
+   "Mentre la palla vola, A torna al centro.",
+   "Serie da 6 palle."
+  ],
+  "easier": "Palla meno larga; basta rimetterla in campo alta.",
+  "harder": "La palla di A deve cadere oltre la linea del servizio, e l'allenatore lancia subito la successiva.",
+  "cue": "Spinto nell'angolo: palla alta e profonda, poi torna al centro.",
+  "stepCues": [
+   "Arriva sulla palla, alzala tanto sopra la rete e torna subito al centro."
+  ],
+  "missTip": "Tre fuori di fila: non cercare la forza, solo altezza e centro del campo.",
+  "streakTip": "Cinque dentro di fila: ora fai cadere la palla più profonda."
+ },
+ "bh_short_angle": {
+  "name": "Angolo corto di rovescio",
+  "goal": "Aprire il campo col rovescio incrociato corto nella diagonale del vantaggio.",
+  "steps": [
+   "A e B palleggiano di rovescio sulla diagonale del vantaggio.",
+   "Sulla palla comoda A gioca l'incrociato corto e stretto.",
+   "B rincorre e rimette: lo scambio continua.",
+   "Dopo 10 angoli si cambiano i ruoli."
+  ],
+  "easier": "L'angolo si gioca su palla lanciata a mano.",
+  "harder": "Solo palle profonde: l'angolo va costruito, non regalato.",
+  "cue": "Rovescio incrociato corto e stretto.",
+  "stepCues": [
+   "Colpisci davanti e chiudi verso l'angolo vicino alla rete."
+  ],
+  "missTip": "Tre fuori di fila: meno forza, più rotazione: la palla deve scendere presto.",
+  "streakTip": "Cinque dentro di fila: ora prova a stringere ancora l'angolo."
+ },
+ "bh_first": {
+  "name": "Primi rovesci",
+  "goal": "Imparare il rovescio da fermi: spalle girate, impatto davanti, palla oltre la rete.",
+  "steps": [
+   "A sta dentro il campo, poco dietro la linea del servizio.",
+   "L'allenatore lancia a mano palle lente sul rovescio, da vicino alla rete.",
+   "A gira le spalle, colpisce davanti al corpo e manda la palla nella metà dell'altro.",
+   "Serie da 10, con una pausa per correggere."
+  ],
+  "easier": "La palla si lascia rimbalzare due volte, o si colpisce da ferma su un cono.",
+  "harder": "A si sposta di un passo prima di ogni colpo; la palla deve cadere oltre la linea del servizio.",
+  "cue": "Spalle girate e impatto davanti.",
+  "stepCues": [
+   "Gira le spalle appena vedi la palla e colpisci davanti al corpo."
+  ],
+  "missTip": "Tre fuori di fila: colpisci più piano e accompagna la palla verso l'alto.",
+  "streakTip": "Cinque dentro di fila: ora prova a mandarla più lontana."
+ },
+ "serve_ad_targets": {
+  "name": "Servizio da sinistra sui bersagli",
+  "goal": "Servire dal lato del vantaggio al centro e all'esterno con lo stesso lancio.",
+  "steps": [
+   "A serve da sinistra.",
+   "Passo 1: 10 prime al centro, sulla T.",
+   "Passo 2: 10 prime all'esterno, verso la riga laterale.",
+   "Contare quante finiscono nel bersaglio."
+  ],
+  "easier": "Bersagli più grandi: tutta la metà del quadrato.",
+  "harder": "Si alterna un servizio al centro e uno all'esterno, senza cambiare il lancio.",
+  "cue": "Da sinistra: stesso lancio, due direzioni.",
+  "stepCues": [
+   "Al centro: punta la linea centrale.",
+   "Ora esterno: apri l'angolo verso la riga laterale."
+  ],
+  "missTip": "Tre fuori di fila: controlla il lancio, deve essere sempre nello stesso punto.",
+  "streakTip": "Cinque dentro di fila: ora punta più vicino alle righe."
+ },
+ "serve_toss": {
+  "name": "Primi servizi",
+  "goal": "Servizio completo e semplice: lancio fermo, palla colpita in alto, dentro il quadrato.",
+  "steps": [
+   "Prima solo il lancio: la palla sale e ricade davanti al piede sinistro, senza colpire.",
+   "Poi il servizio completo, piano, da destra.",
+   "Dopo 10 da destra, 10 da sinistra.",
+   "Conta la palla dentro, non la velocità."
+  ],
+  "easier": "Si serve dalla linea del servizio, più vicino alla rete.",
+  "harder": "La palla deve cadere nella metà del quadrato più lontana dalla rete.",
+  "cue": "Lancio fermo e palla colpita in alto.",
+  "stepCues": [
+   "Da destra: lancio davanti al piede, braccio disteso all'impatto.",
+   "Ora da sinistra: stesso lancio, stesso ritmo."
+  ],
+  "missTip": "Tre fuori di fila: lancia più basso e più davanti, e colpisci più piano.",
+  "streakTip": "Cinque dentro di fila: ora prova a servire un po' più forte."
+ },
+ "serve_first_pct": {
+  "name": "Dieci prime di fila",
+  "goal": "Alzare la percentuale di prime: servizio deciso ma sicuro, alternando i lati.",
+  "steps": [
+   "A serve 5 prime da destra, poi 5 da sinistra, due volte.",
+   "Conta solo la prima: se è fuori, non si serve la seconda.",
+   "Si segna quante prime entrano su 20.",
+   "L'obiettivo è superare il risultato della volta prima."
+  ],
+  "easier": "Si serve con l'80% della forza, pensando solo a farla entrare.",
+  "harder": "Ogni prima fuori costa un giro di corsa attorno al quadrato del servizio.",
+  "cue": "Prima decisa ma sicura: conta farla entrare.",
+  "stepCues": [
+   "Da destra: ritmo tranquillo, lancio sempre uguale.",
+   "Ora da sinistra: stessa velocità.",
+   "Di nuovo da destra.",
+   "Ultimi 5 da sinistra."
+  ],
+  "missTip": "Tre fuori di fila: togli un po' di forza e pensa al lancio.",
+  "streakTip": "Cinque dentro di fila: ora aggiungi un po' di velocità."
+ },
+ "serve_body": {
+  "name": "Servizio al corpo",
+  "goal": "Servire addosso a chi risponde, per togliergli spazio per il colpo.",
+  "steps": [
+   "Passo 1: da destra, servizio verso l'anca di chi risponde.",
+   "Passo 2: da sinistra, stesso bersaglio.",
+   "La palla va diretta al corpo, non all'angolo.",
+   "Contare quante finiscono nel bersaglio."
+  ],
+  "easier": "Bersaglio più largo, tutta la parte centrale del quadrato.",
+  "harder": "Si mette qualcuno a rispondere: conta se la risposta è corta o in rete.",
+  "cue": "Al corpo: togli spazio a chi risponde.",
+  "stepCues": [
+   "Da destra: punta l'anca di chi risponde.",
+   "Ora da sinistra: stesso bersaglio."
+  ],
+  "missTip": "Tre fuori di fila: rallenta e cerca solo il centro del quadrato.",
+  "streakTip": "Cinque dentro di fila: ora prova con un po' più di velocità."
+ },
+ "serve_pressure": {
+  "name": "Prima e seconda come in partita",
+  "goal": "Servire sotto pressione: prima forte al centro, seconda carica e sicura.",
+  "steps": [
+   "A serve 5 prime al centro da destra, poi 5 seconde da destra.",
+   "Poi lo stesso da sinistra.",
+   "Ogni seconda fuori conta come un doppio fallo.",
+   "Si segnano i doppi falli: l'obiettivo è zero."
+  ],
+  "easier": "Le seconde si servono più piano, con tanta rotazione.",
+  "harder": "Si serve un punto vero: se la prima è fuori, si gioca la seconda e poi lo scambio.",
+  "cue": "Prima forte al centro, seconda carica e sicura.",
+  "stepCues": [
+   "Prima da destra: decisa al centro.",
+   "Seconda da destra: tanta rotazione, alta sopra la rete.",
+   "Prima da sinistra: decisa al centro.",
+   "Seconda da sinistra: braccio sciolto."
+  ],
+  "missTip": "Tre fuori di fila: respira, rallenta il ritmo e lancia sempre uguale.",
+  "streakTip": "Cinque dentro di fila: ora prova una prima un po' più veloce."
+ },
+ "return_block": {
+  "name": "Risposta bloccata",
+  "goal": "Rispondere al servizio forte con un movimento corto, mandando la palla profonda al centro.",
+  "steps": [
+   "B serve forte da destra; A risponde sul lato del pari.",
+   "A fa lo split step quando B colpisce e blocca la palla con un movimento corto.",
+   "La risposta va profonda al centro.",
+   "Dopo 10 risposte si cambiano i ruoli."
+  ],
+  "easier": "B serve più piano, o dalla linea del servizio.",
+  "harder": "A si mette un passo più dentro il campo.",
+  "cue": "Movimento corto: blocca la palla al centro.",
+  "stepCues": [
+   "Split step quando l'altro colpisce, poi racchetta davanti e corta."
+  ],
+  "missTip": "Tre fuori di fila: accorcia ancora il movimento e punta al centro.",
+  "streakTip": "Cinque dentro di fila: ora prova a rispondere più profondo."
+ },
+ "return_second_attack": {
+  "name": "Attacco sulla seconda",
+  "goal": "Approfittare della seconda di servizio: entrare in campo e attaccare di dritto.",
+  "steps": [
+   "B serve seconde da sinistra; A risponde sul lato del vantaggio.",
+   "A si avvicina di un passo durante il lancio di B.",
+   "A gira attorno alla palla e attacca di dritto incrociato.",
+   "Dopo 10 seconde si cambiano i ruoli."
+  ],
+  "easier": "B serve seconde lente e alte.",
+  "harder": "Dopo l'attacco si gioca il punto.",
+  "cue": "Sulla seconda entra e attacca di dritto.",
+  "stepCues": [
+   "Entra mentre l'altro lancia, gira attorno alla palla e colpisci incrociato."
+  ],
+  "missTip": "Tre fuori di fila: attacca con più margine, la profondità conta più della forza.",
+  "streakTip": "Cinque dentro di fila: ora prova ad attaccare più vicino alla riga."
+ },
+ "return_cross": {
+  "name": "Risposta di rovescio incrociata",
+  "goal": "Rispondere sul lato del vantaggio col rovescio incrociato, lontano da chi serve.",
+  "steps": [
+   "B serve da sinistra; A risponde sul lato del vantaggio.",
+   "A risponde di rovescio incrociato e profondo.",
+   "Dopo la risposta, A torna al centro.",
+   "Dopo 10 risposte si cambiano i ruoli."
+  ],
+  "easier": "B serve più piano, sempre sul rovescio.",
+  "harder": "Si gioca il punto dopo la risposta.",
+  "cue": "Rovescio incrociato, lontano da chi serve.",
+  "stepCues": [
+   "Spalle girate presto e colpisci davanti, verso l'incrociato."
+  ],
+  "missTip": "Tre fuori di fila: accorcia il movimento e tieni più margine.",
+  "streakTip": "Cinque dentro di fila: ora prova più angolo."
+ },
+ "return_lob": {
+  "name": "Risposta con pallonetto nel doppio",
+  "goal": "Superare chi è a rete con una risposta in pallonetto, quando la coppia avversaria gioca serve e volée.",
+  "steps": [
+   "B1 serve da destra, B2 è a rete.",
+   "A risponde con un pallonetto alto sopra B2.",
+   "B2 prova a raggiungerla arretrando; se non ci riesce, il punto va ad A.",
+   "Dopo 10 risposte si cambiano i ruoli."
+  ],
+  "easier": "B1 serve piano; B2 resta fermo.",
+  "harder": "A sceglie: pallonetto o risposta incrociata bassa, senza farlo capire prima."
+ },
+ "volley_low": {
+  "name": "Volée bassa",
+  "goal": "Giocare la volée sotto la rete: ginocchia piegate, piatto aperto, palla profonda.",
+  "steps": [
+   "A sulla linea del servizio; l'allenatore lancia basso, verso i piedi.",
+   "A scende sulle gambe, apre un po' il piatto e accompagna la palla in avanti.",
+   "La volée deve passare la rete e cadere profonda al centro.",
+   "Serie da 10."
+  ],
+  "easier": "Palle lanciate più alte, sopra il ginocchio.",
+  "harder": "Dopo la volée bassa, una volée alta da chiudere in avanti.",
+  "cue": "Scendi sulle gambe, non con la racchetta.",
+  "stepCues": [
+   "Ginocchia piegate, piatto un po' aperto e accompagna in avanti."
+  ],
+  "missTip": "Tre fuori di fila: piegati di più sulle gambe e apri un po' il piatto.",
+  "streakTip": "Cinque dentro di fila: ora cerca più profondità."
+ },
+ "volley_reflex": {
+  "name": "Volée contro volée",
+  "goal": "Riflessi e piatto fermo, tutti e due a rete.",
+  "steps": [
+   "A e B a un passo dalla linea del servizio, uno di fronte all'altro.",
+   "Si gioca volée contro volée, palle tese ma controllabili.",
+   "Contare gli scambi senza errori.",
+   "Si riprova per battere il risultato."
+  ],
+  "easier": "Più lontani dalla rete, palle più lente.",
+  "harder": "Si avvicinano di un passo ogni 10 volée di fila.",
+  "cue": "Piatto fermo e racchetta davanti.",
+  "stepCues": [
+   "Racchetta sempre davanti, colpi corti e piatto fermo."
+  ],
+  "missTip": "Tre fuori di fila: rallentate, contano gli scambi, non la velocità.",
+  "streakTip": "Cinque dentro di fila: ora avvicinatevi di mezzo passo."
+ },
+ "volley_drop": {
+  "name": "Volée smorzata",
+  "goal": "La volée che muore subito dopo la rete, quando l'altro è a fondo campo.",
+  "steps": [
+   "A a rete; l'allenatore lancia da fondo campo.",
+   "A blocca la palla con il piatto aperto e la mano morbida.",
+   "La palla deve cadere entro il quadrato del servizio, incrociata.",
+   "Serie da 10."
+  ],
+  "easier": "Bersaglio più grande, tutto il quadrato del servizio.",
+  "harder": "L'allenatore corre in avanti dopo ogni smorzata: se la prende, il punto è suo.",
+  "cue": "Mano morbida: la palla muore dopo la rete.",
+  "stepCues": [
+   "Piatto aperto e polso morbido: assorbi la palla invece di spingerla."
+  ],
+  "missTip": "Tre fuori di fila: meno spinta, lascia che la racchetta assorba la palla.",
+  "streakTip": "Cinque dentro di fila: ora prova a farla cadere ancora più vicina alla rete."
+ },
+ "half_volley": {
+  "name": "Demi-volée sulla linea del servizio",
+  "goal": "Giocare la palla subito dopo il rimbalzo, quando si avanza verso la rete.",
+  "steps": [
+   "A sulla linea del servizio; l'allenatore lancia una palla che rimbalza ai piedi di A.",
+   "A scende sulle gambe e colpisce subito dopo il rimbalzo, profondo.",
+   "Dopo il colpo, A continua verso la rete.",
+   "Serie da 8."
+  ],
+  "easier": "Palla più lenta, che rimbalza un passo davanti ad A.",
+  "harder": "Dopo la demi-volée, l'allenatore lancia una volée da chiudere.",
+  "cue": "Giù sulle gambe, colpisci subito dopo il rimbalzo.",
+  "stepCues": [
+   "Racchetta bassa e ferma, accompagna avanti e poi vai a rete."
+  ],
+  "missTip": "Tre fuori di fila: più piegato sulle gambe, movimento corto.",
+  "streakTip": "Cinque dentro di fila: ora prova a mandarla più profonda."
+ },
+ "volley_angle": {
+  "name": "Volée angolata",
+  "goal": "Chiudere il punto a rete con la volée angolata, di dritto e di rovescio.",
+  "steps": [
+   "A a rete, a metà tra la rete e la linea del servizio.",
+   "Passo 1: volée di dritto angolata, che esce dal lato del campo.",
+   "Passo 2: volée di rovescio angolata dall'altra parte.",
+   "10 per parte."
+  ],
+  "easier": "Palle lanciate più lente e più alte.",
+  "harder": "L'allenatore lancia a caso, dritto o rovescio.",
+  "cue": "Volée angolata: la palla esce dal lato del campo.",
+  "stepCues": [
+   "Volée di dritto: racchetta davanti, polso fermo, verso l'angolo.",
+   "Ora rovescio: spalla girata e piatto verso l'angolo."
+  ],
+  "missTip": "Tre fuori di fila: meno angolo, punta un po' più dentro il campo.",
+  "streakTip": "Cinque dentro di fila: ora stringi ancora l'angolo."
+ },
+ "swing_volley": {
+  "name": "Volée al volo da metà campo",
+  "goal": "Non lasciar rimbalzare la palla alta e lenta: prenderla al volo e chiudere.",
+  "steps": [
+   "A parte dalla linea di fondo; l'allenatore lancia una palla alta e lenta.",
+   "A avanza e colpisce al volo, con un dritto pieno, prima del rimbalzo.",
+   "La palla va incrociata e profonda.",
+   "Serie da 8."
+  ],
+  "easier": "Palla più bassa, all'altezza delle spalle.",
+  "harder": "Dopo il colpo al volo, A va a rete per una volée.",
+  "cue": "Al volo, senza aspettare il rimbalzo.",
+  "stepCues": [
+   "Avanza, mettiti sotto la palla e colpisci con un dritto pieno incrociato."
+  ],
+  "missTip": "Tre fuori di fila: colpisci davanti, non sopra la testa, e accompagna verso il basso.",
+  "streakTip": "Cinque dentro di fila: ora prova più profondità."
+ },
+ "smash_bounce": {
+  "name": "Smash dopo il rimbalzo",
+  "goal": "Sul pallonetto molto alto lasciar rimbalzare la palla e schiacciare da fondo campo.",
+  "steps": [
+   "A a metà campo; l'allenatore lancia un pallonetto molto alto e profondo.",
+   "A arretra, lascia rimbalzare la palla e si mette sotto, col braccio sinistro alto.",
+   "Smash profondo al centro, senza fretta.",
+   "Serie da 8."
+  ],
+  "easier": "Pallonetti meno profondi, che rimbalzano vicino alla linea del servizio.",
+  "harder": "L'allenatore decide all'ultimo se lanciare corto (smash al volo) o lungo (dopo il rimbalzo)."
+ },
+ "lob_smash": {
+  "name": "Pallonetto e smash a coppie",
+  "goal": "Allenare insieme pallonetto e smash: chi è a fondo alza, chi è a rete schiaccia.",
+  "steps": [
+   "A a rete, B a fondo campo.",
+   "B gioca pallonetti; A arretra di lato e schiaccia.",
+   "B prova a rimettere lo smash con un altro pallonetto.",
+   "Dopo 10 smash si cambiano i ruoli."
+  ],
+  "easier": "B lancia i pallonetti a mano.",
+  "harder": "Si gioca il punto: B può scegliere pallonetto o passante."
+ },
+ "volley_smash": {
+  "name": "Volée e smash",
+  "goal": "Dopo la volée prepararsi al pallonetto: arretrare e schiacciare.",
+  "steps": [
+   "Passo 1: A a rete gioca una volée profonda.",
+   "Passo 2: l'allenatore lancia subito un pallonetto; A arretra di lato e schiaccia.",
+   "Dopo lo smash, A torna a rete.",
+   "Serie da 6 coppie volée e smash."
+  ],
+  "easier": "Pallonetti più bassi e meno profondi.",
+  "harder": "L'allenatore alterna a caso volée, pallonetto e palla al corpo."
+ },
+ "fw_cones": {
+  "name": "Slalom tra i coni",
+  "goal": "Passi corti e veloci, cambi di direzione puliti.",
+  "steps": [
+   "Cinque coni a zig-zag tra la linea di fondo e quella del servizio.",
+   "A passa attorno a ogni cono con passi corti, sempre fronte alla rete.",
+   "Arrivato in fondo torna camminando.",
+   "Quattro giri, con pausa."
+  ],
+  "easier": "Coni più distanti, passo normale.",
+  "harder": "A ogni cono un colpo a vuoto (dritto o rovescio) prima di ripartire."
+ },
+ "fw_recover": {
+  "name": "Colpisci e torna al centro",
+  "goal": "Abituarsi a tornare al centro dopo ogni colpo, a destra e a sinistra.",
+  "steps": [
+   "Passo 1: palla larga sul dritto, A colpisce incrociato e torna al centro.",
+   "Passo 2: palla larga sul rovescio, A colpisce incrociato e torna al centro.",
+   "Il lancio successivo parte quando A è di nuovo al centro.",
+   "Serie da 8 palle, alternate."
+  ],
+  "easier": "Palle meno larghe e più tempo tra un lancio e l'altro.",
+  "harder": "Il lancio parte prima che A sia tornato al centro."
+ },
+ "fw_body_ball": {
+  "name": "Fuori dalla palla al corpo",
+  "goal": "Togliersi dalla palla che arriva addosso con un passo di lato, per colpire di dritto.",
+  "steps": [
+   "A al centro della linea di fondo; l'allenatore lancia dritto addosso ad A.",
+   "A fa un passo a sinistra, lascia la palla alla sua destra e colpisce di dritto.",
+   "La palla va profonda al centro.",
+   "Serie da 10."
+  ],
+  "easier": "Palla più lenta e un po' spostata.",
+  "harder": "L'allenatore lancia a caso addosso, a destra o a sinistra."
+ },
+ "fw_forward_back": {
+  "name": "Avanti e indietro",
+  "goal": "Coprire il campo in profondità: prima la palla corta, poi quella profonda.",
+  "steps": [
+   "Passo 1: palla corta, A entra in campo e colpisce.",
+   "Passo 2: subito una palla alta e profonda, A arretra e colpisce.",
+   "Arretrare di lato, non di spalle.",
+   "Serie da 6 coppie."
+  ],
+  "easier": "Più tempo tra le due palle.",
+  "harder": "Dopo la palla profonda, una terza palla corta."
+ },
+ "fit_lines": {
+  "name": "Scatti alle linee",
+  "goal": "Velocità e cambi di direzione: scatti sempre più lunghi con ritorno alla linea di fondo.",
+  "steps": [
+   "Dalla linea di fondo, scatto alla linea del servizio e ritorno.",
+   "Poi scatto a metà tra servizio e rete e ritorno.",
+   "Poi scatto fino alla rete e ritorno.",
+   "Tre serie, con un minuto di pausa."
+  ],
+  "easier": "Si cammina veloce nel ritorno.",
+  "harder": "Si tocca la linea con la mano a ogni cambio di direzione."
+ },
+ "fit_shadow": {
+  "name": "Colpi a vuoto",
+  "goal": "Ripetere i movimenti dei colpi senza palla, a ritmo, per scaldarsi e fissare i gesti.",
+  "steps": [
+   "A al centro della linea di fondo, racchetta in mano.",
+   "Passi laterali verso destra, dritto a vuoto, ritorno al centro.",
+   "Poi a sinistra col rovescio, poi avanti per una volée a vuoto.",
+   "30 secondi di lavoro e 30 di pausa, 6 volte."
+  ],
+  "easier": "Più lento, curando solo il gesto.",
+  "harder": "Lavoro di 45 secondi, pausa di 15."
+ },
+ "fit_box": {
+  "name": "Il quadrato del servizio",
+  "goal": "Muoversi in tutte le direzioni: di lato, indietro, avanti.",
+  "steps": [
+   "Quattro coni agli angoli del quadrato del servizio.",
+   "Passi laterali lungo la linea del servizio, poi indietro lungo la riga laterale.",
+   "Passi laterali lungo la rete, poi scatto in avanti fino alla linea del servizio.",
+   "Tre giri per verso, con pausa."
+  ],
+  "easier": "Un giro alla volta, camminando.",
+  "harder": "Si cronometra il giro e si prova a battere il tempo."
+ },
+ "tac_approach_pass": {
+  "name": "Attacco e passante",
+  "goal": "Imparare a scegliere l'attacco giusto e, dall'altra parte, il passante.",
+  "steps": [
+   "Passo 1: B gioca una palla corta, A attacca lungolinea.",
+   "Passo 2: A va a rete, B prova il passante lungolinea o incrociato.",
+   "Si gioca il punto fino alla fine.",
+   "Partita ai 7 punti, poi si cambiano i ruoli."
+  ],
+  "easier": "B lancia la palla corta a mano; il passante si gioca solo incrociato.",
+  "harder": "Il punto vale doppio se A vince con la prima volée."
+ },
+ "tac_middle": {
+  "name": "Doppio: al centro",
+  "goal": "Nel doppio la palla al centro crea dubbi tra i due avversari e riduce gli angoli.",
+  "steps": [
+   "Si gioca il doppio normalmente.",
+   "Per tutto il punto la coppia A gioca solo nella fascia centrale.",
+   "Si cerca il centro anche col servizio.",
+   "Partita ai 10 punti, poi tocca alla coppia B."
+  ],
+  "easier": "Si gioca solo da fondo campo, senza volée.",
+  "harder": "Il punto vale doppio se si vince con un colpo nella fascia centrale."
+ },
+ "tac_high_low": {
+  "name": "Palla alta e palla tesa",
+  "goal": "Cambiare ritmo nel palleggio incrociato per togliere tempo e riferimenti all'altro.",
+  "steps": [
+   "A e B palleggiano incrociato sulla diagonale del pari.",
+   "A alterna una palla alta e carica e una tesa e veloce.",
+   "B deve rimettere tutte le palle profonde.",
+   "Dopo 20 colpi si cambiano i ruoli."
+  ],
+  "easier": "Si cambia ritmo ogni due colpi.",
+  "harder": "A decide a caso; l'altro deve capirlo dalla preparazione.",
+  "cue": "Una palla alta, una tesa: cambia ritmo.",
+  "stepCues": [
+   "Alterna: alta e carica sopra la rete, poi tesa e veloce."
+  ],
+  "missTip": "Tre fuori di fila: tieni più margine sulla palla tesa.",
+  "streakTip": "Cinque dentro di fila: ora fai cadere più profonde tutte e due."
  }
 }
