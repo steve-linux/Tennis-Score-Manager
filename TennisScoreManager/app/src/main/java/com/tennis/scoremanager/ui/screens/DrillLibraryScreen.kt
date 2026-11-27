@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -56,6 +58,9 @@ import com.tennis.scoremanager.ui.TagChip
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.libLevelLabel
 import com.tennis.scoremanager.ui.libTopicLabel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * La raccolta di esercizi illustrati: filtri per argomento, livello e giocatori; ogni esercizio col suo disegno del
@@ -185,6 +190,24 @@ private fun DrillDetail(c: MatchController, item: DrillLibrary.Item, t: DrillLib
                     if (ensure() != null) android.widget.Toast.makeText(context, s.dlAdded, android.widget.Toast.LENGTH_SHORT).show()
                 }, Modifier.fillMaxWidth(), enabled = existing == null)
             }
+            // Sul tabellone TV: i disegni in grande che girano da soli, con accanto come si fa (per tutto il gruppo in campo).
+            val onTv by c.tvDrill.collectAsState()
+            val tvRunning by c.tvServer.running.collectAsState()
+            val scope = rememberCoroutineScope()
+            if (onTv?.title == t.name) GhostButton(s.ctTvHide, Icons.Filled.Tv, { c.showDrillOnTv(null) }, Modifier.fillMaxWidth())
+            else if (tvRunning) GhostButton(s.ctTvShow, Icons.Filled.Tv, {
+                scope.launch {
+                    val id = System.currentTimeMillis().toString(36)
+                    val pages = (1..d.frames).map { n ->
+                        val f = d.frame(n)
+                        val title = if (d.frames > 1) listOfNotNull(s.wzStep(n, d.frames), f.orders.takeIf { it.isNotEmpty() }?.let { o -> s.dlShots(o.first(), o.last()) }).joinToString(" · ") else ""
+                        com.tennis.scoremanager.tv.TvDrillPage(title, "/drill/$id/${n - 1}.png")
+                    }
+                    val images = withContext(Dispatchers.Default) { (1..d.frames).map { n -> com.tennis.scoremanager.ui.drillPng(d.frame(n), 1280, area) } }
+                    c.showDrillOnTv(com.tennis.scoremanager.tv.TvDrill(id, t.name, meta(s, item), 10, pages, s.dlHow, t.steps), images)
+                }
+            }, Modifier.fillMaxWidth())
+            else GhostButton(s.ctTvOff, Icons.Filled.Tv, { onDone(); c.go(com.tennis.scoremanager.Screen.DEVICES) }, Modifier.fillMaxWidth())
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, onDone, Modifier.fillMaxWidth())
         }
     }

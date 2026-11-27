@@ -272,6 +272,8 @@ class MatchController(
      * del blocco init, che la ascolta per aggiornare il tabellone.
      */
     val tvReplay = MutableStateFlow<TvReplay?>(null)
+    /** L'esercizio della raccolta sul tabellone (null = niente): dichiarato qui, prima che il tabellone parta. */
+    val tvDrill = MutableStateFlow<com.tennis.scoremanager.tv.TvDrill?>(null)
     /** Il torneo del circolo mostrato sul tabellone (ClubTournament.id), null = nessuno. */
     override val tvClubTournament = MutableStateFlow<String?>(null)
     /** Storico: partite finite salvate sul telefono, dalla più recente. */
@@ -559,6 +561,7 @@ class MatchController(
                 photos = tvPhotos(match?.record?.setup ?: setup.value),
                 replay = tvReplay.value,
                 club = tvClubSnapshot(),
+                drill = tvDrill.value,
                 balls = ballsAnimation.value,
                 arena = arenaActive,
             ),
@@ -574,6 +577,14 @@ class MatchController(
         tvServer.replayFiles = files
         tvServer.replayId = id
         tvReplay.value = TvReplay(id, files.size, speed, strings.replayTitle.uppercase())
+    }
+
+    /** Manda al tabellone un esercizio coi suoi disegni già fatti in PNG ([images], uno per pagina); null lo toglie. */
+    fun showDrillOnTv(drill: com.tennis.scoremanager.tv.TvDrill?, images: List<ByteArray> = emptyList()) {
+        tvServer.drillImages = images
+        tvServer.drillId = drill?.id.orEmpty()
+        tvDrill.value = drill
+        publishTv()
     }
 
     override fun showClubOnTv(id: String?) {

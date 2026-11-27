@@ -24389,7 +24389,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - Eine **Übung** ist ein Schlag mit Schritten nacheinander: zum Beispiel *20 Vorhand cross, dann 20 longline*, oder beim Aufschlag *10 erste Aufschläge von der Einstandseite durch die Mitte, dann 10 nach außen…*. Es gibt vier fertige Beispiele, eines pro Schlag.
 - **Übungen** (über die Auswahl **Übung** unter *Starten*, im Schlagtraining): **Neue Übung**, Name, Schlag und Schritte; für jeden Schritt wie viele Schläge (− und + in Fünferschritten) und je nach Schlag Seite, erster oder zweiter Aufschlag und Ziel, Richtung, Volley mit Vorhand oder Rückhand (*—* = so lassen). Eine Übung antippen, um sie zu ändern oder zu löschen.
 - Unter **Trainieren**, unter den Schlägen, wählt **Übung** die zu folgende (oder *Frei*). Im Training stellt die App die Auswahl des Schritts selbst ein, zeigt oben *Schritt 1 von 2 · 7/20*, am Ende eines Schritts sagt die Stimme den nächsten an (und das Armband zeigt ihn) und am Ende *Übung beendet*. Wird ein Schlag rückgängig gemacht, geht es zum richtigen Schritt zurück. Die Übersicht zählt nach Richtung und Ziel, und die Einheit merkt sich den Namen der Übung.
-- **Übungssammlung** (unter **Trainieren**, im Tab **Schüler** des Trainers und oben in den *Übungen*): 60 illustrierte Übungen, für die App geschrieben (Vorhand, Rückhand, Aufschlag, Return, Volley, Schmetterball, Beinarbeit, Taktik, Kondition), mit Filtern nach Thema, Niveau und Spielerzahl. Jede hat eine Platzzeichnung von hinter A gesehen, wie auf dem Platz (der Ball im Bogen, eine Farbe pro Schlag in der Reihenfolge mit seiner Nummer; nummerierte Ovale: wo er landen soll; gestrichelt wer läuft und, im gestrichelten Feld, wohin man nach dem Schlag zurückgeht; Figuren mit dem Schläger auf der Seite des Schlags; orange mit Korb wer zuspielt; Dreiecke die Hütchen; in der Liste eine Miniatur von oben; Übungen mit vielen Schlägen sind in Schritte geteilt, *Schritt 1 von 2 · Schläge 1-2*, untereinander; die Flugbahnen beginnen und enden am Schläger des Spielers), das Ziel, die Schritte und eine leichtere und eine schwerere Variante. Übungen für einen einzelnen Schlag haben zwei Tasten: **Übung starten** geht zurück zum Training, Schlag und Übung sind schon gewählt (einfach **Starten** drücken, oder vom Platz aus KEY1 am Armband oder ein Klick der Fernbedienung); **Zu meinen Übungen hinzufügen** legt sie nur in die Liste der geführten Übungen und du bleibst in der Sammlung (ist sie schon da, steht auf der Taste *Schon in meinen Übungen*, Kopien gibt es nicht). Hast du mehrere Übungen für einen Schlag, zeigt die Zeile *Übung* die gewählte und wie viele es sind; die anderen wählst du mit *Ändern*. Die Texte sind in der Sprache der App.
+- **Übungssammlung** (unter **Trainieren**, im Tab **Schüler** des Trainers und oben in den *Übungen*): 60 illustrierte Übungen, für die App geschrieben (Vorhand, Rückhand, Aufschlag, Return, Volley, Schmetterball, Beinarbeit, Taktik, Kondition), mit Filtern nach Thema, Niveau und Spielerzahl. Jede hat eine Platzzeichnung von hinter A gesehen, wie auf dem Platz (der Ball im Bogen, eine Farbe pro Schlag in der Reihenfolge mit seiner Nummer; nummerierte Ovale: wo er landen soll; gestrichelt wer läuft und, im gestrichelten Feld, wohin man nach dem Schlag zurückgeht; Figuren mit dem Schläger auf der Seite des Schlags; orange mit Korb wer zuspielt; Dreiecke die Hütchen; in der Liste eine Miniatur von oben; Übungen mit vielen Schlägen sind in Schritte geteilt, *Schritt 1 von 2 · Schläge 1-2*, untereinander; die Flugbahnen beginnen und enden am Schläger des Spielers), das Ziel, die Schritte und eine leichtere und eine schwerere Variante. Übungen für einen einzelnen Schlag haben zwei Tasten: **Übung starten** geht zurück zum Training, Schlag und Übung sind schon gewählt (einfach **Starten** drücken, oder vom Platz aus KEY1 am Armband oder ein Klick der Fernbedienung); **Zu meinen Übungen hinzufügen** legt sie nur in die Liste der geführten Übungen und du bleibst in der Sammlung (ist sie schon da, steht auf der Taste *Schon in meinen Übungen*, Kopien gibt es nicht). Hast du mehrere Übungen für einen Schlag, zeigt die Zeile *Übung* die gewählte und wie viele es sind; die anderen wählst du mit *Ändern*. Die Texte sind in der Sprache der App. Mit eingeschalteter TV-Anzeigetafel bringt **Auf der TV-Anzeigetafel zeigen** die Übung auf den Fernseher, über den Spielstand: die Zeichnungen groß, alle 10 Sekunden wechselnd, daneben wie es geht, damit die ganze Gruppe auf dem Platz sieht, was zu tun ist; **Von der TV-Anzeigetafel nehmen** nimmt sie weg (ist die Anzeigetafel aus, führt die Taste zu den Geräten, um sie einzuschalten).
 - **Die Stimme bei den Übungen der Sammlung** (mit eingeschaltetem Ton, in der Sprache der App): am Anfang sagt sie Name, Ziel und Kernsatz der Übung und den ersten Schritt; bei jedem Schritt sagt sie auch, wie er geht (*Jetzt Rückhand-Volley: Schulter gedreht, Handgelenk fest*); nach drei Schlägen hintereinander im Aus gibt sie einen Tipp, nach fünf hintereinander im Feld schlägt sie vor, die Übung schwerer zu machen (einmal pro Schritt). Bei selbst erstellten Übungen bleiben die üblichen Ansagen.
 
 ### 7.11 Vereinsmitglieder
@@ -25030,7 +25030,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - A **drill** is a stroke and steps in a row: for example *20 cross-court forehands, then 20 down the line*, or for the serve *10 first serves from the deuce side to the T, then 10 wide…*. There are four ready examples, one per stroke.
 - **Drills** (from the **Drill** choice under *Start*, in stroke practice): **New drill**, name, stroke and steps; for each step how many shots (− and + by 5) and, depending on the stroke, side, first or second and target, direction, forehand or backhand volley (*—* = leave as it is). Tap a drill to change or delete it.
 - In **Practice**, under the strokes, **Drill** picks the one to follow (or *Free*). During practice the app sets the step's choices by itself, shows *Step 1 of 2 · 7/20* at the top, at the end of a step the voice says the next one (and the wristband shows it) and at the end *Drill finished*. Undoing a shot goes back to the right step. The summary counts by direction and target, and the session remembers the drill's name.
-- **Drill library** (in **Practice**, in the coach's **Students** tab and at the top of *Drills*): 60 illustrated drills written for the app (forehand, backhand, serve, return, volley, overhead, footwork, tactics, fitness), with filters by topic, level and number of players. Each one has a court drawing seen from behind A, as on court (the ball in an arc, one colour per shot in order with its number; numbered ovals: where it should land; dashed who moves and, in the dashed box, where to recover after the shot; figures holding the racket on the side of the stroke; orange with a basket who feeds; triangles the cones; a top-down thumbnail in the list; drills with many shots are split into steps, *Step 1 of 2 · Shots 1-2*, one below the other; paths start and end on the hitter's racket), the goal, the steps and an easier and a harder version. Those for a single stroke have two buttons: **Start drill** goes back to practice with the stroke and drill already picked (just press **Start**, or from the court the band's KEY1 or a click of the remote); **Add to my drills** only puts it in the list of guided drills and you stay in the library (if it is already there the button says *Already in my drills*, and no copies are made). If you have several drills for a stroke, the *Drill* row shows the chosen one and how many there are; pick another with *Change*. The texts are in the app's language.
+- **Drill library** (in **Practice**, in the coach's **Students** tab and at the top of *Drills*): 60 illustrated drills written for the app (forehand, backhand, serve, return, volley, overhead, footwork, tactics, fitness), with filters by topic, level and number of players. Each one has a court drawing seen from behind A, as on court (the ball in an arc, one colour per shot in order with its number; numbered ovals: where it should land; dashed who moves and, in the dashed box, where to recover after the shot; figures holding the racket on the side of the stroke; orange with a basket who feeds; triangles the cones; a top-down thumbnail in the list; drills with many shots are split into steps, *Step 1 of 2 · Shots 1-2*, one below the other; paths start and end on the hitter's racket), the goal, the steps and an easier and a harder version. Those for a single stroke have two buttons: **Start drill** goes back to practice with the stroke and drill already picked (just press **Start**, or from the court the band's KEY1 or a click of the remote); **Add to my drills** only puts it in the list of guided drills and you stay in the library (if it is already there the button says *Already in my drills*, and no copies are made). If you have several drills for a stroke, the *Drill* row shows the chosen one and how many there are; pick another with *Change*. The texts are in the app's language. With the TV scoreboard on, **Show on the TV scoreboard** puts the drill on the TV, over the score: the drawings in large size, changing every 10 seconds, with how to do it next to them, so the whole group on court sees what to do; **Remove from the TV scoreboard** takes it off (if the scoreboard is off, the button leads to Devices to turn it on).
 - **The voice in library drills** (with audio on, in the app's language): at the start it says the drill's name, goal and key phrase and the first step; at each step it also says how to do it (*Now backhand volley: shoulder turned, firm wrist*); after three shots out in a row it gives a tip and after five in a row in it suggests making the drill harder (once per step). In drills you create yourself the usual announcements remain.
 
 ### 7.11 Club members
@@ -25670,7 +25670,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - Un **ejercicio** es un golpe y unos pasos seguidos: por ejemplo *20 derechas cruzadas, luego 20 paralelas*, o en el saque *10 primeros desde el lado de iguales a la T, luego 10 abiertos…*. Hay cuatro ejemplos listos, uno por golpe.
 - **Ejercicios** (desde la elección **Ejercicio** bajo *Empezar*, en el entrenamiento de golpes): **Ejercicio nuevo**, nombre, golpe y pasos; para cada paso cuántos golpes (− y + de 5 en 5) y, según el golpe, lado, primero o segundo y objetivo, dirección, volea de derecha o de revés (*—* = dejar como está). Toca un ejercicio para cambiarlo o borrarlo.
 - En **Entrenar**, bajo los golpes, **Ejercicio** elige el que seguir (o *Libre*). Durante el entrenamiento la app pone sola las opciones del paso, arriba muestra *Paso 1 de 2 · 7/20*, al acabar un paso la voz dice el siguiente (y la pulsera lo muestra) y al final *Ejercicio terminado*. Anulando un golpe se vuelve al paso correcto. El resumen cuenta por dirección y objetivo, y la sesión recuerda el nombre del ejercicio.
-- **Colección de ejercicios** (en **Entrenar**, en la pestaña **Alumnos** del entrenador y arriba en *Ejercicios*): 60 ejercicios ilustrados escritos para la app (derecha, revés, saque, resto, volea, remate, juego de pies, táctica, físico), con filtros por tema, nivel y número de jugadores. Cada uno tiene el dibujo de la pista visto desde detrás de A, como en la pista (la bola en arco, un color por golpe en orden con su número; óvalos numerados: dónde debe caer; discontinua quien se mueve y, en el recuadro discontinuo, dónde volver tras el golpe; figuras con la raqueta del lado del golpe; en naranja con el cesto quien lanza; triángulos los conos; en la lista una miniatura vista desde arriba; los ejercicios con muchos golpes se dividen en pasos, *Paso 1 de 2 · Golpes 1-2*, uno debajo del otro; las trayectorias salen y llegan a la raqueta de quien golpea), el objetivo, los pasos y una versión más fácil y otra más difícil. Los de un solo golpe tienen dos botones: **Iniciar ejercicio** vuelve al entrenamiento con el golpe y el ejercicio ya elegidos (basta con pulsar **Empezar**, o desde la pista KEY1 de la pulsera o un clic del mando); **Añadir a mis ejercicios** solo lo pone en la lista de ejercicios guiados y te quedas en la colección (si ya está, el botón dice *Ya en mis ejercicios* y no se hacen copias). Si tienes varios ejercicios para un golpe, la fila *Ejercicio* muestra el elegido y cuántos hay; los demás se eligen con *Cambiar*. Los textos están en el idioma de la app.
+- **Colección de ejercicios** (en **Entrenar**, en la pestaña **Alumnos** del entrenador y arriba en *Ejercicios*): 60 ejercicios ilustrados escritos para la app (derecha, revés, saque, resto, volea, remate, juego de pies, táctica, físico), con filtros por tema, nivel y número de jugadores. Cada uno tiene el dibujo de la pista visto desde detrás de A, como en la pista (la bola en arco, un color por golpe en orden con su número; óvalos numerados: dónde debe caer; discontinua quien se mueve y, en el recuadro discontinuo, dónde volver tras el golpe; figuras con la raqueta del lado del golpe; en naranja con el cesto quien lanza; triángulos los conos; en la lista una miniatura vista desde arriba; los ejercicios con muchos golpes se dividen en pasos, *Paso 1 de 2 · Golpes 1-2*, uno debajo del otro; las trayectorias salen y llegan a la raqueta de quien golpea), el objetivo, los pasos y una versión más fácil y otra más difícil. Los de un solo golpe tienen dos botones: **Iniciar ejercicio** vuelve al entrenamiento con el golpe y el ejercicio ya elegidos (basta con pulsar **Empezar**, o desde la pista KEY1 de la pulsera o un clic del mando); **Añadir a mis ejercicios** solo lo pone en la lista de ejercicios guiados y te quedas en la colección (si ya está, el botón dice *Ya en mis ejercicios* y no se hacen copias). Si tienes varios ejercicios para un golpe, la fila *Ejercicio* muestra el elegido y cuántos hay; los demás se eligen con *Cambiar*. Los textos están en el idioma de la app. Con el marcador de la TV encendido, **Mostrar en el marcador de la TV** lleva el ejercicio a la TV, encima del marcador: los dibujos en grande que cambian cada 10 segundos, con al lado cómo se hace, para que todo el grupo en la pista vea qué hacer; **Quitar del marcador de la TV** lo quita (si el marcador está apagado, el botón lleva a Dispositivos para encenderlo).
 - **La voz en los ejercicios de la colección** (con el audio activado, en el idioma de la app): al principio dice el nombre, el objetivo y la frase clave del ejercicio y el primer paso; en cada paso dice también cómo hacerlo (*Ahora volea de revés: hombro girado y muñeca firme*); tras tres golpes fuera seguidos da un consejo y tras cinco dentro seguidos propone hacer el ejercicio más difícil (una vez por paso). En los ejercicios que creas tú quedan los avisos de siempre.
 
 ### 7.11 Socios del club
@@ -26310,7 +26310,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - Un **exercice** est un coup et des étapes à la suite : par exemple *20 coups droits croisés, puis 20 le long de la ligne*, ou pour le service *10 premières côté égalité au T, puis 10 extérieures…*. Il y a quatre exemples prêts, un par coup.
 - **Exercices** (depuis le choix **Exercice** sous *Commencer*, dans l'entraînement des coups) : **Nouvel exercice**, nom, coup et étapes ; pour chaque étape combien de coups (− et + de 5 en 5) et, selon le coup, côté, première ou seconde et cible, direction, volée de coup droit ou de revers (*—* = laisser tel quel). Touchez un exercice pour le modifier ou le supprimer.
 - Dans **S'entraîner**, sous les coups, **Exercice** choisit celui à suivre (ou *Libre*). Pendant l'entraînement l'appli règle toute seule les choix de l'étape, affiche en haut *Étape 1 sur 2 · 7/20*, à la fin d'une étape la voix annonce la suivante (et le bracelet l'affiche) et à la fin *Exercice terminé*. En annulant un coup on revient à la bonne étape. Le bilan compte par direction et par cible, et la séance garde le nom de l'exercice.
-- **Recueil d'exercices** (dans **S'entraîner**, dans l'onglet **Élèves** de l'entraîneur et en haut des *Exercices*) : 60 exercices illustrés écrits pour l'appli (coup droit, revers, service, retour, volée, smash, jeu de jambes, tactique, physique), avec des filtres par sujet, niveau et nombre de joueurs. Chacun a le dessin du court vu de derrière A, comme sur le terrain (la balle en arc, une couleur par coup dans l'ordre avec son numéro ; ovales numérotés : où elle doit tomber ; pointillés qui se déplace et, dans le cadre en pointillés, où se replacer après le coup ; des silhouettes tenant la raquette du côté du coup ; en orange avec le panier qui lance les balles ; triangles les plots ; dans la liste une vignette vue de dessus ; les exercices avec beaucoup de coups sont divisés en étapes, *Étape 1 sur 2 · Coups 1-2*, l'une sous l'autre ; les trajectoires partent et arrivent sur la raquette de celui qui frappe), l'objectif, les étapes et une version plus facile et une plus difficile. Ceux d'un seul coup ont deux boutons : **Lancer l'exercice** revient à l'entraînement avec le coup et l'exercice déjà choisis (il suffit d'appuyer sur **Commencer**, ou depuis le court KEY1 du bracelet ou un clic de la télécommande) ; **Ajouter à mes exercices** le met seulement dans la liste des exercices guidés et vous restez dans la bibliothèque (s'il y est déjà, le bouton indique *Déjà dans mes exercices*, et aucune copie n'est faite). Si vous avez plusieurs exercices pour un coup, la ligne *Exercice* montre celui choisi et combien il y en a ; les autres se choisissent avec *Changer*. Les textes sont dans la langue de l'appli.
+- **Recueil d'exercices** (dans **S'entraîner**, dans l'onglet **Élèves** de l'entraîneur et en haut des *Exercices*) : 60 exercices illustrés écrits pour l'appli (coup droit, revers, service, retour, volée, smash, jeu de jambes, tactique, physique), avec des filtres par sujet, niveau et nombre de joueurs. Chacun a le dessin du court vu de derrière A, comme sur le terrain (la balle en arc, une couleur par coup dans l'ordre avec son numéro ; ovales numérotés : où elle doit tomber ; pointillés qui se déplace et, dans le cadre en pointillés, où se replacer après le coup ; des silhouettes tenant la raquette du côté du coup ; en orange avec le panier qui lance les balles ; triangles les plots ; dans la liste une vignette vue de dessus ; les exercices avec beaucoup de coups sont divisés en étapes, *Étape 1 sur 2 · Coups 1-2*, l'une sous l'autre ; les trajectoires partent et arrivent sur la raquette de celui qui frappe), l'objectif, les étapes et une version plus facile et une plus difficile. Ceux d'un seul coup ont deux boutons : **Lancer l'exercice** revient à l'entraînement avec le coup et l'exercice déjà choisis (il suffit d'appuyer sur **Commencer**, ou depuis le court KEY1 du bracelet ou un clic de la télécommande) ; **Ajouter à mes exercices** le met seulement dans la liste des exercices guidés et vous restez dans la bibliothèque (s'il y est déjà, le bouton indique *Déjà dans mes exercices*, et aucune copie n'est faite). Si vous avez plusieurs exercices pour un coup, la ligne *Exercice* montre celui choisi et combien il y en a ; les autres se choisissent avec *Changer*. Les textes sont dans la langue de l'appli. Avec le tableau TV allumé, **Afficher sur le tableau TV** met l'exercice sur la TV, par-dessus le score : les dessins en grand qui changent toutes les 10 secondes, avec à côté comment le faire, pour que tout le groupe sur le court voie quoi faire ; **Retirer du tableau TV** l'enlève (si le tableau est éteint, le bouton mène aux Appareils pour l'allumer).
 - **La voix dans les exercices de la bibliothèque** (avec le son activé, dans la langue de l'appli) : au début elle dit le nom, l'objectif et la phrase clé de l'exercice et la première étape ; à chaque étape elle dit aussi comment la faire (*Maintenant volée de revers : épaule tournée, poignet ferme*) ; après trois coups dehors d'affilée elle donne un conseil et après cinq dedans d'affilée elle propose de rendre l'exercice plus difficile (une fois par étape). Dans les exercices que vous créez vous-même, les annonces habituelles restent.
 
 ### 7.11 Adhérents du club
@@ -26950,7 +26950,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - Un **esercizio** è un colpo e dei passi in fila: per esempio *20 dritti incrociati, poi 20 lungolinea*, o per il servizio *10 prime da destra al T, poi 10 esterne…*. Ci sono quattro esempi pronti, uno per colpo.
 - **Esercizi** (dalla scelta **Esercizio** sotto *Inizia*, nell'allenamento dei colpi): **Nuovo esercizio**, nome, colpo e passi; per ogni passo quanti colpi (− e + di 5 in 5) e, secondo il colpo, lato, prima o seconda e bersaglio, direzione, volée di dritto o di rovescio (*—* = lascia com'è). Toccando un esercizio lo cambi o lo elimini.
 - In **Allenati**, sotto i colpi, **Esercizio** sceglie quello da seguire (o *Libero*). Durante l'allenamento l'app imposta da sola le scelte del passo, in alto mostra *Passo 1 di 2 · 7/20*, a fine passo la voce dice il prossimo (e il braccialetto lo mostra) e alla fine *Esercizio finito*. Annullando un colpo si torna al passo giusto. Il riepilogo conta per direzione e bersaglio, e la sessione ricorda il nome dell'esercizio.
-- **Raccolta di esercizi** (in **Allenati**, nella scheda **Allievi** dell'allenatore e in cima agli *Esercizi*): 60 esercizi illustrati, scritti per l'app (dritto, rovescio, servizio, risposta, volée, smash, gioco di gambe, tattica, fisico), con filtri per argomento, livello e numero di giocatori. Ognuno ha il disegno del campo visto da dietro A, come in campo (la palla ad arco, un colore per ogni colpo in ordine col suo numero; gli ovali col numero: dove deve arrivare; tratteggio chi si sposta e, nel riquadro tratteggiato, dove tornare dopo il colpo; gli omini con la racchetta dalla parte del colpo; in arancio col cesto chi lancia le palle; triangoli i coni; nell'elenco una miniatura vista dall'alto; gli esercizi con tanti colpi sono divisi in passi, *Passo 1 di 2 · Colpi 1-2*, uno sotto l'altro; le traiettorie partono e finiscono sulla racchetta di chi colpisce), l'obiettivo, i passi e una versione più facile e una più difficile. Quelli di un colpo solo hanno due tasti: **Avvia esercizio** torna all'allenamento col colpo e l'esercizio già scelti (basta premere **Inizia**, oppure dal campo KEY1 del braccialetto o un clic del telecomando); **Aggiungi ai miei esercizi** lo mette solo nella lista degli esercizi guidati e resti nella raccolta (se c'è già il tasto dice *Già nei miei esercizi*, e non si fanno copie). Se per un colpo hai più esercizi, la riga *Esercizio* mostra quello scelto e quanti sono; gli altri si scelgono con *Cambia*. I testi sono nella lingua dell'app.
+- **Raccolta di esercizi** (in **Allenati**, nella scheda **Allievi** dell'allenatore e in cima agli *Esercizi*): 60 esercizi illustrati, scritti per l'app (dritto, rovescio, servizio, risposta, volée, smash, gioco di gambe, tattica, fisico), con filtri per argomento, livello e numero di giocatori. Ognuno ha il disegno del campo visto da dietro A, come in campo (la palla ad arco, un colore per ogni colpo in ordine col suo numero; gli ovali col numero: dove deve arrivare; tratteggio chi si sposta e, nel riquadro tratteggiato, dove tornare dopo il colpo; gli omini con la racchetta dalla parte del colpo; in arancio col cesto chi lancia le palle; triangoli i coni; nell'elenco una miniatura vista dall'alto; gli esercizi con tanti colpi sono divisi in passi, *Passo 1 di 2 · Colpi 1-2*, uno sotto l'altro; le traiettorie partono e finiscono sulla racchetta di chi colpisce), l'obiettivo, i passi e una versione più facile e una più difficile. Quelli di un colpo solo hanno due tasti: **Avvia esercizio** torna all'allenamento col colpo e l'esercizio già scelti (basta premere **Inizia**, oppure dal campo KEY1 del braccialetto o un clic del telecomando); **Aggiungi ai miei esercizi** lo mette solo nella lista degli esercizi guidati e resti nella raccolta (se c'è già il tasto dice *Già nei miei esercizi*, e non si fanno copie). Se per un colpo hai più esercizi, la riga *Esercizio* mostra quello scelto e quanti sono; gli altri si scelgono con *Cambia*. I testi sono nella lingua dell'app. Con il tabellone TV acceso, **Mostra sul tabellone TV** porta l'esercizio sulla TV, sopra il punteggio: i disegni in grande che si alternano ogni 10 secondi, con accanto come si fa, così tutto il gruppo in campo vede cosa fare; **Togli dal tabellone TV** lo toglie (se il tabellone è spento, il tasto porta ai Dispositivi per accenderlo).
 - **La voce negli esercizi della raccolta** (con l'audio acceso, nella lingua dell'app): all'inizio dice nome, obiettivo e la frase chiave dell'esercizio e il primo passo; a ogni passo dice anche come farlo (*Ora volée di rovescio: spalla girata e polso fermo*); dopo tre colpi fuori di fila dà un consiglio e dopo cinque dentro di fila propone di rendere l'esercizio più difficile (una volta per passo). Negli esercizi creati da te restano gli annunci di sempre.
 
 ### 7.11 Soci del circolo
@@ -27590,7 +27590,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - Um **exercício** é um golpe e passos em sequência: por exemplo *20 forehands cruzados, depois 20 na paralela*, ou no saque *10 primeiros do lado de iguais no T, depois 10 abertos…*. Há quatro exemplos prontos, um por golpe.
 - **Exercícios** (na escolha **Exercício** embaixo de *Começar*, no treino de golpes): **Novo exercício**, nome, golpe e passos; para cada passo quantos golpes (− e + de 5 em 5) e, conforme o golpe, lado, primeiro ou segundo e alvo, direção, voleio de forehand ou de backhand (*—* = deixar como está). Toque num exercício para mudar ou apagar.
 - Em **Treinar**, embaixo dos golpes, **Exercício** escolhe o que seguir (ou *Livre*). Durante o treino o app ajusta sozinho as escolhas do passo, no alto mostra *Passo 1 de 2 · 7/20*, no fim de um passo a voz diz o próximo (e a pulseira mostra) e no fim *Exercício terminado*. Desfazendo um golpe volta-se ao passo certo. O resumo conta por direção e alvo, e a sessão lembra o nome do exercício.
-- **Coleção de exercícios** (em **Treinar**, na aba **Alunos** do treinador e no alto de *Exercícios*): 60 exercícios ilustrados feitos para o app (forehand, backhand, saque, devolução, voleio, smash, trabalho de pernas, tática, físico), com filtros por tema, nível e número de jogadores. Cada um tem o desenho da quadra visto de trás de A, como na quadra (a bola em arco, uma cor por golpe na ordem com seu número; ovais numerados: onde deve cair; tracejada quem se move e, no quadro tracejado, para onde voltar depois do golpe; bonecos com a raquete do lado do golpe; em laranja com o cesto quem lança as bolas; triângulos os cones; na lista uma miniatura vista de cima; os exercícios com muitos golpes são divididos em etapas, *Etapa 1 de 2 · Golpes 1-2*, uma embaixo da outra; as trajetórias saem e chegam na raquete de quem bate), o objetivo, os passos e uma versão mais fácil e outra mais difícil. Os de um só golpe têm dois botões: **Iniciar exercício** volta ao treino com o golpe e o exercício já escolhidos (basta tocar em **Começar**, ou da quadra KEY1 da pulseira ou um clique do controle); **Adicionar aos meus exercícios** só o coloca na lista de exercícios guiados e você continua na coleção (se já estiver lá, o botão diz *Já nos meus exercícios* e não se fazem cópias). Se você tem vários exercícios para um golpe, a linha *Exercício* mostra o escolhido e quantos são; os outros escolhem-se com *Trocar*. Os textos ficam no idioma do app.
+- **Coleção de exercícios** (em **Treinar**, na aba **Alunos** do treinador e no alto de *Exercícios*): 60 exercícios ilustrados feitos para o app (forehand, backhand, saque, devolução, voleio, smash, trabalho de pernas, tática, físico), com filtros por tema, nível e número de jogadores. Cada um tem o desenho da quadra visto de trás de A, como na quadra (a bola em arco, uma cor por golpe na ordem com seu número; ovais numerados: onde deve cair; tracejada quem se move e, no quadro tracejado, para onde voltar depois do golpe; bonecos com a raquete do lado do golpe; em laranja com o cesto quem lança as bolas; triângulos os cones; na lista uma miniatura vista de cima; os exercícios com muitos golpes são divididos em etapas, *Etapa 1 de 2 · Golpes 1-2*, uma embaixo da outra; as trajetórias saem e chegam na raquete de quem bate), o objetivo, os passos e uma versão mais fácil e outra mais difícil. Os de um só golpe têm dois botões: **Iniciar exercício** volta ao treino com o golpe e o exercício já escolhidos (basta tocar em **Começar**, ou da quadra KEY1 da pulseira ou um clique do controle); **Adicionar aos meus exercícios** só o coloca na lista de exercícios guiados e você continua na coleção (se já estiver lá, o botão diz *Já nos meus exercícios* e não se fazem cópias). Se você tem vários exercícios para um golpe, a linha *Exercício* mostra o escolhido e quantos são; os outros escolhem-se com *Trocar*. Os textos ficam no idioma do app. Com o placar da TV ligado, **Mostrar no placar da TV** leva o exercício para a TV, por cima do placar: os desenhos em tamanho grande que mudam a cada 10 segundos, com ao lado como se faz, para todo o grupo na quadra ver o que fazer; **Tirar do placar da TV** tira (se o placar estiver desligado, o botão leva aos Dispositivos para ligá-lo).
 - **A voz nos exercícios da coleção** (com o áudio ligado, no idioma do app): no início diz o nome, o objetivo e a frase-chave do exercício e o primeiro passo; em cada passo diz também como fazê-lo (*Agora vólei de esquerda: ombro rodado e pulso firme*); depois de três pancadas fora seguidas dá um conselho e depois de cinco dentro seguidas propõe tornar o exercício mais difícil (uma vez por passo). Nos exercícios criados por você ficam os avisos de sempre.
 
 ### 7.11 Sócios do clube
@@ -27985,6 +27985,22 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   #cp { font: 700 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); white-space: nowrap; }
   #cdots { font: 700 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); letter-spacing: .3em; }
   #cb { flex: 1; min-height: 0; display: flex; padding-top: calc(2 * var(--vh)); }
+  /* Esercizio della raccolta: sopra il torneo (sotto la moviola); il disegno a sinistra, come si fa a destra. */
+  #drill { display: none; position: fixed; inset: 0; z-index: 41; background: #05070B; color: #F1F5FB; font-family: sans-serif;
+           padding: calc(3 * var(--vh)) calc(3 * var(--vw)); flex-direction: column; overflow: hidden; }
+  #drill.on { display: flex; }
+  #dh { display: flex; align-items: baseline; gap: calc(2 * var(--vw)); border-bottom: 2px solid var(--line); padding-bottom: calc(1.2 * var(--vh)); }
+  #dt { font: 900 calc(6 * var(--vh)) sans-serif; color: var(--ball); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #ds { font: 600 calc(3 * var(--vh)) sans-serif; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  #dp { font: 700 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); white-space: nowrap; }
+  #ddots { font: 700 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); letter-spacing: .3em; }
+  #db { flex: 1; min-height: 0; display: flex; gap: calc(3 * var(--vw)); padding-top: calc(2 * var(--vh)); }
+  #dimg { flex: 1.2; min-width: 0; display: flex; align-items: center; justify-content: center; }
+  #dimg img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: calc(1.5 * var(--vh)); }
+  #dhow { flex: 1; min-width: 0; overflow: hidden; }
+  #dhow h3 { margin: 0 0 calc(1.2 * var(--vh)); font: 800 calc(3.4 * var(--vh)) sans-serif; color: var(--ball); text-transform: uppercase; }
+  #dhow ol { margin: 0; padding-left: calc(4 * var(--vh)); }
+  #dhow li { font: 500 calc(3.4 * var(--vh)) sans-serif; line-height: 1.35; margin-bottom: calc(1.4 * var(--vh)); }
   /* Tabellone: un turno per colonna; space-around mette ogni partita a metà tra le due da cui viene. */
   .rnd { flex: 1; min-width: 0; display: flex; flex-direction: column; margin-right: calc(1.2 * var(--vw)); }
   .rnd h3 { margin: 0 0 calc(.8 * var(--vh)); font: 800 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); text-transform: uppercase; }
@@ -28036,6 +28052,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
 </div>
 <div id="banner"></div>
 <div id="club"><div id="ch"><div id="ct"></div><div id="cs"></div><div id="cp"></div><div id="cdots"></div></div><div id="cb"></div></div>
+<div id="drill"><div id="dh"><div id="dt"></div><div id="ds"></div><div id="dp"></div><div id="ddots"></div></div><div id="db"><div id="dimg"></div><div id="dhow"></div></div></div>
 <div id="balls"><div id="bw"></div><div class="nb b1"></div><div class="nb b2"></div><div class="nb b3"></div><div id="bt"><div id="lid"></div></div></div>
 <div id="replay"><video id="rv" muted playsinline></video><div id="rl"></div></div>
 <button id="fs" type="button"></button>
@@ -28280,6 +28297,7 @@ function onState(json) {
   render();
   replayUpdate(S.replay);
   clubUpdate(S.club);
+  drillUpdate(S.drill);
   ballsUpdate(S.balls);
 }
 
@@ -28354,6 +28372,35 @@ function clubDraw(c) {
     }
   }
   b.innerHTML = h;
+}
+// ------------------------------------------------------------------ esercizio della raccolta
+// I disegni dell'esercizio (immagini /drill/<id>/<n>.png fatte dal telefono) si alternano ogni drill.seconds secondi;
+// accanto i passi. Un esercizio nuovo riparte dal primo disegno.
+let drId = "", drPage = 0, drTimer = null;
+function drillUpdate(d) {
+  const box = $("drill");
+  if (!d || !d.pages || !d.pages.length) {
+    box.classList.remove("on"); drId = ""; if (drTimer) { clearInterval(drTimer); drTimer = null; }
+    return;
+  }
+  if (d.id !== drId) {
+    drId = d.id; drPage = 0;
+    if (drTimer) { clearInterval(drTimer); drTimer = null; }
+    let h = `<h3>${esc(d.howTitle)}</h3><ol>`;
+    for (const st of d.steps) h += `<li>${esc(st)}</li>`;
+    $("dhow").innerHTML = h + `</ol>`;
+    setText($("dt"), d.title); setText($("ds"), d.subtitle);
+    drillDraw(d);
+  }
+  if (!drTimer && d.pages.length > 1) drTimer = setInterval(() => { if (S && S.drill) { drPage = (drPage + 1) % S.drill.pages.length; drillDraw(S.drill); } }, Math.max(5, d.seconds || 10) * 1000);
+  box.classList.add("on");
+}
+function drillDraw(d) {
+  drPage = drPage % d.pages.length;
+  const p = d.pages[drPage];
+  setText($("dp"), p.title);
+  $("ddots").textContent = d.pages.length > 1 ? d.pages.map((_, i) => i === drPage ? "●" : "○").join("") : "";
+  $("dimg").innerHTML = `<img src="${esc(p.image)}" alt="">`;
 }
 // ------------------------------------------------------------------ moviola
 // L'arbitro manda la moviola: i pezzi /replay/<id>/<n>.mp4 uno dopo l'altro, in loop, alla sua velocità, sopra il
@@ -29089,6 +29136,8 @@ class MatchController(
      * del blocco init, che la ascolta per aggiornare il tabellone.
      */
     val tvReplay = MutableStateFlow<TvReplay?>(null)
+    /** L'esercizio della raccolta sul tabellone (null = niente): dichiarato qui, prima che il tabellone parta. */
+    val tvDrill = MutableStateFlow<com.tennis.scoremanager.tv.TvDrill?>(null)
     /** Il torneo del circolo mostrato sul tabellone (ClubTournament.id), null = nessuno. */
     override val tvClubTournament = MutableStateFlow<String?>(null)
     /** Storico: partite finite salvate sul telefono, dalla più recente. */
@@ -29376,6 +29425,7 @@ class MatchController(
                 photos = tvPhotos(match?.record?.setup ?: setup.value),
                 replay = tvReplay.value,
                 club = tvClubSnapshot(),
+                drill = tvDrill.value,
                 balls = ballsAnimation.value,
                 arena = arenaActive,
             ),
@@ -29391,6 +29441,14 @@ class MatchController(
         tvServer.replayFiles = files
         tvServer.replayId = id
         tvReplay.value = TvReplay(id, files.size, speed, strings.replayTitle.uppercase())
+    }
+
+    /** Manda al tabellone un esercizio coi suoi disegni già fatti in PNG ([images], uno per pagina); null lo toglie. */
+    fun showDrillOnTv(drill: com.tennis.scoremanager.tv.TvDrill?, images: List<ByteArray> = emptyList()) {
+        tvServer.drillImages = images
+        tvServer.drillId = drill?.id.orEmpty()
+        tvDrill.value = drill
+        publishTv()
     }
 
     override fun showClubOnTv(id: String?) {
@@ -55813,6 +55871,8 @@ data class TvSnapshot(
     val replay: TvReplay? = null,
     /** Torneo del circolo mandato al tabellone (null = niente): pagine che girano da sole sopra il punteggio. */
     val club: TvClub? = null,
+    /** Esercizio della raccolta mandato al tabellone (null = niente): i suoi disegni che girano da soli, sopra il punteggio. */
+    val drill: TvDrill? = null,
     /** Animazione del cambio palle: un numero nuovo = parte (null = niente). */
     val balls: Long? = null,
     /** TSM Arena aperta sul telefono: la pagina del tabellone passa da sola al gioco (/arena), che torna qui alla chiusura. */
@@ -55855,6 +55915,26 @@ data class TvOrderRow(val time: String, val court: String, val a: String, val b:
 
 @Serializable
 data class TvClubLabels(val won: String, val sets: String, val games: String, val noMatches: String)
+
+/**
+ * Un esercizio della raccolta sul tabellone: nome e riga sotto ([subtitle]: livello, argomento, giocatori, durata), i
+ * disegni ([pages], uno per passo, immagini /drill/[id]/0.png ...) che si alternano ogni [seconds] secondi e, accanto,
+ * come si fa ([howTitle] e [steps]). [id] cambia a ogni invio, così la pagina riparte dal primo disegno.
+ */
+@Serializable
+data class TvDrill(
+    val id: String,
+    val title: String,
+    val subtitle: String,
+    val seconds: Int,
+    val pages: List<TvDrillPage>,
+    val howTitle: String,
+    val steps: List<String>,
+)
+
+/** Un disegno dell'esercizio: [title] ("Passo 1 di 2 · Colpi 1-2", vuoto se è uno solo) e l'indirizzo dell'immagine. */
+@Serializable
+data class TvDrillPage(val title: String, val image: String)
 
 /**
  * Moviola sul tabellone: i pezzi /replay/[id]/0.mp4 ... ([parts]), in loop, a [speed] (1, 0,5, 0,25), con la scritta
@@ -55931,6 +56011,7 @@ data class TvInput(
     val photos: Map<Side, List<String>> = emptyMap(),
     val replay: TvReplay? = null,
     val club: TvClub? = null,
+    val drill: TvDrill? = null,
     val balls: Long? = null,
     val arena: Boolean = false,
 )
@@ -56010,6 +56091,7 @@ object TvSnapshots {
             labels = labels(s),
             replay = i.replay,
             club = i.club,
+            drill = i.drill,
             balls = i.balls,
             arena = i.arena,
         )
@@ -56118,6 +56200,7 @@ class TvServer(context: Context) {
         private val PHOTO_NAME = Regex("[0-9a-f]{40}\\.jpg")
         private const val TAG = "TvServer"
         private val REPLAY_PATH = Regex("^/replay/([0-9a-z]+)/(\\d+)\\.mp4$")
+        private val DRILL_PATH = Regex("^/drill/([0-9a-z]+)/(\\d+)\\.png$")
         /** File del gioco TSM Arena (grafica 3D e modello del giocatore), da assets/arena/. */
         private val ARENA_FILE = Regex("^/arena/([a-z0-9_-]+\\.(js|glb))$")
         private val RANGE = Regex("bytes=(\\d*)-(\\d*)")
@@ -56371,6 +56454,12 @@ class TvServer(context: Context) {
                     )
                 } else if (path.startsWith("/replay/")) {
                     serveReplay(out, path, range, head)
+                } else if (path.startsWith("/drill/")) {
+                    // I disegni dell'esercizio mandato al tabellone, già pronti in memoria.
+                    val img = DRILL_PATH.matchEntire(path)?.takeIf { it.groupValues[1] == drillId }?.groupValues?.get(2)?.toIntOrNull()
+                        ?.let { drillImages.getOrNull(it) }
+                    if (img != null) respond(out, "200 OK", "image/png", img, head)
+                    else respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
                 } else if (path.startsWith("/avatar/")) {
                     val img = avatars[path.removePrefix("/avatar/").removeSuffix(".webp")]?.takeIf { it.isNotEmpty() }
                     if (img != null) respond(out, "200 OK", "image/webp", img, head)
@@ -56385,6 +56474,10 @@ class TvServer(context: Context) {
             }
         }
     }
+
+    /** Esercizio mandato al tabellone: [drillId] e i suoi disegni in PNG (vuoto = nessuno). */
+    @Volatile var drillId: String = ""
+    @Volatile var drillImages: List<ByteArray> = emptyList()
 
     /** Moviola mandata al tabellone: [replayId] e i suoi pezzi (vuoto = nessuna). */
     @Volatile var replayId: String = ""
@@ -60519,6 +60612,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
@@ -60593,12 +60687,39 @@ private class Projection(val perspective: Boolean, val w: Float, minY: Float, ma
 @Composable
 fun CourtDiagram(d: DrillLibrary.Diagram, modifier: Modifier = Modifier, perspective: Boolean = false) {
     val area = LocalArea.current
-    // In prospettiva più spazio dietro la linea di fondo lontana: gli omini sono in piedi e sporgono verso l'alto.
-    val minY = if (d.half) -1.2f else -BASE - MARGIN_Y - if (perspective) 4.4f else 0f
-    val maxY = BASE + MARGIN_Y + if (perspective) 0.6f else 0f
+    Canvas(modifier.fillMaxWidth().aspectRatio(drillAspect(d, perspective))) { drawDrill(d, perspective, area) }
+}
+
+/** Fin dove arriva il disegno, in metri: in prospettiva più spazio dietro la linea di fondo lontana (gli omini sporgono). */
+private fun drillRange(d: DrillLibrary.Diagram, perspective: Boolean): Pair<Float, Float> =
+    (if (d.half) -1.2f else -BASE - MARGIN_Y - if (perspective) 4.4f else 0f) to (BASE + MARGIN_Y + if (perspective) 0.6f else 0f)
+
+/** Larghezza diviso altezza del disegno. */
+fun drillAspect(d: DrillLibrary.Diagram, perspective: Boolean): Float {
+    val (minY, maxY) = drillRange(d, perspective)
     val spanX = 2 * (HALF_W + MARGIN_X)
-    val ratio = Projection(perspective, spanX, minY, maxY).let { spanX / it.height }
-    Canvas(modifier.fillMaxWidth().aspectRatio(ratio)) {
+    return Projection(perspective, spanX, minY, maxY).let { spanX / it.height }
+}
+
+/**
+ * Il disegno in un'immagine PNG larga [width] pixel, per il tabellone sulla TV (lo stesso disegno della scheda, in
+ * prospettiva); [area] è il colore delle parti di campo.
+ */
+fun drillPng(d: DrillLibrary.Diagram, width: Int, area: Color): ByteArray {
+    val height = (width / drillAspect(d, true)).toInt()
+    val bmp = androidx.compose.ui.graphics.ImageBitmap(width, height)
+    androidx.compose.ui.graphics.drawscope.CanvasDrawScope().draw(
+        androidx.compose.ui.unit.Density(1f), androidx.compose.ui.unit.LayoutDirection.Ltr,
+        androidx.compose.ui.graphics.Canvas(bmp), Size(width.toFloat(), height.toFloat()),
+    ) { drawDrill(d, true, area) }
+    return java.io.ByteArrayOutputStream().also {
+        bmp.asAndroidBitmap().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+    }.toByteArray()
+}
+
+private fun DrawScope.drawDrill(d: DrillLibrary.Diagram, perspective: Boolean, area: Color) {
+    val (minY, maxY) = drillRange(d, perspective)
+    run {
         val pr = Projection(perspective, size.width, minY, maxY)
         fun o(x: Float, y: Float, z: Float = 0f) = pr.at(x, y, z)
         fun o(p: DrillLibrary.Pt) = pr.at(p.x, p.y)
@@ -89908,6 +90029,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89915,6 +90037,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -89940,6 +90063,9 @@ import com.tennis.scoremanager.ui.TagChip
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.libLevelLabel
 import com.tennis.scoremanager.ui.libTopicLabel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * La raccolta di esercizi illustrati: filtri per argomento, livello e giocatori; ogni esercizio col suo disegno del
@@ -90069,6 +90195,24 @@ private fun DrillDetail(c: MatchController, item: DrillLibrary.Item, t: DrillLib
                     if (ensure() != null) android.widget.Toast.makeText(context, s.dlAdded, android.widget.Toast.LENGTH_SHORT).show()
                 }, Modifier.fillMaxWidth(), enabled = existing == null)
             }
+            // Sul tabellone TV: i disegni in grande che girano da soli, con accanto come si fa (per tutto il gruppo in campo).
+            val onTv by c.tvDrill.collectAsState()
+            val tvRunning by c.tvServer.running.collectAsState()
+            val scope = rememberCoroutineScope()
+            if (onTv?.title == t.name) GhostButton(s.ctTvHide, Icons.Filled.Tv, { c.showDrillOnTv(null) }, Modifier.fillMaxWidth())
+            else if (tvRunning) GhostButton(s.ctTvShow, Icons.Filled.Tv, {
+                scope.launch {
+                    val id = System.currentTimeMillis().toString(36)
+                    val pages = (1..d.frames).map { n ->
+                        val f = d.frame(n)
+                        val title = if (d.frames > 1) listOfNotNull(s.wzStep(n, d.frames), f.orders.takeIf { it.isNotEmpty() }?.let { o -> s.dlShots(o.first(), o.last()) }).joinToString(" · ") else ""
+                        com.tennis.scoremanager.tv.TvDrillPage(title, "/drill/$id/${n - 1}.png")
+                    }
+                    val images = withContext(Dispatchers.Default) { (1..d.frames).map { n -> com.tennis.scoremanager.ui.drillPng(d.frame(n), 1280, area) } }
+                    c.showDrillOnTv(com.tennis.scoremanager.tv.TvDrill(id, t.name, meta(s, item), 10, pages, s.dlHow, t.steps), images)
+                }
+            }, Modifier.fillMaxWidth())
+            else GhostButton(s.ctTvOff, Icons.Filled.Tv, { onDone(); c.go(com.tennis.scoremanager.Screen.DEVICES) }, Modifier.fillMaxWidth())
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, onDone, Modifier.fillMaxWidth())
         }
     }
@@ -127432,6 +127576,17 @@ class TvSnapshotTest {
         val on = TvSnapshots.build(input(screen = Screen.ARENA).copy(arena = true))
         assertTrue(on.arena)
         assertTrue("\"arena\":true" in json.encodeToString(TvSnapshot.serializer(), on))
+    }
+
+    /** Esercizio della raccolta mandato al tabellone: arriva alla pagina con i disegni e i passi, anche senza partita. */
+    @Test
+    fun drillReachesTheTv() {
+        val d = TvDrill("abc", "Volée", "Principiante · Volée", 10, listOf(TvDrillPage("Passo 1 di 2", "/drill/abc/0.png"), TvDrillPage("Passo 2 di 2", "/drill/abc/1.png")), "Come si fa", listOf("Uno", "Due"))
+        val snap = TvSnapshots.build(input(screen = Screen.HOME).copy(drill = d))
+        assertEquals(d, snap.drill)
+        val json = Json { encodeDefaults = true }.encodeToString(TvSnapshot.serializer(), snap)
+        assertTrue("\"/drill/abc/1.png\"" in json)
+        assertEquals(null, TvSnapshots.build(input(screen = Screen.HOME)).drill)
     }
 
     @Test

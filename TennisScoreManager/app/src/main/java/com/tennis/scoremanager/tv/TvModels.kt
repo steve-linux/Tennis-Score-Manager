@@ -77,6 +77,8 @@ data class TvSnapshot(
     val replay: TvReplay? = null,
     /** Torneo del circolo mandato al tabellone (null = niente): pagine che girano da sole sopra il punteggio. */
     val club: TvClub? = null,
+    /** Esercizio della raccolta mandato al tabellone (null = niente): i suoi disegni che girano da soli, sopra il punteggio. */
+    val drill: TvDrill? = null,
     /** Animazione del cambio palle: un numero nuovo = parte (null = niente). */
     val balls: Long? = null,
     /** TSM Arena aperta sul telefono: la pagina del tabellone passa da sola al gioco (/arena), che torna qui alla chiusura. */
@@ -119,6 +121,26 @@ data class TvOrderRow(val time: String, val court: String, val a: String, val b:
 
 @Serializable
 data class TvClubLabels(val won: String, val sets: String, val games: String, val noMatches: String)
+
+/**
+ * Un esercizio della raccolta sul tabellone: nome e riga sotto ([subtitle]: livello, argomento, giocatori, durata), i
+ * disegni ([pages], uno per passo, immagini /drill/[id]/0.png ...) che si alternano ogni [seconds] secondi e, accanto,
+ * come si fa ([howTitle] e [steps]). [id] cambia a ogni invio, così la pagina riparte dal primo disegno.
+ */
+@Serializable
+data class TvDrill(
+    val id: String,
+    val title: String,
+    val subtitle: String,
+    val seconds: Int,
+    val pages: List<TvDrillPage>,
+    val howTitle: String,
+    val steps: List<String>,
+)
+
+/** Un disegno dell'esercizio: [title] ("Passo 1 di 2 · Colpi 1-2", vuoto se è uno solo) e l'indirizzo dell'immagine. */
+@Serializable
+data class TvDrillPage(val title: String, val image: String)
 
 /**
  * Moviola sul tabellone: i pezzi /replay/[id]/0.mp4 ... ([parts]), in loop, a [speed] (1, 0,5, 0,25), con la scritta
@@ -195,6 +217,7 @@ data class TvInput(
     val photos: Map<Side, List<String>> = emptyMap(),
     val replay: TvReplay? = null,
     val club: TvClub? = null,
+    val drill: TvDrill? = null,
     val balls: Long? = null,
     val arena: Boolean = false,
 )
@@ -274,6 +297,7 @@ object TvSnapshots {
             labels = labels(s),
             replay = i.replay,
             club = i.club,
+            drill = i.drill,
             balls = i.balls,
             arena = i.arena,
         )

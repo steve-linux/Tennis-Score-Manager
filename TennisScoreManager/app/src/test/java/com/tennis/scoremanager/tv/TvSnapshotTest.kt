@@ -157,6 +157,17 @@ class TvSnapshotTest {
         assertTrue("\"arena\":true" in json.encodeToString(TvSnapshot.serializer(), on))
     }
 
+    /** Esercizio della raccolta mandato al tabellone: arriva alla pagina con i disegni e i passi, anche senza partita. */
+    @Test
+    fun drillReachesTheTv() {
+        val d = TvDrill("abc", "Volée", "Principiante · Volée", 10, listOf(TvDrillPage("Passo 1 di 2", "/drill/abc/0.png"), TvDrillPage("Passo 2 di 2", "/drill/abc/1.png")), "Come si fa", listOf("Uno", "Due"))
+        val snap = TvSnapshots.build(input(screen = Screen.HOME).copy(drill = d))
+        assertEquals(d, snap.drill)
+        val json = Json { encodeDefaults = true }.encodeToString(TvSnapshot.serializer(), snap)
+        assertTrue("\"/drill/abc/1.png\"" in json)
+        assertEquals(null, TvSnapshots.build(input(screen = Screen.HOME)).drill)
+    }
+
     @Test
     fun defaultTitle() {
         assertEquals("", TvSnapshots.defaultTitle(SetupData(), ItStrings))

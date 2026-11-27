@@ -83,6 +83,7 @@ class TvServer(context: Context) {
         private val PHOTO_NAME = Regex("[0-9a-f]{40}\\.jpg")
         private const val TAG = "TvServer"
         private val REPLAY_PATH = Regex("^/replay/([0-9a-z]+)/(\\d+)\\.mp4$")
+        private val DRILL_PATH = Regex("^/drill/([0-9a-z]+)/(\\d+)\\.png$")
         /** File del gioco TSM Arena (grafica 3D e modello del giocatore), da assets/arena/. */
         private val ARENA_FILE = Regex("^/arena/([a-z0-9_-]+\\.(js|glb))$")
         private val RANGE = Regex("bytes=(\\d*)-(\\d*)")
@@ -336,6 +337,12 @@ class TvServer(context: Context) {
                     )
                 } else if (path.startsWith("/replay/")) {
                     serveReplay(out, path, range, head)
+                } else if (path.startsWith("/drill/")) {
+                    // I disegni dell'esercizio mandato al tabellone, già pronti in memoria.
+                    val img = DRILL_PATH.matchEntire(path)?.takeIf { it.groupValues[1] == drillId }?.groupValues?.get(2)?.toIntOrNull()
+                        ?.let { drillImages.getOrNull(it) }
+                    if (img != null) respond(out, "200 OK", "image/png", img, head)
+                    else respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
                 } else if (path.startsWith("/avatar/")) {
                     val img = avatars[path.removePrefix("/avatar/").removeSuffix(".webp")]?.takeIf { it.isNotEmpty() }
                     if (img != null) respond(out, "200 OK", "image/webp", img, head)
@@ -350,6 +357,10 @@ class TvServer(context: Context) {
             }
         }
     }
+
+    /** Esercizio mandato al tabellone: [drillId] e i suoi disegni in PNG (vuoto = nessuno). */
+    @Volatile var drillId: String = ""
+    @Volatile var drillImages: List<ByteArray> = emptyList()
 
     /** Moviola mandata al tabellone: [replayId] e i suoi pezzi (vuoto = nessuna). */
     @Volatile var replayId: String = ""

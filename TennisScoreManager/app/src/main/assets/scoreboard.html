@@ -150,6 +150,22 @@
   #cp { font: 700 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); white-space: nowrap; }
   #cdots { font: 700 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); letter-spacing: .3em; }
   #cb { flex: 1; min-height: 0; display: flex; padding-top: calc(2 * var(--vh)); }
+  /* Esercizio della raccolta: sopra il torneo (sotto la moviola); il disegno a sinistra, come si fa a destra. */
+  #drill { display: none; position: fixed; inset: 0; z-index: 41; background: #05070B; color: #F1F5FB; font-family: sans-serif;
+           padding: calc(3 * var(--vh)) calc(3 * var(--vw)); flex-direction: column; overflow: hidden; }
+  #drill.on { display: flex; }
+  #dh { display: flex; align-items: baseline; gap: calc(2 * var(--vw)); border-bottom: 2px solid var(--line); padding-bottom: calc(1.2 * var(--vh)); }
+  #dt { font: 900 calc(6 * var(--vh)) sans-serif; color: var(--ball); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #ds { font: 600 calc(3 * var(--vh)) sans-serif; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  #dp { font: 700 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); white-space: nowrap; }
+  #ddots { font: 700 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); letter-spacing: .3em; }
+  #db { flex: 1; min-height: 0; display: flex; gap: calc(3 * var(--vw)); padding-top: calc(2 * var(--vh)); }
+  #dimg { flex: 1.2; min-width: 0; display: flex; align-items: center; justify-content: center; }
+  #dimg img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: calc(1.5 * var(--vh)); }
+  #dhow { flex: 1; min-width: 0; overflow: hidden; }
+  #dhow h3 { margin: 0 0 calc(1.2 * var(--vh)); font: 800 calc(3.4 * var(--vh)) sans-serif; color: var(--ball); text-transform: uppercase; }
+  #dhow ol { margin: 0; padding-left: calc(4 * var(--vh)); }
+  #dhow li { font: 500 calc(3.4 * var(--vh)) sans-serif; line-height: 1.35; margin-bottom: calc(1.4 * var(--vh)); }
   /* Tabellone: un turno per colonna; space-around mette ogni partita a metà tra le due da cui viene. */
   .rnd { flex: 1; min-width: 0; display: flex; flex-direction: column; margin-right: calc(1.2 * var(--vw)); }
   .rnd h3 { margin: 0 0 calc(.8 * var(--vh)); font: 800 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); text-transform: uppercase; }
@@ -201,6 +217,7 @@
 </div>
 <div id="banner"></div>
 <div id="club"><div id="ch"><div id="ct"></div><div id="cs"></div><div id="cp"></div><div id="cdots"></div></div><div id="cb"></div></div>
+<div id="drill"><div id="dh"><div id="dt"></div><div id="ds"></div><div id="dp"></div><div id="ddots"></div></div><div id="db"><div id="dimg"></div><div id="dhow"></div></div></div>
 <div id="balls"><div id="bw"></div><div class="nb b1"></div><div class="nb b2"></div><div class="nb b3"></div><div id="bt"><div id="lid"></div></div></div>
 <div id="replay"><video id="rv" muted playsinline></video><div id="rl"></div></div>
 <button id="fs" type="button"></button>
@@ -445,6 +462,7 @@ function onState(json) {
   render();
   replayUpdate(S.replay);
   clubUpdate(S.club);
+  drillUpdate(S.drill);
   ballsUpdate(S.balls);
 }
 
@@ -519,6 +537,35 @@ function clubDraw(c) {
     }
   }
   b.innerHTML = h;
+}
+// ------------------------------------------------------------------ esercizio della raccolta
+// I disegni dell'esercizio (immagini /drill/<id>/<n>.png fatte dal telefono) si alternano ogni drill.seconds secondi;
+// accanto i passi. Un esercizio nuovo riparte dal primo disegno.
+let drId = "", drPage = 0, drTimer = null;
+function drillUpdate(d) {
+  const box = $("drill");
+  if (!d || !d.pages || !d.pages.length) {
+    box.classList.remove("on"); drId = ""; if (drTimer) { clearInterval(drTimer); drTimer = null; }
+    return;
+  }
+  if (d.id !== drId) {
+    drId = d.id; drPage = 0;
+    if (drTimer) { clearInterval(drTimer); drTimer = null; }
+    let h = `<h3>${esc(d.howTitle)}</h3><ol>`;
+    for (const st of d.steps) h += `<li>${esc(st)}</li>`;
+    $("dhow").innerHTML = h + `</ol>`;
+    setText($("dt"), d.title); setText($("ds"), d.subtitle);
+    drillDraw(d);
+  }
+  if (!drTimer && d.pages.length > 1) drTimer = setInterval(() => { if (S && S.drill) { drPage = (drPage + 1) % S.drill.pages.length; drillDraw(S.drill); } }, Math.max(5, d.seconds || 10) * 1000);
+  box.classList.add("on");
+}
+function drillDraw(d) {
+  drPage = drPage % d.pages.length;
+  const p = d.pages[drPage];
+  setText($("dp"), p.title);
+  $("ddots").textContent = d.pages.length > 1 ? d.pages.map((_, i) => i === drPage ? "●" : "○").join("") : "";
+  $("dimg").innerHTML = `<img src="${esc(p.image)}" alt="">`;
 }
 // ------------------------------------------------------------------ moviola
 // L'arbitro manda la moviola: i pezzi /replay/<id>/<n>.mp4 uno dopo l'altro, in loop, alla sua velocità, sopra il

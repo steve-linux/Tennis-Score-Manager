@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
@@ -88,12 +89,39 @@ private class Projection(val perspective: Boolean, val w: Float, minY: Float, ma
 @Composable
 fun CourtDiagram(d: DrillLibrary.Diagram, modifier: Modifier = Modifier, perspective: Boolean = false) {
     val area = LocalArea.current
-    // In prospettiva più spazio dietro la linea di fondo lontana: gli omini sono in piedi e sporgono verso l'alto.
-    val minY = if (d.half) -1.2f else -BASE - MARGIN_Y - if (perspective) 4.4f else 0f
-    val maxY = BASE + MARGIN_Y + if (perspective) 0.6f else 0f
+    Canvas(modifier.fillMaxWidth().aspectRatio(drillAspect(d, perspective))) { drawDrill(d, perspective, area) }
+}
+
+/** Fin dove arriva il disegno, in metri: in prospettiva più spazio dietro la linea di fondo lontana (gli omini sporgono). */
+private fun drillRange(d: DrillLibrary.Diagram, perspective: Boolean): Pair<Float, Float> =
+    (if (d.half) -1.2f else -BASE - MARGIN_Y - if (perspective) 4.4f else 0f) to (BASE + MARGIN_Y + if (perspective) 0.6f else 0f)
+
+/** Larghezza diviso altezza del disegno. */
+fun drillAspect(d: DrillLibrary.Diagram, perspective: Boolean): Float {
+    val (minY, maxY) = drillRange(d, perspective)
     val spanX = 2 * (HALF_W + MARGIN_X)
-    val ratio = Projection(perspective, spanX, minY, maxY).let { spanX / it.height }
-    Canvas(modifier.fillMaxWidth().aspectRatio(ratio)) {
+    return Projection(perspective, spanX, minY, maxY).let { spanX / it.height }
+}
+
+/**
+ * Il disegno in un'immagine PNG larga [width] pixel, per il tabellone sulla TV (lo stesso disegno della scheda, in
+ * prospettiva); [area] è il colore delle parti di campo.
+ */
+fun drillPng(d: DrillLibrary.Diagram, width: Int, area: Color): ByteArray {
+    val height = (width / drillAspect(d, true)).toInt()
+    val bmp = androidx.compose.ui.graphics.ImageBitmap(width, height)
+    androidx.compose.ui.graphics.drawscope.CanvasDrawScope().draw(
+        androidx.compose.ui.unit.Density(1f), androidx.compose.ui.unit.LayoutDirection.Ltr,
+        androidx.compose.ui.graphics.Canvas(bmp), Size(width.toFloat(), height.toFloat()),
+    ) { drawDrill(d, true, area) }
+    return java.io.ByteArrayOutputStream().also {
+        bmp.asAndroidBitmap().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+    }.toByteArray()
+}
+
+private fun DrawScope.drawDrill(d: DrillLibrary.Diagram, perspective: Boolean, area: Color) {
+    val (minY, maxY) = drillRange(d, perspective)
+    run {
         val pr = Projection(perspective, size.width, minY, maxY)
         fun o(x: Float, y: Float, z: Float = 0f) = pr.at(x, y, z)
         fun o(p: DrillLibrary.Pt) = pr.at(p.x, p.y)
